@@ -284,9 +284,10 @@ public sealed class NukeSystem : EntitySystem
         if (args.Handled || args.Cancelled)
             return;
 
+        var bypass = component.DiskBypassEnabled;
         DisarmBomb(uid, component);
 
-        var ev = new NukeDisarmSuccessEvent();
+        var ev = new NukeDisarmSuccessEvent(!bypass);
         RaiseLocalEvent(ev);
 
         args.Handled = true;
@@ -602,11 +603,11 @@ public sealed class NukeSystem : EntitySystem
 
         component.Exploded = true;
 
-        _explosions.QueueExplosion(uid,
-            component.ExplosionType,
-            component.TotalIntensity,
-            component.IntensitySlope,
-            component.MaxIntensity);
+        // _explosions.QueueExplosion(uid,
+        //     component.ExplosionType,
+        //     component.TotalIntensity,
+        //     component.IntensitySlope,
+        //     component.MaxIntensity);
 
         RaiseLocalEvent(new NukeExplodedEvent()
         {
@@ -705,6 +706,13 @@ public sealed class NukeExplodedEvent : EntityEventArgs
 /// </summary>
 public sealed class NukeDisarmSuccessEvent : EntityEventArgs
 {
+    /// <summary>
+    ///     Check for NukeOps round end conditions
+    /// </summary>
+    public bool CheckRoundShouldEnd;
 
+    public NukeDisarmSuccessEvent(bool checkRoundShouldEnd)
+    {
+        CheckRoundShouldEnd = checkRoundShouldEnd;
+    }
 }
-

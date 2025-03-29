@@ -603,11 +603,11 @@ public sealed class NukeSystem : EntitySystem
 
         component.Exploded = true;
 
-        // _explosions.QueueExplosion(uid,
-        //     component.ExplosionType,
-        //     component.TotalIntensity,
-        //     component.IntensitySlope,
-        //     component.MaxIntensity);
+        _explosions.QueueExplosion(uid,
+            component.ExplosionType,
+            component.TotalIntensity,
+            component.IntensitySlope,
+            component.MaxIntensity);
 
         RaiseLocalEvent(new NukeExplodedEvent()
         {

@@ -10,13 +10,14 @@ public abstract partial class SharedHandsSystem
 {
     private void InitializeEventListeners()
     {
-        SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnStandupArgs);
+        SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
+        SubscribeLocalEvent<HandsComponent, KnockedDownRefreshEvent>(OnKnockdownRefresh);
     }
 
     /// <summary>
     /// Reduces the time it takes to stand up based on the number of hands we have available.
     /// </summary>
-    private void OnStandupArgs(Entity<HandsComponent> ent, ref GetStandUpTimeEvent time)
+    private void OnGetStandUpTime(Entity<HandsComponent> ent, ref GetStandUpTimeEvent time)
     {
         if (!HasComp<KnockedDownComponent>(ent))
             return;
@@ -27,5 +28,10 @@ public abstract partial class SharedHandsSystem
             return;
 
         time.DoAfterTime *= (float)ent.Comp.Count / (hands + ent.Comp.Count);
+    }
+
+    private void OnKnockdownRefresh(Entity<HandsComponent> ent, ref KnockedDownRefreshEvent args)
+    {
+        //if (!TryGetActiveItem())
     }
 }

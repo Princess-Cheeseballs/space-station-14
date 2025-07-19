@@ -50,10 +50,29 @@ public abstract class SharedConveyorController : VirtualController
         SubscribeLocalEvent<ConveyedComponent, ComponentStartup>(OnConveyedStartup);
         SubscribeLocalEvent<ConveyedComponent, ComponentShutdown>(OnConveyedShutdown);
 
-        SubscribeLocalEvent<ConveyorComponent, StartCollideEvent>(OnConveyorStartCollide);
-        SubscribeLocalEvent<ConveyorComponent, ComponentStartup>(OnConveyorStartup);
+        //SubscribeLocalEvent<ConveyorComponent, StartCollideEvent>(OnConveyorStartCollide);
+        //SubscribeLocalEvent<ConveyorComponent, ComponentStartup>(OnConveyorStartup);
+
+        SubscribeLocalEvent<ConveyorComponent, StartPointCollideEvent>(OnStartPointCollide);
+        SubscribeLocalEvent<ConveyorComponent, EndPointCollideEvent>(OnEndPointCollide);
 
         base.Initialize();
+    }
+
+    private void OnStartPointCollide(Entity<ConveyorComponent> entity, ref StartPointCollideEvent args)
+    {
+        Log.Debug("We have started point colliding.");
+        var otherUid = args.OtherEntity;
+
+        if (!args.OtherFixture.Hard || args.OtherBody.BodyType == BodyType.Static)
+            return;
+
+        EnsureComp<ConveyedComponent>(otherUid);
+    }
+
+    private void OnEndPointCollide(Entity<ConveyorComponent> entity, ref EndPointCollideEvent args)
+    {
+        Log.Debug("We have stopped point colliding.");
     }
 
     private void OnConveyedFriction(Entity<ConveyedComponent> ent, ref TileFrictionEvent args)
@@ -110,6 +129,8 @@ public abstract class SharedConveyorController : VirtualController
 
     private void OnConveyorStartCollide(Entity<ConveyorComponent> conveyor, ref StartCollideEvent args)
     {
+        Log.Debug("We have started colliding.");
+
         var otherUid = args.OtherEntity;
 
         if (!args.OtherFixture.Hard || args.OtherBody.BodyType == BodyType.Static)
@@ -188,6 +209,7 @@ public abstract class SharedConveyorController : VirtualController
         if (conveyed.Conveying == value)
             return;
 
+        Log.Debug($"Our conveying status has changed to {value}");
         conveyed.Conveying = value;
         Dirty(uid, conveyed);
     }
@@ -389,7 +411,7 @@ public abstract class SharedConveyorController : VirtualController
 
         while (contacts.MoveNext(out var contact))
         {
-            if (!contact.IsTouching)
+            if (!contact.IsTouching || !contact.IsOverlappingA)
                 continue;
 
             var other = contact.OtherEnt(ent.Owner);

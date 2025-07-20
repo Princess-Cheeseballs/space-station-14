@@ -198,6 +198,12 @@ public abstract partial class SharedStunSystem : EntitySystem
             drop = evAttempt.Drop;
         }
 
+        Knockdown(entity, time, refresh, autoStand, drop);
+        return true;
+    }
+
+    private void Knockdown(Entity<StandingStateComponent?> entity, TimeSpan time, bool refresh, bool autoStand = true, bool drop = true)
+    {
         // Initialize our component with the relevant data we need if we don't have it
         if (EnsureComp<KnockedDownComponent>(entity, out var component))
         {
@@ -225,8 +231,6 @@ public abstract partial class SharedStunSystem : EntitySystem
         Alerts.ShowAlert(entity, KnockdownAlert, null, (GameTiming.CurTime, component.NextUpdate));
 
         _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} knocked down for {time.Seconds} seconds");
-
-        return true;
     }
 
     /// <summary>

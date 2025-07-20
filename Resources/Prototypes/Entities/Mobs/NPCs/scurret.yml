@@ -151,6 +151,10 @@
     - CanPilot
     - VimPilot
     - AnomalyHost
+  - type: StandingState
+    allowCrawling: true
+    speedModifier: 0.8 # Rain world reference
+    frictionModifier: 0.2 # They're probably very slippery...
 
 # Spawnable scurrets have a random name and colour.
 

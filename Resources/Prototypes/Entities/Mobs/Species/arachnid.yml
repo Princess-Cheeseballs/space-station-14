@@ -117,6 +117,10 @@
   - type: Inventory
     templateId: arachnid
     speciesId: arachnid
+  - type: StandingState
+    allowCrawling: true
+    speedModifier: 0.5 # Spider crawl on floor. Simple as that...
+    frictionModifier: 0.5
 
 
 - type: entity
@@ -127,7 +131,7 @@
   - type: HumanoidAppearance
     species: Arachnid
   - type: Inventory
-    speciesId: arachnid 
+    speciesId: arachnid
 
 
 #>88w88<

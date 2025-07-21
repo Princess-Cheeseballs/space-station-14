@@ -7,6 +7,7 @@
   components:
   - type: Sprite
   - type: Item
+    bulk: 12
     size: Huge
   - type: Clothing
     sprite: Objects/Weapons/Guns/Rifles/ak.rsi

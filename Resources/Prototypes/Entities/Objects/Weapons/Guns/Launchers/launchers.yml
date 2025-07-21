@@ -12,6 +12,7 @@
     slots:
     - Back
   - type: Item
+    bulk: 15
     size: Huge
   - type: StaticPrice
     price: 500

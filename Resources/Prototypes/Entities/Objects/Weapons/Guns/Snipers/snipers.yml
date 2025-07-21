@@ -10,6 +10,7 @@
     - state: base
       map: ["enum.GunVisualLayers.Base"]
   - type: Item
+    bulk: 15
     size: Huge
   - type: Clothing
     sprite: Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi

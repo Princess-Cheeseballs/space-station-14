@@ -60,6 +60,7 @@ public abstract partial class SharedStunSystem
         // Crawling
         SubscribeLocalEvent<CrawlerComponent, KnockedDownRefreshEvent>(OnKnockdownRefresh);
         SubscribeLocalEvent<CrawlerComponent, DamageChangedEvent>(OnDamaged);
+        SubscribeLocalEvent<StaminaComponent, StandUpAttemptEvent>(OnStaminaStandUpAttempt);
 
         // Handling Alternative Inputs
         SubscribeAllEvent<ForceStandUpEvent>(OnForceStandup);
@@ -78,7 +79,8 @@ public abstract partial class SharedStunSystem
 
         while (query.MoveNext(out var uid, out var knockedDown))
         {
-            if (!knockedDown.AutoStand || knockedDown.DoAfterId.HasValue || knockedDown.NextUpdate > GameTiming.CurTime)
+            // If it's null then we don't want to stand up
+            if (knockedDown.NextUpdate == null || !knockedDown.AutoStand || knockedDown.DoAfterId.HasValue || knockedDown.NextUpdate > GameTiming.CurTime)
                 continue;
 
             TryStanding(uid);
@@ -167,7 +169,7 @@ public abstract partial class SharedStunSystem
     /// </summary>
     /// <param name="entity">Entity whose timer we're updating</param>
     /// <param name="time">The exact time we're setting the next update to.</param>
-    public void SetKnockdownTime(Entity<KnockedDownComponent> entity, TimeSpan time)
+    public void SetKnockdownTime(Entity<KnockedDownComponent> entity, TimeSpan? time)
     {
         entity.Comp.NextUpdate = time;
         DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.NextUpdate));
@@ -481,6 +483,12 @@ public abstract partial class SharedStunSystem
     {
         args.FrictionModifier *= entity.Comp.FrictionModifier;
         args.SpeedModifier *= entity.Comp.SpeedModifier;
+    }
+
+    private void OnStaminaStandUpAttempt(Entity<StaminaComponent> entity, ref StandUpAttemptEvent args)
+    {
+        if (entity.Comp.StaminaDamage >= entity.Comp.SoftCritThreshold)
+            args.Cancelled = true;
     }
 
     #endregion

@@ -39,10 +39,16 @@ public sealed partial class StaminaComponent : Component
     public float StaminaDamage;
 
     /// <summary>
+    /// The threshold for a stamina "softcrit" where we drop our items and get knocked down.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
+    public float SoftCritThreshold = 100f;
+
+    /// <summary>
     /// How much stamina damage is required to enter stam crit.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
-    public float CritThreshold = 100f;
+    public float CritThreshold = 200f;
 
     /// <summary>
     /// How long will this mob be stunned for?

@@ -82,7 +82,10 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         else
         {
             if (entity.Comp.StaminaDamage > 0f)
+            {
                 EnsureComp<ActiveStaminaComponent>(entity);
+            }
+
 
             ExitStamCrit(entity);
         }
@@ -309,6 +312,12 @@ public abstract partial class SharedStaminaSystem : EntitySystem
             if (component.StaminaDamage >= component.CritThreshold)
             {
                 EnterStamCrit(uid, component);
+            }
+            else if (component.StaminaDamage >= component.SoftCritThreshold)
+            {
+                // If we can't softcrit then we should just hardcrit...
+                if (!StunSystem.TryCrawling(uid, null))
+                    EnterStamCrit(uid, component);
             }
         }
         else

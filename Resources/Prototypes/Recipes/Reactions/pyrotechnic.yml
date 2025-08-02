@@ -40,9 +40,9 @@
       amount: 3
   effects:
   - !type:ExplosionReactionEffect
-    explosionType: Default # 15 damage per intensity.
-    maxIntensity: 200
-    intensityPerUnit: 5
+    explosionType: FireBomb # 6 damage per intensity.
+    maxIntensity: 25
+    intensityPerUnit: 10
     intensitySlope: 5
     maxTotalIntensity: 200
   - !type:PopupMessage

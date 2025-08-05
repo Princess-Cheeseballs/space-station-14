@@ -9,11 +9,11 @@
       effects:
       - !type:SatiateThirst
         factor: 3
-  reactiveEffects:
+  newReactiveEffects:
     Extinguish:
       methods: [ Touch ]
       effects:
-      - !type:ExtinguishReaction
+      - !type:ExtinguishEffectArgs
   plantMetabolism:
   - !type:PlantAdjustWater
     amount: 1

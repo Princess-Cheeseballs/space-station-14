@@ -19,7 +19,7 @@ public sealed class FirestarterSystem : SharedFirestarterSystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
 
-    private readonly HashSet<Entity<FlammableComponent>> _flammables = new();
+    private readonly HashSet<Entity<Shared.Atmos.Components.FlammableComponent>> _flammables = new();
 
     public override void Initialize()
     {

@@ -121,13 +121,13 @@ public record class EntityEffectBaseArgs
 
 public record class EntityEffectReagentArgs : EntityEffectBaseArgs
 {
-    //public EntityUid? OrganEntity;
+    public EntityUid? OrganEntity;
 
     public Solution? Source;
 
     public FixedPoint2 Quantity;
 
-    //public ReagentPrototype? Reagent;
+    public ReagentPrototype? Reagent;
 
     public ReactionMethod? Method;
 

@@ -679,7 +679,7 @@ public sealed class EntityEffectSystem : EntitySystem
 
     private void OnExecuteFlammableReaction(ref ExecuteEntityEffectEvent<FlammableReaction> args)
     {
-        if (!TryComp(args.Args.TargetEntity, out FlammableComponent? flammable))
+        if (!TryComp(args.Args.TargetEntity, out Shared.Atmos.Components.FlammableComponent? flammable))
             return;
 
         // Sets the multiplier for FireStacks to MultiplierOnExisting is 0 or greater and target already has FireStacks
@@ -729,7 +729,7 @@ public sealed class EntityEffectSystem : EntitySystem
 
     private void OnExecuteIgnite(ref ExecuteEntityEffectEvent<Ignite> args)
     {
-        if (!TryComp(args.Args.TargetEntity, out FlammableComponent? flammable))
+        if (!TryComp(args.Args.TargetEntity, out Shared.Atmos.Components.FlammableComponent? flammable))
             return;
 
         if (args.Args is EntityEffectReagentArgs reagentArgs)

@@ -4,6 +4,7 @@ using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
+using Content.Shared.Research;
 using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -105,6 +106,7 @@ public sealed class ReactiveSystem : EntitySystem
         }
     }
 }
+
 public enum ReactionMethod
 {
 Touch,

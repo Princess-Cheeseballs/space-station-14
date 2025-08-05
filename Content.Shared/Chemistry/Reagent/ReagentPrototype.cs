@@ -151,6 +151,9 @@ namespace Content.Shared.Chemistry.Reagent
         [DataField]
         public Dictionary<ProtoId<ReactiveGroupPrototype>, ReactiveReagentEffectEntry>? ReactiveEffects;
 
+        [DataField]
+        public Dictionary<ProtoId<ReactiveGroupPrototype>, NewReactiveReagentEffectEntry>? NewReactiveEffects;
+
         [DataField(serverOnly: true)]
         public List<ITileReaction> TileReactions = new(0);
 
@@ -286,5 +289,15 @@ namespace Content.Shared.Chemistry.Reagent
 
         [DataField("effects", required: true)]
         public EntityEffect[] Effects = default!;
+    }
+
+    [DataDefinition]
+    public sealed partial class NewReactiveReagentEffectEntry
+    {
+        [DataField("methods", required: true)]
+        public HashSet<ReactionMethod> Methods = default!;
+
+        [DataField("effects", required: true)]
+        public EntityEffectBase[] Effects = default!;
     }
 }

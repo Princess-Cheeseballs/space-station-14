@@ -83,7 +83,9 @@ namespace Content.Shared.EntityEffects.Effects
                     ("amount", MathF.Abs(Amount.Float())));
             }
 
-            throw new NotImplementedException();
+            // TODO: DELET THIS
+            return new string("Fuck you.");
+            //throw new NotImplementedException();
         }
     }
 }

@@ -16,7 +16,7 @@ public sealed class XAEIgniteSystem : BaseXAESystem<XAEIgniteComponent>
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
 
-    private EntityQuery<FlammableComponent> _flammables;
+    private EntityQuery<Shared.Atmos.Components.FlammableComponent> _flammables;
 
     /// <summary> Pre-allocated and re-used collection.</summary>
     private readonly HashSet<EntityUid> _entities = new();
@@ -26,7 +26,7 @@ public sealed class XAEIgniteSystem : BaseXAESystem<XAEIgniteComponent>
     {
         base.Initialize();
 
-        _flammables = GetEntityQuery<FlammableComponent>();
+        _flammables = GetEntityQuery<Shared.Atmos.Components.FlammableComponent>();
     }
 
     /// <inheritdoc />

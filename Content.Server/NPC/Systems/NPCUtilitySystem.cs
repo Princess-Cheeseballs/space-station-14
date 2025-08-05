@@ -363,7 +363,7 @@ public sealed class NPCUtilitySystem : EntitySystem
             }
             case TargetOnFireCon:
                 {
-                    if (TryComp(targetUid, out FlammableComponent? fire) && fire.OnFire)
+                    if (TryComp(targetUid, out Shared.Atmos.Components.FlammableComponent? fire) && fire.OnFire)
                         return 1f;
                     return 0f;
                 }

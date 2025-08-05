@@ -145,7 +145,7 @@ public sealed partial class AdminVerbSystem
         };
         args.Verbs.Add(chess);
 
-        if (TryComp<FlammableComponent>(args.Target, out var flammable))
+        if (TryComp<Shared.Atmos.Components.FlammableComponent>(args.Target, out var flammable))
         {
             var flamesName = Loc.GetString("admin-smite-set-alight-name").ToLowerInvariant();
             Verb flames = new()

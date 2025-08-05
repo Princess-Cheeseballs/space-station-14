@@ -3,7 +3,7 @@ using Content.Shared.Damage;
 using Robust.Shared.Physics.Collision.Shapes;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Atmos.Components
+namespace Content.Shared.Atmos.Components
 {
     [RegisterComponent]
     public sealed partial class FlammableComponent : Component

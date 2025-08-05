@@ -58,7 +58,7 @@ namespace Content.Server.Atmos.EntitySystems
 
         private float _timer;
 
-        private readonly Dictionary<Entity<FlammableComponent>, float> _fireEvents = new();
+        private readonly Dictionary<Entity<Shared.Atmos.Components.FlammableComponent>, float> _fireEvents = new();
 
         public override void Initialize()
         {
@@ -67,14 +67,14 @@ namespace Content.Server.Atmos.EntitySystems
             _inventoryQuery = GetEntityQuery<InventoryComponent>();
             _physicsQuery = GetEntityQuery<PhysicsComponent>();
 
-            SubscribeLocalEvent<FlammableComponent, MapInitEvent>(OnMapInit);
-            SubscribeLocalEvent<FlammableComponent, InteractUsingEvent>(OnInteractUsing);
-            SubscribeLocalEvent<FlammableComponent, StartCollideEvent>(OnCollide);
-            SubscribeLocalEvent<FlammableComponent, IsHotEvent>(OnIsHot);
-            SubscribeLocalEvent<FlammableComponent, TileFireEvent>(OnTileFire);
-            SubscribeLocalEvent<FlammableComponent, RejuvenateEvent>(OnRejuvenate);
-            SubscribeLocalEvent<FlammableComponent, ResistFireAlertEvent>(OnResistFireAlert);
-            Subs.SubscribeWithRelay<FlammableComponent, ExtinguishEvent>(OnExtinguishEvent);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, MapInitEvent>(OnMapInit);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, InteractUsingEvent>(OnInteractUsing);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, StartCollideEvent>(OnCollide);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, IsHotEvent>(OnIsHot);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, TileFireEvent>(OnTileFire);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, RejuvenateEvent>(OnRejuvenate);
+            SubscribeLocalEvent<Shared.Atmos.Components.FlammableComponent, ResistFireAlertEvent>(OnResistFireAlert);
+            Subs.SubscribeWithRelay<Shared.Atmos.Components.FlammableComponent, ExtinguishEvent>(OnExtinguishEvent);
 
             SubscribeLocalEvent<IgniteOnCollideComponent, StartCollideEvent>(IgniteOnCollide);
             SubscribeLocalEvent<IgniteOnCollideComponent, LandEvent>(OnIgniteLand);
@@ -86,7 +86,7 @@ namespace Content.Server.Atmos.EntitySystems
             SubscribeLocalEvent<IgniteOnHeatDamageComponent, DamageChangedEvent>(OnDamageChanged);
         }
 
-        private void OnExtinguishEvent(Entity<FlammableComponent> ent, ref ExtinguishEvent args)
+        private void OnExtinguishEvent(Entity<Shared.Atmos.Components.FlammableComponent> ent, ref ExtinguishEvent args)
         {
             // You know I'm really not sure if having AdjustFireStacks *after* Extinguish,
             // but I'm just moving this code, not questioning it.
@@ -98,7 +98,7 @@ namespace Content.Server.Atmos.EntitySystems
         {
             foreach (var entity in args.HitEntities)
             {
-                if (!TryComp<FlammableComponent>(entity, out var flammable))
+                if (!TryComp<Shared.Atmos.Components.FlammableComponent>(entity, out var flammable))
                     continue;
 
                 AdjustFireStacks(entity, component.FireStacks, flammable);
@@ -119,7 +119,7 @@ namespace Content.Server.Atmos.EntitySystems
 
             var otherEnt = args.OtherEntity;
 
-            if (!TryComp(otherEnt, out FlammableComponent? flammable))
+            if (!TryComp(otherEnt, out Shared.Atmos.Components.FlammableComponent? flammable))
                 return;
 
             //Only ignite when the colliding fixture is projectile or ignition.
@@ -136,7 +136,7 @@ namespace Content.Server.Atmos.EntitySystems
                 RemCompDeferred<IgniteOnCollideComponent>(uid);
         }
 
-        private void OnMapInit(EntityUid uid, FlammableComponent component, MapInitEvent args)
+        private void OnMapInit(EntityUid uid, Shared.Atmos.Components.FlammableComponent component, MapInitEvent args)
         {
             // Sets up a fixture for flammable collisions.
             // TODO: Should this be generalized into a general non-hard 'effects' fixture or something? I can't think of other use cases for it.
@@ -149,7 +149,7 @@ namespace Content.Server.Atmos.EntitySystems
                 collisionMask: (int) CollisionGroup.FullTileLayer, body: body);
         }
 
-        private void OnInteractUsing(EntityUid uid, FlammableComponent flammable, InteractUsingEvent args)
+        private void OnInteractUsing(EntityUid uid, Shared.Atmos.Components.FlammableComponent flammable, InteractUsingEvent args)
         {
             if (args.Handled)
                 return;
@@ -169,7 +169,7 @@ namespace Content.Server.Atmos.EntitySystems
             if (args.Handled || !args.Complex)
                 return;
 
-            if (!TryComp(uid, out FlammableComponent? flammable))
+            if (!TryComp(uid, out Shared.Atmos.Components.FlammableComponent? flammable))
                 return;
 
             if (!flammable.OnFire)
@@ -192,7 +192,7 @@ namespace Content.Server.Atmos.EntitySystems
             }
         }
 
-        private void OnCollide(EntityUid uid, FlammableComponent flammable, ref StartCollideEvent args)
+        private void OnCollide(EntityUid uid, Shared.Atmos.Components.FlammableComponent flammable, ref StartCollideEvent args)
         {
             var otherUid = args.OtherEntity;
 
@@ -209,7 +209,7 @@ namespace Content.Server.Atmos.EntitySystems
             if (!flammable.FireSpread)
                 return;
 
-            if (!TryComp(otherUid, out FlammableComponent? otherFlammable) || !otherFlammable.FireSpread)
+            if (!TryComp(otherUid, out Shared.Atmos.Components.FlammableComponent? otherFlammable) || !otherFlammable.FireSpread)
                 return;
 
             if (!flammable.OnFire && !otherFlammable.OnFire)
@@ -241,12 +241,12 @@ namespace Content.Server.Atmos.EntitySystems
             AdjustFireStacks(otherUid, dest * avg * mass1, otherFlammable, ignite: true);
         }
 
-        private void OnIsHot(EntityUid uid, FlammableComponent flammable, IsHotEvent args)
+        private void OnIsHot(EntityUid uid, Shared.Atmos.Components.FlammableComponent flammable, IsHotEvent args)
         {
             args.IsHot = flammable.OnFire;
         }
 
-        private void OnTileFire(Entity<FlammableComponent> ent, ref TileFireEvent args)
+        private void OnTileFire(Entity<Shared.Atmos.Components.FlammableComponent> ent, ref TileFireEvent args)
         {
             var tempDelta = args.Temperature - ent.Comp.MinIgnitionTemperature;
 
@@ -256,12 +256,12 @@ namespace Content.Server.Atmos.EntitySystems
                 _fireEvents[ent] = tempDelta;
         }
 
-        private void OnRejuvenate(EntityUid uid, FlammableComponent component, RejuvenateEvent args)
+        private void OnRejuvenate(EntityUid uid, Shared.Atmos.Components.FlammableComponent component, RejuvenateEvent args)
         {
             Extinguish(uid, component);
         }
 
-        private void OnResistFireAlert(Entity<FlammableComponent> ent, ref ResistFireAlertEvent args)
+        private void OnResistFireAlert(Entity<Shared.Atmos.Components.FlammableComponent> ent, ref ResistFireAlertEvent args)
         {
             if (args.Handled)
                 return;
@@ -270,7 +270,7 @@ namespace Content.Server.Atmos.EntitySystems
             args.Handled = true;
         }
 
-        public void UpdateAppearance(EntityUid uid, FlammableComponent? flammable = null, AppearanceComponent? appearance = null)
+        public void UpdateAppearance(EntityUid uid, Shared.Atmos.Components.FlammableComponent? flammable = null, AppearanceComponent? appearance = null)
         {
             if (!Resolve(uid, ref flammable, ref appearance))
                 return;
@@ -285,7 +285,7 @@ namespace Content.Server.Atmos.EntitySystems
             _appearance.SetData(uid, ToggleableVisuals.Enabled, flammable.OnFire, appearance);
         }
 
-        public void AdjustFireStacks(EntityUid uid, float relativeFireStacks, FlammableComponent? flammable = null, bool ignite = false)
+        public void AdjustFireStacks(EntityUid uid, float relativeFireStacks, Shared.Atmos.Components.FlammableComponent? flammable = null, bool ignite = false)
         {
             if (!Resolve(uid, ref flammable))
                 return;
@@ -293,7 +293,7 @@ namespace Content.Server.Atmos.EntitySystems
             SetFireStacks(uid, flammable.FireStacks + relativeFireStacks, flammable, ignite);
         }
 
-        public void SetFireStacks(EntityUid uid, float stacks, FlammableComponent? flammable = null, bool ignite = false)
+        public void SetFireStacks(EntityUid uid, float stacks, Shared.Atmos.Components.FlammableComponent? flammable = null, bool ignite = false)
         {
             if (!Resolve(uid, ref flammable))
                 return;
@@ -311,7 +311,7 @@ namespace Content.Server.Atmos.EntitySystems
             }
         }
 
-        public void Extinguish(EntityUid uid, FlammableComponent? flammable = null)
+        public void Extinguish(EntityUid uid, Shared.Atmos.Components.FlammableComponent? flammable = null)
         {
             if (!Resolve(uid, ref flammable))
                 return;
@@ -331,7 +331,7 @@ namespace Content.Server.Atmos.EntitySystems
             UpdateAppearance(uid, flammable);
         }
 
-        public void Ignite(EntityUid uid, EntityUid ignitionSource, FlammableComponent? flammable = null,
+        public void Ignite(EntityUid uid, EntityUid ignitionSource, Shared.Atmos.Components.FlammableComponent? flammable = null,
             EntityUid? ignitionSourceUser = null)
         {
             if (!Resolve(uid, ref flammable))
@@ -360,7 +360,7 @@ namespace Content.Server.Atmos.EntitySystems
         private void OnDamageChanged(EntityUid uid, IgniteOnHeatDamageComponent component, DamageChangedEvent args)
         {
             // Make sure the entity is flammable
-            if (!TryComp<FlammableComponent>(uid, out var flammable))
+            if (!TryComp<Shared.Atmos.Components.FlammableComponent>(uid, out var flammable))
                 return;
 
             // Make sure the damage delta isn't null
@@ -383,7 +383,7 @@ namespace Content.Server.Atmos.EntitySystems
         }
 
         public void Resist(EntityUid uid,
-            FlammableComponent? flammable = null)
+            Shared.Atmos.Components.FlammableComponent? flammable = null)
         {
             if (!Resolve(uid, ref flammable))
                 return;
@@ -430,7 +430,7 @@ namespace Content.Server.Atmos.EntitySystems
             _timer -= UpdateTime;
 
             // TODO: This needs cleanup to take off the crust from TemperatureComponent and shit.
-            var query = EntityQueryEnumerator<FlammableComponent, TransformComponent>();
+            var query = EntityQueryEnumerator<Shared.Atmos.Components.FlammableComponent, TransformComponent>();
             while (query.MoveNext(out var uid, out var flammable, out _))
             {
                 // Slowly dry ourselves off if wet.

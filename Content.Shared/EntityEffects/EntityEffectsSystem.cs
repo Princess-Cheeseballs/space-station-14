@@ -6,7 +6,7 @@ namespace Content.Shared.EntityEffects;
 /// <summary>
 /// This handles Entity Effects, except they're in shared and predicted...
 /// </summary>
-public abstract partial class SharedEntityEffectsSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase
+public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase
 {
     /// <inheritdoc/>
     public override void Initialize()
@@ -15,7 +15,7 @@ public abstract partial class SharedEntityEffectsSystem<T, TEffect> : EntitySyst
         SubscribeLocalEvent<T, EntityEffectEvent<TEffect>>(Effect);
 
         // Relays ???
-        SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
+        //SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
     }
 
     protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
@@ -35,15 +35,16 @@ public abstract partial class SharedEntityEffectsSystem<T, TEffect> : EntitySyst
                 if (!entity.Comp.ReactiveGroups[key].Contains(args.Method))
                     continue;
 
-                foreach (var effect in val.Effects)
+                foreach (var entityEffectBase in val.Effects)
                 {
+                    var effect = (TEffect)entityEffectBase;
                     RaiseEffectEvent(entity, effect);
                 }
             }
         }
     }
 
-    protected void RaiseEffectEvent(EntityUid target, EntityEffectBase effect)
+    protected void RaiseEffectEvent(EntityUid target, TEffect effect)
     {
         var effectEv = new EntityEffectEvent<TEffect>(effect);
         RaiseLocalEvent(target, ref effectEv);
@@ -51,6 +52,6 @@ public abstract partial class SharedEntityEffectsSystem<T, TEffect> : EntitySyst
 }
 
 [ByRefEvent]
-public readonly record struct EntityEffectEvent<TEffect>(EntityEffectBase Effect) where TEffect : EntityEffectBase;
+public readonly record struct EntityEffectEvent<TEffect>(TEffect Effect) where TEffect : EntityEffectBase;
 
 public abstract partial class EntityEffectBase;

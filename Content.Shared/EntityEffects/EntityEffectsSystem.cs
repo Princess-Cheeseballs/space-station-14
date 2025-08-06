@@ -19,6 +19,14 @@ public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem whe
     }
 
     protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
+}
+
+public sealed partial class EntityEffectsSystem2 : EntitySystem
+{
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
+    }
 
     private void OnReactive(Entity<ReactiveComponent> entity, ref ReactionEntityEvent args)
     {
@@ -35,23 +43,23 @@ public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem whe
                 if (!entity.Comp.ReactiveGroups[key].Contains(args.Method))
                     continue;
 
-                foreach (var entityEffectBase in val.Effects)
+                foreach (var effect in val.Effects)
                 {
-                    var effect = (TEffect)entityEffectBase;
                     RaiseEffectEvent(entity, effect);
                 }
             }
         }
     }
 
-    protected void RaiseEffectEvent(EntityUid target, TEffect effect)
+    private void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase
     {
-        var effectEv = new EntityEffectEvent<TEffect>(effect);
+        var effectEv = new EntityEffectEvent<T>(effect);
         RaiseLocalEvent(target, ref effectEv);
     }
 }
 
+
 [ByRefEvent]
-public readonly record struct EntityEffectEvent<TEffect>(TEffect Effect) where TEffect : EntityEffectBase;
+public readonly record struct EntityEffectEvent<T>(T Effect) where T : EntityEffectBase;
 
 public abstract partial class EntityEffectBase;

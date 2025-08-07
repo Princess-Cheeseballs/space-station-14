@@ -33,11 +33,12 @@ namespace Content.Shared.Standing
         [DataField, AutoNetworkedField]
         public float SpeedModifier = 0.3f;
 
+        // TODO: Change this to dictionary with masks per fixture?
         /// <summary>
         ///     List of fixtures that had their collision mask changed when the entity was downed.
         ///     Required for re-adding the collision mask.
         /// </summary>
         [DataField, AutoNetworkedField]
-        public List<string> ChangedFixtures = new();
+        public Dictionary<string, int> DisabledFixtureMasks = new();
     }
 }

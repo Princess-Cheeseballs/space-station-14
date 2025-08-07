@@ -1,4 +1,5 @@
-﻿using Robust.Shared.Physics;
+﻿using Content.Shared.Physics.Events;
+using Robust.Shared.Physics;
 
 namespace Content.Shared.Physics;
 
@@ -13,9 +14,10 @@ public sealed class FixtureChangeController : EntitySystem
 
     }
 
-    public bool TryReenableFixtures(Entity<FixturesComponent?> entity)
+    public bool TryReEnableFixtures(Entity<FixturesComponent?> entity, Dictionary<string, int> fixDict)
     {
-
+        var ev = new ReEnableFixturesEvent(fixDict);
+        RaiseLocalEvent(entity, ref ev);
 
         return true;
     }

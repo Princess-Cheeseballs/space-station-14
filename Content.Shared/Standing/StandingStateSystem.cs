@@ -2,15 +2,19 @@ using Content.Shared.Hands.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
+using Content.Shared.Physics.Events;
 using Content.Shared.Rotation;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
+using Robust.Shared.Timing;
 
 namespace Content.Shared.Standing;
 
 public sealed class StandingStateSystem : EntitySystem
 {
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private readonly FixtureChangeController _fixtureCon = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
@@ -26,6 +30,12 @@ public sealed class StandingStateSystem : EntitySystem
         SubscribeLocalEvent<StandingStateComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovementSpeedModifiers);
         SubscribeLocalEvent<StandingStateComponent, RefreshFrictionModifiersEvent>(OnRefreshFrictionModifiers);
         SubscribeLocalEvent<StandingStateComponent, TileFrictionEvent>(OnTileFriction);
+        SubscribeLocalEvent<StandingStateComponent, ReEnableFixturesEvent>(OnReEnableFixtures);
+    }
+
+    private void OnReEnableFixtures(Entity<StandingStateComponent> entity, ref ReEnableFixturesEvent args)
+    {
+        args.Filter(entity.Comp.DisabledFixtureMasks);
     }
 
     private void OnMobTargetCollide(Entity<StandingStateComponent> ent, ref AttemptMobTargetCollideEvent args)
@@ -81,6 +91,10 @@ public sealed class StandingStateSystem : EntitySystem
         AppearanceComponent? appearance = null,
         HandsComponent? hands = null)
     {
+        // TODO: MOVE TO THE FIXTURES STUFF IF BREAKS PREDICITON
+        if (!_gameTiming.IsFirstTimePredicted)
+            return false;
+
         // TODO: This should actually log missing comps...
         if (!Resolve(uid, ref standingState, false))
             return false;
@@ -125,7 +139,7 @@ public sealed class StandingStateSystem : EntitySystem
                 if ((fixture.CollisionMask & StandingCollisionLayer) == 0)
                     continue;
 
-                standingState.ChangedFixtures.Add(key);
+                standingState.DisabledFixtureMasks.Add(key, StandingCollisionLayer);
                 _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
             }
         }
@@ -173,15 +187,17 @@ public sealed class StandingStateSystem : EntitySystem
 
         _appearance.SetData(uid, RotationVisuals.RotationState, RotationState.Vertical, appearance);
 
+        _fixtureCon.TryReEnableFixtures(uid, standingState.DisabledFixtureMasks);
+
         if (TryComp(uid, out FixturesComponent? fixtureComponent))
         {
-            foreach (var key in standingState.ChangedFixtures)
+            foreach (var key in standingState.DisabledFixtureMasks.Keys)
             {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
                     _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
             }
         }
-        standingState.ChangedFixtures.Clear();
+        standingState.DisabledFixtureMasks.Clear();
 
         return true;
     }

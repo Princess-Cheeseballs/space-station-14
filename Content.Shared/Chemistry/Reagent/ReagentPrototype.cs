@@ -298,6 +298,6 @@ namespace Content.Shared.Chemistry.Reagent
         public HashSet<ReactionMethod> Methods = default!;
 
         [DataField("effects", required: true)]
-        public EntityEffectBase[] Effects = default!;
+        public AnyEntityEffect[] Effects = default!;
     }
 }

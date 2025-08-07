@@ -19,7 +19,7 @@ public sealed partial class TestEntityEffectsSystem : EntityEffectsSystem<Flamma
     }
 }
 
-public sealed partial class TestEffectArgs : EntityEffectBase
+public sealed partial class TestEffectArgs : EntityEffectBase<TestEffectArgs>
 {
     /// <summary>
     ///     Amount of firestacks reduced.

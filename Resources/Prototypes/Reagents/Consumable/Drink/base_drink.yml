@@ -14,10 +14,6 @@
       methods: [ Touch ]
       effects:
       - !type:ExtinguishEffectArgs
-    Test:
-      methods: [ Touch ]
-      effects:
-      - !type:TestEffectArgs
   plantMetabolism:
   - !type:PlantAdjustWater
     amount: 1

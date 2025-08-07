@@ -29,7 +29,7 @@ public sealed partial class ExtinguishEntityEffectsSystem2 : EntityEffectsSystem
     }
 }
 
-public sealed partial class ExtinguishEffectArgs : EntityEffectBase
+public sealed partial class ExtinguishEffectArgs : EntityEffectBase<ExtinguishEffectArgs>
 {
     /// <summary>
     ///     Amount of firestacks reduced.

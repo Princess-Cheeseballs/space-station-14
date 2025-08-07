@@ -6,7 +6,7 @@ namespace Content.Shared.EntityEffects;
 /// <summary>
 /// This handles Entity Effects, except they're in shared and predicted...
 /// </summary>
-public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase
+public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase<TEffect>
 {
     /// <inheritdoc/>
     public override void Initialize()
@@ -21,7 +21,7 @@ public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem whe
     protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
 }
 
-public sealed partial class EntityEffectsSystem2 : EntitySystem
+public sealed partial class EntityEffectsSystem2 : EntitySystem, IEntityEffectRaiser
 {
     public override void Initialize()
     {
@@ -45,21 +45,40 @@ public sealed partial class EntityEffectsSystem2 : EntitySystem
 
                 foreach (var effect in val.Effects)
                 {
-                    RaiseEffectEvent(entity, effect);
+                    effect.RaiseEvent(entity, this);
                 }
             }
         }
     }
 
-    private void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase
+    public void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase<T>
     {
         var effectEv = new EntityEffectEvent<T>(effect);
         RaiseLocalEvent(target, ref effectEv);
     }
 }
 
+public interface IEntityEffectRaiser
+{
+    void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase<T>;
+}
 
 [ByRefEvent]
-public readonly record struct EntityEffectEvent<T>(T Effect) where T : EntityEffectBase;
+public readonly record struct EntityEffectEvent<T>(T Effect) where T : EntityEffectBase<T>;
 
-public abstract partial class EntityEffectBase;
+public abstract partial class EntityEffectBase<T> : AnyEntityEffect where T : EntityEffectBase<T>
+{
+    public override void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser)
+    {
+        if (this is not T type)
+            return;
+
+        raiser.RaiseEffectEvent(target, type);
+    }
+}
+
+// This exists so we can store entity effects in list and raise events without type erasure.
+public abstract partial class AnyEntityEffect
+{
+    public abstract void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser);
+}

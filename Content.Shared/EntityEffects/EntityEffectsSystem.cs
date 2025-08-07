@@ -6,22 +6,17 @@ namespace Content.Shared.EntityEffects;
 /// <summary>
 /// This handles Entity Effects, except they're in shared and predicted...
 /// </summary>
-public abstract partial class EntityEffectsSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase<TEffect>
+public abstract partial class EntityEffectSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase<TEffect>
 {
     /// <inheritdoc/>
     public override void Initialize()
     {
-        // Generic
         SubscribeLocalEvent<T, EntityEffectEvent<TEffect>>(Effect);
-
-        // Relays ???
-        //SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
     }
-
     protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
 }
 
-public sealed partial class EntityEffectsSystem2 : EntitySystem, IEntityEffectRaiser
+public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEffectRaiser
 {
     public override void Initialize()
     {

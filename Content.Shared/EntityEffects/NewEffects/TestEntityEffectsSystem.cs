@@ -6,7 +6,7 @@ namespace Content.Shared.EntityEffects.NewEffects;
 /// <summary>
 /// This is used for...
 /// </summary>
-public sealed partial class TestEntityEffectsSystem : EntityEffectsSystem<FlammableComponent, TestEffectArgs>
+public sealed partial class TestEntityEffectsSystem : EntityEffectSystem<FlammableComponent, TestEffectArgs>
 {
     protected override void Effect(Entity<FlammableComponent> entity, ref EntityEffectEvent<TestEffectArgs> effectEvent)
     {

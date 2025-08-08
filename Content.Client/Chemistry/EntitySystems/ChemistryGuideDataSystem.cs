@@ -15,7 +15,7 @@ namespace Content.Client.Chemistry.EntitySystems;
 
 // TODO: UNCOMMENT AND FIX THIS!!!!
 /// <inheritdoc/>
-/*
+
 public sealed class ChemistryGuideDataSystem : SharedChemistryGuideDataSystem
 {
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
@@ -228,4 +228,3 @@ public sealed class ReagentGasSourceData : ReagentSourceData
         GasPrototype = gasPrototype;
     }
 }
-*/

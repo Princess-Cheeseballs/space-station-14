@@ -1,0 +1,117 @@
+﻿using System.Linq;
+using Content.Shared.Chemistry;
+using Content.Shared.Chemistry.Reaction;
+using Content.Shared.Localizations;
+using Robust.Shared.Prototypes;
+
+namespace Content.Shared.EntityEffects;
+
+/// <summary>
+/// This handles entity effects.
+/// Specifically it handles the receiving of events for causing entity effects, and provides
+/// public API for other systems to take advantage of entity effects.
+/// </summary>
+public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEffectRaiser
+{
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<ReactiveComponent, ReactionEntityEvent>(OnReactive);
+    }
+
+    private void OnReactive(Entity<ReactiveComponent> entity, ref ReactionEntityEvent args)
+    {
+        if (args.Reagent.NewReactiveEffects != null && entity.Comp.ReactiveGroups != null)
+        {
+            foreach (var (key, val) in args.Reagent.NewReactiveEffects)
+            {
+                if (!val.Methods.Contains(args.Method))
+                    continue;
+
+                if (!entity.Comp.ReactiveGroups.ContainsKey(key))
+                    continue;
+
+                if (!entity.Comp.ReactiveGroups[key].Contains(args.Method))
+                    continue;
+
+                foreach (var effect in val.Effects)
+                {
+                    effect.RaiseEvent(entity, this);
+                }
+            }
+        }
+    }
+
+    public void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase<T>
+    {
+        var effectEv = new EntityEffectEvent<T>(effect);
+        RaiseLocalEvent(target, ref effectEv);
+    }
+}
+
+/// <summary>
+/// This is a basic abstract entity effect containing all the data an entity effect needs to affect entities with effects...
+/// </summary>
+/// <typeparam name="T">The Component that is required for the effect</typeparam>
+/// <typeparam name="TEffect">The Entity Effect itself</typeparam>
+public abstract partial class EntityEffectSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase<TEffect>
+{
+    /// <inheritdoc/>
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<T, EntityEffectEvent<TEffect>>(Effect);
+    }
+    protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
+
+    public string? GuidebookEffectDescription(TEffect effect)
+    {
+        if (effect.EntityEffectGuidebookText is null)
+            return null;
+
+        return Loc.GetString(
+            effect.EntityEffectFormat,
+            ("effect", effect),
+            ("chance", effect.Probability),
+            ("conditionCount", effect.Conditions?.Length ?? 0),
+            ("conditions",
+                ContentLocalizationManager.FormatList(
+                    effect.Conditions?.Select(x => x.EntityConditionGuidebookText).ToList() ?? new List<string>()
+                    )));
+    }
+}
+
+public interface IEntityEffectRaiser
+{
+    void RaiseEffectEvent<T>(EntityUid target, T effect) where T : EntityEffectBase<T>;
+}
+
+public abstract partial class EntityEffectBase<T> : AnyEntityEffect where T : EntityEffectBase<T>
+{
+    public override void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser)
+    {
+        if (this is not T type)
+            return;
+
+        raiser.RaiseEffectEvent(target, type);
+    }
+}
+
+// This exists so we can store entity effects in list and raise events without type erasure.
+public abstract partial class AnyEntityEffect
+{
+    public abstract void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser);
+
+    [DataField]
+    public AnyEntityCondition[]? Conditions;
+
+    [DataField]
+    public float Probability = 1.0f;
+
+    [DataField]
+    public readonly string EntityEffectFormat = "guidebook-reagent-effect-description";
+
+    [DataField]
+    public readonly string? EntityEffectGuidebookText;
+}
+
+[ByRefEvent]
+public readonly record struct EntityEffectEvent<T>(T Effect) where T : EntityEffectBase<T>;

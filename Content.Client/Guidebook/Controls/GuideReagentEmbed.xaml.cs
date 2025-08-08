@@ -29,7 +29,7 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     // TODO: UNCOMMENT AND FIX THIS!!!
-    //private readonly ChemistryGuideDataSystem _chemistryGuideData;
+    private readonly ChemistryGuideDataSystem _chemistryGuideData;
     private readonly ISawmill _sawmill;
 
     public IPrototype? RepresentedPrototype { get; private set; }
@@ -39,7 +39,7 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         _sawmill = _logManager.GetSawmill("guidebook.reagent");
-        //_chemistryGuideData = _systemManager.GetEntitySystem<ChemistryGuideDataSystem>();
+        _chemistryGuideData = _systemManager.GetEntitySystem<ChemistryGuideDataSystem>();
         MouseFilter = MouseFilterMode.Stop;
     }
 
@@ -103,7 +103,7 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
 
         ReagentName.SetMarkup(Loc.GetString("guidebook-reagent-name",
             ("color", textColor), ("name", reagent.LocalizedName)));
-/*
+
         #region Recipe
         var reactions = _prototype.EnumeratePrototypes<ReactionPrototype>()
             .Where(p => !p.Source && p.Products.ContainsKey(reagent.ID))
@@ -247,6 +247,6 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
                     _prototype,
                     _systemManager));
             }
-        }*/
+        }
     }
 }

@@ -135,10 +135,10 @@ public record class EntityEffectReagentArgs : EntityEffectBaseArgs
 
     public EntityEffectReagentArgs(EntityUid targetEntity, IEntityManager entityManager, EntityUid? organEntity, Solution? source, FixedPoint2 quantity, ReagentPrototype? reagent, ReactionMethod? method, FixedPoint2 scale) : base(targetEntity, entityManager)
     {
-        //OrganEntity = organEntity;
+        OrganEntity = organEntity;
         Source = source;
         Quantity = quantity;
-        //Reagent = reagent;
+        Reagent = reagent;
         Method = method;
         Scale = scale;
     }

@@ -24,8 +24,8 @@ namespace Content.Shared.Damage
         [Dependency] private readonly INetManager _netMan = default!;
         [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
         [Dependency] private readonly IConfigurationManager _config = default!;
-        // TODO: UNCOMMENT AND FIX THIS!!!
-        //[Dependency] private readonly SharedChemistryGuideDataSystem _chemistryGuideData = default!;
+
+        [Dependency] private readonly SharedChemistryGuideDataSystem _chemistryGuideData = default!;
 
         private EntityQuery<AppearanceComponent> _appearanceQuery;
         private EntityQuery<DamageableComponent> _damageableQuery;
@@ -60,12 +60,12 @@ namespace Content.Shared.Damage
             Subs.CVar(_config, CCVars.PlaytestAllDamageModifier, value =>
             {
                 UniversalAllDamageModifier = value;
-                //_chemistryGuideData.ReloadAllReagentPrototypes();
+                _chemistryGuideData.ReloadAllReagentPrototypes();
             }, true);
             Subs.CVar(_config, CCVars.PlaytestAllHealModifier, value =>
             {
                 UniversalAllHealModifier = value;
-                //_chemistryGuideData.ReloadAllReagentPrototypes();
+                _chemistryGuideData.ReloadAllReagentPrototypes();
             }, true);
             Subs.CVar(_config, CCVars.PlaytestProjectileDamageModifier, value => UniversalProjectileDamageModifier = value, true);
             Subs.CVar(_config, CCVars.PlaytestMeleeDamageModifier, value => UniversalMeleeDamageModifier = value, true);
@@ -74,12 +74,12 @@ namespace Content.Shared.Damage
             Subs.CVar(_config, CCVars.PlaytestReagentDamageModifier, value =>
             {
                 UniversalReagentDamageModifier = value;
-                //_chemistryGuideData.ReloadAllReagentPrototypes();
+                _chemistryGuideData.ReloadAllReagentPrototypes();
             }, true);
             Subs.CVar(_config, CCVars.PlaytestReagentHealModifier, value =>
             {
                  UniversalReagentHealModifier = value;
-                 //_chemistryGuideData.ReloadAllReagentPrototypes();
+                 _chemistryGuideData.ReloadAllReagentPrototypes();
             }, true);
             Subs.CVar(_config, CCVars.PlaytestExplosionDamageModifier, value => UniversalExplosionDamageModifier = value, true);
             Subs.CVar(_config, CCVars.PlaytestThrownDamageModifier, value => UniversalThrownDamageModifier = value, true);

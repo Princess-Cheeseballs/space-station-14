@@ -8,7 +8,7 @@ namespace Content.Shared.EntityEffects.Effects.StatusEffects;
 /// Changes status effects on entities: Adds, removes or sets time.
 /// </summary>
 [UsedImplicitly]
-public sealed partial class ModifyStatusEntityEffect : EntityEffect
+public sealed partial class ModifyStatusEffect : EntityEffect
 {
     [DataField(required: true)]
     public EntProtoId EffectProto;

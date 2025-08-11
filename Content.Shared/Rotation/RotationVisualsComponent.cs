@@ -12,7 +12,7 @@ public sealed partial class RotationVisualsComponent : Component
     [DataField]
     public Angle DefaultRotation = Angle.FromDegrees(90);
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public Angle VerticalRotation = 0;
 
     [DataField, AutoNetworkedField]

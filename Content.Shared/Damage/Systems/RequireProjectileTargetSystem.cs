@@ -19,15 +19,18 @@ public sealed class RequireProjectileTargetSystem : EntitySystem
 
     private void PreventCollide(Entity<RequireProjectileTargetComponent> ent, ref PreventCollideEvent args)
     {
-        if (args.Cancelled)
+        if (args.Cancelled || !ent.Comp.Active)
           return;
 
-        if (!ent.Comp.Active)
+        var other = args.OtherEntity;
+
+        if (!TryComp<ProjectileComponent>(other, out var projectile))
             return;
 
-        var other = args.OtherEntity;
-        if (TryComp(other, out ProjectileComponent? projectile) &&
-            CompOrNull<TargetedProjectileComponent>(other)?.Target != ent)
+        // TODO: Targeted projectile just needs its logic server side almost entirely changed.
+        // A player should be able to shoot a non-targeted projectile and the client should not be trusted with that determination.
+
+        if (CompOrNull<TargetedProjectileComponent>(other)?.Target != ent)
         {
             // Prevents shooting out of while inside of crates
             var shooter = projectile.Shooter;

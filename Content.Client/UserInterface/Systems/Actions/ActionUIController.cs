@@ -311,8 +311,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (actionId == SelectingTargetFor)
             StopTargeting();
 
-        if (!_lockActions || _actionsSystem.GetAction(actionId) is not { } action ||
-            action.Comp.Container == _playerManager.LocalEntity)
+        if (!_lockActions || _actionsSystem.GetAction(actionId) is not { } action || action.Comp.Container == _playerManager.LocalEntity)
         {
             _actions.RemoveAll(x => x == actionId);
             return;

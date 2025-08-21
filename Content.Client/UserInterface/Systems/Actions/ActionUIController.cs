@@ -297,9 +297,6 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (action.Comp.Toggled && EntityManager.TryGetComponent<TargetActionComponent>(actionId, out var target))
             StartTargeting((action, action, target));
 
-        if (action.Comp.AttachedEntity == _playerManager.LocalEntity && _timing.IsFirstTimePredicted)
-            _phantomActions.Remove(action);
-
         SetPhantomAction(action);
     }
 

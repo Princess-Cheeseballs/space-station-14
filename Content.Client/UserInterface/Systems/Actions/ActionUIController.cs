@@ -297,17 +297,10 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
         if (action.Comp.Toggled && EntityManager.TryGetComponent<TargetActionComponent>(actionId, out var target))
             StartTargeting((action, action, target));
 
-        if (!_actions.Contains(action))
-        {
-            _actions.Add(action);
-            return;
-        }
-
-        if (action.Comp.AttachedEntity != _playerManager.LocalEntity)
-            return;
-
-        if (_timing.IsFirstTimePredicted)
+        if (action.Comp.AttachedEntity == _playerManager.LocalEntity && _timing.IsFirstTimePredicted)
             _phantomActions.Remove(action);
+
+        SetPhantomAction(action);
     }
 
     private void OnActionRemoved(EntityUid actionId)
@@ -325,7 +318,18 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
             return;
         }
 
-        if (_timing.IsFirstTimePredicted)
+        SetPhantomAction(action);
+    }
+
+    private void SetPhantomAction(Entity<ActionComponent> action)
+    {
+        // TODO: This still flickers.
+        if (!_timing.IsFirstTimePredicted)
+            return;
+
+        if (action.Comp.AttachedEntity == _playerManager.LocalEntity)
+            _phantomActions.Remove(action);
+        else
             _phantomActions.Add(action);
     }
 

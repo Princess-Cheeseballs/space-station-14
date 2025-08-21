@@ -305,7 +305,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
 
     private void OnActionRemoved(EntityUid actionId)
     {
-        if (_container == null || _actionsSystem == null)
+        if (_actionsSystem == null)
             return;
 
         if (actionId == SelectingTargetFor)

@@ -187,7 +187,7 @@ namespace Content.Server.Hands.Systems
                 return true;
 
             // This can grief the above event so we raise it afterwards
-            if (IsHolding((player, hands), throwEnt, out _) && !TryDrop(player, throwEnt.Value))
+            if (IsHolding((player, hands), throwEnt, out var hand) && !TryDrop(player, hand))
                 return false;
 
             _throwingSystem.TryThrow(ev.ItemUid, ev.Direction, ev.ThrowSpeed, ev.PlayerUid, compensateFriction: !HasComp<LandAtCursorComponent>(ev.ItemUid));

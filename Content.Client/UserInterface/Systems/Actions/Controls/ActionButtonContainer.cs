@@ -40,12 +40,12 @@ public class ActionButtonContainer : GridContainer
                 AddChild(MakeButton(i));
             }
 
-            if (!actionTypes.TryGetValue(i, out var action))
-                action = null;
+            actionTypes.TryGetValue(i, out var action);
 
             var actionButton = (ActionButton) GetChild(i);
+
+            actionButton.IsPhantom = phantomActionTypes != null && action != null && phantomActionTypes.Contains(action.Value);
             actionButton.UpdateData(action, system);
-            actionButton.IsPhantom = phantomActionTypes != null && phantomActionTypes.Any(phantom => action == phantom);
         }
 
         for (var i = ChildCount - 1; i >= uniqueCount; i--)

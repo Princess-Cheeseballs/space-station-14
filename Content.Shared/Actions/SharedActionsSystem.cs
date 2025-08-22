@@ -907,8 +907,8 @@ public abstract class SharedActionsSystem : EntitySystem
     #region EquipHandlers
     private void OnDidEquip(Entity<ActionsComponent> ent, ref DidEquipEvent args)
     {
-        if (GameTiming.ApplyingState)
-            return;
+        //if (GameTiming.ApplyingState)
+            //return;
 
         var ev = new GetItemActionsEvent(_actionContainer, args.Equipee, args.Equipment, args.SlotFlags);
         RaiseLocalEvent(args.Equipment, ev);
@@ -921,8 +921,8 @@ public abstract class SharedActionsSystem : EntitySystem
 
     private void OnHandEquipped(Entity<ActionsComponent> ent, ref DidEquipHandEvent args)
     {
-        if (GameTiming.ApplyingState)
-            return;
+        //if (GameTiming.ApplyingState)
+            //return;
 
         var ev = new GetItemActionsEvent(_actionContainer, args.User, args.Equipped);
         RaiseLocalEvent(args.Equipped, ev);
@@ -935,16 +935,16 @@ public abstract class SharedActionsSystem : EntitySystem
 
     private void OnDidUnequip(EntityUid uid, ActionsComponent component, DidUnequipEvent args)
     {
-        if (GameTiming.ApplyingState)
-            return;
+        //if (GameTiming.ApplyingState)
+            //return;
 
         RemoveProvidedActions(uid, args.Equipment, component);
     }
 
     private void OnHandUnequipped(EntityUid uid, ActionsComponent component, DidUnequipHandEvent args)
     {
-        if (GameTiming.ApplyingState)
-            return;
+        //if (GameTiming.ApplyingState)
+            //return;
 
         RemoveProvidedActions(uid, args.Unequipped, component);
     }

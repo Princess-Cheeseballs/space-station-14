@@ -432,7 +432,7 @@ public sealed class AdminSystem : EntitySystem
                 while (enumerator.NextItem(out var item, out var slot))
                 {
                     if (_inventory.TryUnequip(entity, entity, slot.Name, true, true))
-                        _physics.ApplyAngularImpulse(item, ThrowingSystem.ThrowAngularImpulse);
+                        _physics.ApplyAngularImpulse(item, SharedThrowingSystem.ThrowAngularImpulse);
                 }
             }
 

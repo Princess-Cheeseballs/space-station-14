@@ -29,7 +29,7 @@ namespace Content.Server.VendingMachines
     {
         [Dependency] private readonly IRobustRandom _random = default!;
         [Dependency] private readonly PricingSystem _pricing = default!;
-        [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
+        [Dependency] private readonly SharedThrowingSystem _throwingSystem = default!;
         [Dependency] private readonly IGameTiming _timing = default!;
 
         private const float WallVendEjectDistanceFromWall = 1f;

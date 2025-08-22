@@ -15,7 +15,7 @@ namespace Content.Shared.RepulseAttract;
 public sealed class RepulseAttractSystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly ThrowingSystem _throw = default!;
+    [Dependency] private readonly SharedThrowingSystem _throw = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
     [Dependency] private readonly SharedTransformSystem _xForm = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;

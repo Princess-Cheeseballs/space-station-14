@@ -25,7 +25,7 @@ namespace Content.Shared.Hands.EntitySystems;
 public abstract partial class SharedHandsSystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] protected readonly ThrowingSystem ThrowingSystem = default!;
+    [Dependency] protected readonly SharedThrowingSystem ThrowingSystem = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] protected readonly SharedContainerSystem ContainerSystem = default!;

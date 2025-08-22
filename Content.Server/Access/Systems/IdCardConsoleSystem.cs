@@ -33,7 +33,7 @@ public sealed class IdCardConsoleSystem : SharedIdCardConsoleSystem
     [Dependency] private readonly IdCardSystem _idCard = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
 

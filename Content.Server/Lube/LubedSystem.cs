@@ -10,7 +10,7 @@ namespace Content.Server.Lube;
 
 public sealed class LubedSystem : EntitySystem
 {
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;

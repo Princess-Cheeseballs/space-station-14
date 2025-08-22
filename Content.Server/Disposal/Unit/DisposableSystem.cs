@@ -15,7 +15,7 @@ namespace Content.Server.Disposal.Unit
 {
     public sealed class DisposableSystem : EntitySystem
     {
-        [Dependency] private readonly ThrowingSystem _throwing = default!;
+        [Dependency] private readonly SharedThrowingSystem _throwing = default!;
         [Dependency] private readonly AtmosphereSystem _atmosphereSystem = default!;
         [Dependency] private readonly DamageableSystem _damageable = default!;
         [Dependency] private readonly DisposalUnitSystem _disposalUnitSystem = default!;

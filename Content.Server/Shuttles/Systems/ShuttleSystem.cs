@@ -59,7 +59,7 @@ public sealed partial class ShuttleSystem : SharedShuttleSystem
     [Dependency] private readonly ShuttleConsoleSystem _console = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly StunSystem _stuns = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly ThrusterSystem _thruster = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly TurfSystem _turf = default!;

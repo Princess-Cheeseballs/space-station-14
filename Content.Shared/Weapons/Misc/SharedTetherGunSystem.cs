@@ -32,7 +32,7 @@ public abstract partial class SharedTetherGunSystem : EntitySystem
     [Dependency] private readonly SharedJointSystem _joints = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly ThrownItemSystem _thrown = default!;
 
     private const string TetherJoint = "tether";

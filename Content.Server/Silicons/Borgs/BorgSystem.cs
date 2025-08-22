@@ -56,7 +56,7 @@ public sealed partial class BorgSystem : SharedBorgSystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;

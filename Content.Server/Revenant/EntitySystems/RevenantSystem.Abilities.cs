@@ -37,7 +37,7 @@ namespace Content.Server.Revenant.EntitySystems;
 public sealed partial class RevenantSystem
 {
     [Dependency] private readonly EmagSystem _emagSystem = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly MobThresholdSystem _mobThresholdSystem = default!;

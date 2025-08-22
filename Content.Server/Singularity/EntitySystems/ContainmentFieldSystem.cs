@@ -11,7 +11,7 @@ namespace Content.Server.Singularity.EntitySystems;
 
 public sealed class ContainmentFieldSystem : EntitySystem
 {
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
 

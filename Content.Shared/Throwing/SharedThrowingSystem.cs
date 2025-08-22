@@ -4,7 +4,6 @@ using Content.Shared.Camera;
 using Content.Shared.CCVar;
 using Content.Shared.Construction.Components;
 using Content.Shared.Database;
-using Content.Shared.Friction;
 using Content.Shared.Gravity;
 using Content.Shared.Projectiles;
 using Robust.Shared.Configuration;
@@ -16,7 +15,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared.Throwing;
 
-public sealed class ThrowingSystem : EntitySystem
+public abstract class SharedThrowingSystem : EntitySystem
 {
     public const float ThrowAngularImpulse = 5f;
 
@@ -29,12 +28,10 @@ public sealed class ThrowingSystem : EntitySystem
     private float _frictionModifier;
     private float _airDamping;
 
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly SharedGravitySystem _gravity = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
+    [Dependency] protected readonly SharedTransformSystem Transform = default!;
     [Dependency] private readonly ThrownItemSystem _thrownSystem = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IConfigurationManager _configManager = default!;
 
@@ -60,8 +57,8 @@ public sealed class ThrowingSystem : EntitySystem
         bool doSpin = true,
         bool unanchor = false)
     {
-        var thrownPos = _transform.GetMapCoordinates(uid);
-        var mapPos = _transform.ToMapCoordinates(coordinates);
+        var thrownPos = Transform.GetMapCoordinates(uid);
+        var mapPos = Transform.ToMapCoordinates(coordinates);
 
         if (mapPos.MapId != thrownPos.MapId)
             return;
@@ -122,7 +119,7 @@ public sealed class ThrowingSystem : EntitySystem
     /// <param name="compensateFriction">True will adjust the throw so the item stops at the target coordinates. False means it will land at the target and keep sliding.</param>
     /// <param name="doSpin">Whether spin will be applied to the thrown entity.</param>
     /// <param name="unanchor">If true and the thrown entity has <see cref="AnchorableComponent"/>, unanchor the thrown entity</param>
-    public void TryThrow(EntityUid uid,
+    public virtual bool TryThrow(EntityUid uid,
         Vector2 direction,
         PhysicsComponent physics,
         TransformComponent transform,
@@ -139,17 +136,17 @@ public sealed class ThrowingSystem : EntitySystem
         bool unanchor = false)
     {
         if (baseThrowSpeed <= 0 || direction == Vector2Helpers.Infinity || direction == Vector2Helpers.NaN || direction == Vector2.Zero || friction < 0)
-            return;
+            return false;
 
         if (unanchor && HasComp<AnchorableComponent>(uid))
-            _transform.Unanchor(uid);
+            Transform.Unanchor(uid);
 
         if ((physics.BodyType & (BodyType.Dynamic | BodyType.KinematicController)) == 0x0)
-            return;
+            return false;
 
         // Allow throwing if this projectile only acts as a projectile when shot, otherwise disallow
         if (projectileQuery.TryGetComponent(uid, out var proj) && !proj.OnlyCollideWhenShot)
-            return;
+            return false;
 
         var comp = new ThrownItemComponent
         {
@@ -168,27 +165,29 @@ public sealed class ThrowingSystem : EntitySystem
         var flyTime = direction.Length() / baseThrowSpeed;
         if (compensateFriction)
             flyTime *= FlyTimePercentage;
-        comp.ThrownTime = _gameTiming.CurTime;
+        comp.ThrownTime = Timing.CurTime;
         comp.LandTime = comp.ThrownTime + TimeSpan.FromSeconds(flyTime);
         comp.PlayLandSound = playSound;
         AddComp(uid, comp, true);
 
         ThrowingAngleComponent? throwingAngle = null;
 
+        Physics.UpdateIsPredicted(uid);
+
         // Give it a l'il spin.
         if (doSpin)
         {
             if (physics.InvI > 0f && (!TryComp(uid, out throwingAngle) || throwingAngle.AngularVelocity))
             {
-                _physics.ApplyAngularImpulse(uid, ThrowAngularImpulse / physics.InvI, body: physics);
+                Physics.ApplyAngularImpulse(uid, ThrowAngularImpulse / physics.InvI, body: physics);
             }
             else
             {
                 Resolve(uid, ref throwingAngle, false);
-                var gridRot = _transform.GetWorldRotation(transform.ParentUid);
+                var gridRot = Transform.GetWorldRotation(transform.ParentUid);
                 var angle = direction.ToWorldAngle() - gridRot;
                 var offset = throwingAngle?.Angle ?? Angle.Zero;
-                _transform.SetLocalRotation(uid, angle + offset);
+                Transform.SetLocalRotation(uid, angle + offset);
             }
         }
 
@@ -202,7 +201,7 @@ public sealed class ThrowingSystem : EntitySystem
         // This doesn't actually compensate for air friction, but it's low enough it shouldn't matter.
         var throwSpeed = compensateFriction ? direction.Length() / (flyTime + 1 / tileFriction) : baseThrowSpeed;
         var impulseVector = direction.Normalized() * throwSpeed * physics.Mass;
-        _physics.ApplyLinearImpulse(uid, impulseVector, body: physics);
+        Physics.ApplyLinearImpulse(uid, impulseVector, body: physics);
 
         var thrownEvent = new ThrownEvent(user, uid);
         RaiseLocalEvent(uid, ref thrownEvent, true);
@@ -218,31 +217,30 @@ public sealed class ThrowingSystem : EntitySystem
         }
         else
         {
-            _physics.SetBodyStatus(uid, physics, BodyStatus.InAir);
+            Physics.SetBodyStatus(uid, physics, BodyStatus.InAir);
         }
 
         if (user == null)
-            return;
-
-        if (recoil)
-            _recoil.KickCamera(user.Value, -direction * 0.04f);
+            return true;
 
         // Give thrower an impulse in the other direction
         if (pushbackRatio == 0.0f ||
             physics.Mass == 0f ||
             !TryComp(user.Value, out PhysicsComponent? userPhysics))
-            return;
+            return true;
         var msg = new ThrowPushbackAttemptEvent();
         RaiseLocalEvent(uid, msg);
 
         if (msg.Cancelled)
-            return;
+            return true;
 
         var pushEv = new ThrowerImpulseEvent();
         RaiseLocalEvent(user.Value, ref pushEv);
         const float massLimit = 5f;
 
         if (pushEv.Push)
-            _physics.ApplyLinearImpulse(user.Value, -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics);
+            Physics.ApplyLinearImpulse(user.Value, -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics);
+
+        return true;
     }
 }

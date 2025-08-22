@@ -22,7 +22,7 @@ namespace Content.Server.Atmos.EntitySystems
         [Dependency] private readonly SharedAudioSystem _audioSys = default!;
         [Dependency] private readonly UserInterfaceSystem _ui = default!;
         [Dependency] private readonly IRobustRandom _random = default!;
-        [Dependency] private readonly ThrowingSystem _throwing = default!;
+        [Dependency] private readonly SharedThrowingSystem _throwing = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
 
         private const float TimerDelay = 0.5f;

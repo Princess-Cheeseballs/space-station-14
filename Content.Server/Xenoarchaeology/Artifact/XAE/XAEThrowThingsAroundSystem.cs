@@ -18,7 +18,7 @@ public sealed class XAEThrowThingsAroundSystem : BaseXAESystem<XAEThrowThingsAro
 {
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly TileSystem _tile = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;

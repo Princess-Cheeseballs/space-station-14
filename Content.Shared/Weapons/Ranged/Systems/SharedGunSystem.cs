@@ -64,7 +64,7 @@ public abstract partial class SharedGunSystem : EntitySystem
     [Dependency] protected readonly SharedProjectileSystem Projectiles = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] protected readonly TagSystem TagSystem = default!;
-    [Dependency] protected readonly ThrowingSystem ThrowingSystem = default!;
+    [Dependency] protected readonly SharedThrowingSystem ThrowingSystem = default!;
     [Dependency] private   readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
 

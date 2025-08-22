@@ -45,7 +45,7 @@ namespace Content.Server.Medical.BiomassReclaimer
         [Dependency] private readonly SharedAmbientSoundSystem _ambientSoundSystem = default!;
         [Dependency] private readonly SharedPopupSystem _popup = default!;
         [Dependency] private readonly PuddleSystem _puddleSystem = default!;
-        [Dependency] private readonly ThrowingSystem _throwing = default!;
+        [Dependency] private readonly SharedThrowingSystem _throwing = default!;
         [Dependency] private readonly IRobustRandom _robustRandom = default!;
         [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
         [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;

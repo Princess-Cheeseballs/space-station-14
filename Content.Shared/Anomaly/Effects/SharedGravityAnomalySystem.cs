@@ -13,7 +13,7 @@ namespace Content.Shared.Anomaly.Effects;
 public abstract class SharedGravityAnomalySystem : EntitySystem
 {
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
+    [Dependency] private readonly SharedThrowingSystem _throwing = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
 

@@ -9,6 +9,7 @@ using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Verbs;
 using JetBrains.Annotations;
 using Robust.Shared.GameStates;
+using Robust.Shared.Map;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -20,7 +21,7 @@ namespace Content.Shared.Stacks
     public abstract class SharedStackSystem : EntitySystem
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;
-        [Dependency] private readonly IPrototypeManager _prototype = default!;
+        [Dependency] protected readonly IPrototypeManager Prototype = default!;
         [Dependency] private readonly IViewVariablesManager _vvm = default!;
         [Dependency] protected readonly SharedAppearanceSystem Appearance = default!;
         [Dependency] protected readonly SharedHandsSystem Hands = default!;
@@ -263,7 +264,7 @@ namespace Content.Shared.Stacks
         [PublicAPI]
         public int GetMaxCount(string entityId)
         {
-            var entProto = _prototype.Index<EntityPrototype>(entityId);
+            var entProto = Prototype.Index<EntityPrototype>(entityId);
             entProto.TryGetComponent<StackComponent>(out var stackComp, EntityManager.ComponentFactory);
             return GetMaxCount(stackComp);
         }
@@ -303,7 +304,7 @@ namespace Content.Shared.Stacks
             if (string.IsNullOrEmpty(component.StackTypeId))
                 return 1;
 
-            var stackProto = _prototype.Index<StackPrototype>(component.StackTypeId);
+            var stackProto = Prototype.Index<StackPrototype>(component.StackTypeId);
 
             return stackProto.MaxCount ?? int.MaxValue;
         }
@@ -484,6 +485,40 @@ namespace Content.Shared.Stacks
             TransformComponent? userTransform = null)
         {
 
+        }
+
+        /// <summary>
+        ///     Try to split this stack into two. Returns a non-null <see cref="Robust.Shared.GameObjects.EntityUid"/> if successful.
+        /// </summary>
+        public EntityUid? Split(EntityUid uid, int amount, EntityCoordinates spawnPosition, StackComponent? stack = null)
+        {
+            if (!Resolve(uid, ref stack))
+                return null;
+
+            // Try to remove the amount of things we want to split from the original stack...
+            if (!Use(uid, amount, stack))
+                return null;
+
+            // Get a prototype ID to spawn the new entity. Null is also valid, although it should rarely be picked...
+            var prototype = Prototype.TryIndex<StackPrototype>(stack.StackTypeId, out var stackType)
+                ? stackType.Spawn.ToString()
+                : Prototype(uid)?.ID;
+
+            // Set the output parameter in the event instance to the newly split stack.
+            var entity = Spawn(prototype, spawnPosition);
+
+            if (TryComp(entity, out StackComponent? stackComp))
+            {
+                // Set the split stack's count.
+                SetCount(entity, amount, stackComp);
+                // Don't let people dupe unlimited stacks
+                stackComp.Unlimited = false;
+            }
+
+            var ev = new StackSplitEvent(entity);
+            RaiseLocalEvent(uid, ref ev);
+
+            return entity;
         }
     }
 

@@ -14,13 +14,6 @@ namespace Content.Server.Stack
     [UsedImplicitly]
     public sealed class StackSystem : SharedStackSystem
     {
-        [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         public override void SetCount(EntityUid uid, int amount, StackComponent? component = null)
         {
             if (!Resolve(uid, ref component, false))
@@ -34,45 +27,11 @@ namespace Content.Server.Stack
         }
 
         /// <summary>
-        ///     Try to split this stack into two. Returns a non-null <see cref="Robust.Shared.GameObjects.EntityUid"/> if successful.
-        /// </summary>
-        public EntityUid? Split(EntityUid uid, int amount, EntityCoordinates spawnPosition, StackComponent? stack = null)
-        {
-            if (!Resolve(uid, ref stack))
-                return null;
-
-            // Try to remove the amount of things we want to split from the original stack...
-            if (!Use(uid, amount, stack))
-                return null;
-
-            // Get a prototype ID to spawn the new entity. Null is also valid, although it should rarely be picked...
-            var prototype = _prototypeManager.TryIndex<StackPrototype>(stack.StackTypeId, out var stackType)
-                ? stackType.Spawn.ToString()
-                : Prototype(uid)?.ID;
-
-            // Set the output parameter in the event instance to the newly split stack.
-            var entity = Spawn(prototype, spawnPosition);
-
-            if (TryComp(entity, out StackComponent? stackComp))
-            {
-                // Set the split stack's count.
-                SetCount(entity, amount, stackComp);
-                // Don't let people dupe unlimited stacks
-                stackComp.Unlimited = false;
-            }
-
-            var ev = new StackSplitEvent(entity);
-            RaiseLocalEvent(uid, ref ev);
-
-            return entity;
-        }
-
-        /// <summary>
         ///     Spawns a stack of a certain stack type. See <see cref="StackPrototype"/>.
         /// </summary>
         public EntityUid Spawn(int amount, ProtoId<StackPrototype> id, EntityCoordinates spawnPosition)
         {
-            var proto = _prototypeManager.Index(id);
+            var proto = Prototype.Index(id);
             return Spawn(amount, proto, spawnPosition);
         }
 
@@ -147,7 +106,7 @@ namespace Content.Server.Stack
         /// <returns>The list of stack counts per entity.</returns>
         private List<int> CalculateSpawns(string entityPrototype, int amount)
         {
-            var proto = _prototypeManager.Index<EntityPrototype>(entityPrototype);
+            var proto = Prototype.Index<EntityPrototype>(entityPrototype);
             proto.TryGetComponent<StackComponent>(out var stack, EntityManager.ComponentFactory);
             var maxCountPerStack = GetMaxCount(stack);
             var amounts = new List<int>();

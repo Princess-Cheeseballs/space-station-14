@@ -26,13 +26,9 @@ namespace Content.Server.Hands.Systems
 {
     public sealed class HandsSystem : SharedHandsSystem
     {
-        [Dependency] private readonly IGameTiming _timing = default!;
         [Dependency] private readonly IRobustRandom _random = default!;
-        [Dependency] private readonly StackSystem _stackSystem = default!;
-        [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
         [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
         [Dependency] private readonly PullingSystem _pullingSystem = default!;
-        [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
 
         private EntityQuery<PhysicsComponent> _physicsQuery;
 
@@ -57,10 +53,6 @@ namespace Content.Server.Hands.Systems
             SubscribeLocalEvent<HandsComponent, BeforeExplodeEvent>(OnExploded);
 
             SubscribeLocalEvent<HandsComponent, DropHandItemsEvent>(OnDropHandItems);
-
-            CommandBinds.Builder
-                .Bind(ContentKeyFunctions.ThrowItemInHand, new PointerInputCmdHandler(HandleThrowItem))
-                .Register<HandsSystem>();
 
             _physicsQuery = GetEntityQuery<PhysicsComponent>();
         }
@@ -135,66 +127,6 @@ namespace Content.Server.Hands.Systems
 
         #region interactions
 
-        private bool HandleThrowItem(ICommonSession? playerSession, EntityCoordinates coordinates, EntityUid entity)
-        {
-            if (playerSession?.AttachedEntity is not {Valid: true} player || !Exists(player) || !coordinates.IsValid(EntityManager))
-                return false;
-
-            return ThrowHeldItem(player, coordinates);
-        }
-
-        /// <summary>
-        /// Throw the player's currently held item.
-        /// </summary>
-        public bool ThrowHeldItem(EntityUid player, EntityCoordinates coordinates, float minDistance = 0.1f)
-        {
-            if (ContainerSystem.IsEntityInContainer(player) ||
-                !TryComp(player, out HandsComponent? hands) ||
-                !TryGetActiveItem((player, hands), out var throwEnt) ||
-                !_actionBlockerSystem.CanThrow(player, throwEnt.Value))
-                return false;
-
-            if (_timing.CurTime < hands.NextThrowTime)
-                return false;
-            hands.NextThrowTime = _timing.CurTime + hands.ThrowCooldown;
-
-            if (TryComp(throwEnt, out StackComponent? stack) && stack.Count > 1 && stack.ThrowIndividually)
-            {
-                var splitStack = _stackSystem.Split(throwEnt.Value, 1, Comp<TransformComponent>(player).Coordinates, stack);
-
-                if (splitStack is not {Valid: true})
-                    return false;
-
-                throwEnt = splitStack.Value;
-            }
-
-            var direction = _transformSystem.ToMapCoordinates(coordinates).Position - _transformSystem.GetWorldPosition(player);
-            if (direction == Vector2.Zero)
-                return true;
-
-            var length = direction.Length();
-            var distance = Math.Clamp(length, minDistance, hands.ThrowRange);
-            direction *= distance / length;
-
-            var throwSpeed = hands.BaseThrowspeed;
-
-            // Let other systems change the thrown entity (useful for virtual items)
-            // or the throw strength.
-            var ev = new BeforeThrowEvent(throwEnt.Value, direction, throwSpeed, player);
-            RaiseLocalEvent(player, ref ev);
-
-            if (ev.Cancelled)
-                return true;
-
-            // This can grief the above event so we raise it afterwards
-            if (IsHolding((player, hands), throwEnt, out _) && !TryDrop(player, throwEnt.Value))
-                return false;
-
-            _throwingSystem.TryThrow(ev.ItemUid, ev.Direction, ev.ThrowSpeed, ev.PlayerUid, compensateFriction: !HasComp<LandAtCursorComponent>(ev.ItemUid));
-
-            return true;
-        }
-
         private void OnDropHandItems(Entity<HandsComponent> entity, ref DropHandItemsEvent args)
         {
             // If the holder doesn't have a physics component, they ain't moving
@@ -231,7 +163,7 @@ namespace Content.Server.Hands.Systems
                 // vary the speed a little to make it look more interesting
                 var throwSpeed = entity.Comp.BaseThrowspeed * _random.NextFloat(0.45f, 0.55f);
 
-                _throwingSystem.TryThrow(heldEntity.Value,
+                ThrowingSystem.TryThrow(heldEntity.Value,
                     itemVelocity,
                     throwSpeed,
                     entity,

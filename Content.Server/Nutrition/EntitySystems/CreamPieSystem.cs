@@ -1,5 +1,4 @@
 using Content.Server.Fluids.EntitySystems;
-using Content.Server.Nutrition.Components;
 using Content.Server.Popups;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.IdentityManagement;
@@ -34,7 +33,7 @@ namespace Content.Server.Nutrition.EntitySystems
             base.Initialize();
 
             // activate BEFORE entity is deleted and trash is spawned
-            SubscribeLocalEvent<CreamPieComponent, ConsumeDoAfterEvent>(OnConsume, before: [typeof(FoodSystem)]);
+            SubscribeLocalEvent<CreamPieComponent, FullyEatenEvent>(OnCreamPieFullyEaten);
             SubscribeLocalEvent<CreamPieComponent, SliceFoodEvent>(OnSlice);
 
             SubscribeLocalEvent<CreamPiedComponent, RejuvenateEvent>(OnRejuvenate);
@@ -59,7 +58,8 @@ namespace Content.Server.Nutrition.EntitySystems
             QueueDel(entity);
         }
 
-        private void OnConsume(Entity<CreamPieComponent> entity, ref ConsumeDoAfterEvent args)
+        // TODO: I think this is duplicate code from the hidden inventory stuff...
+        private void OnCreamPieFullyEaten(Entity<CreamPieComponent> entity, ref FullyEatenEvent args)
         {
             ActivatePayload(entity);
         }

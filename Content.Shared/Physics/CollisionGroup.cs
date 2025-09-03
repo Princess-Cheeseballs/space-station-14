@@ -37,7 +37,7 @@ public enum CollisionGroup
     MobMask = Impassable | HighImpassable | MidImpassable | LowImpassable,
     MobLayer = Opaque | BulletImpassable,
     // Mice, drones
-    SmallMobMask = Impassable | LowImpassable,
+    SmallMobMask = Impassable,
     SmallMobLayer = Opaque | BulletImpassable,
     // Birds/other small flyers
     FlyingMobMask = Impassable | HighImpassable,
@@ -57,7 +57,7 @@ public enum CollisionGroup
 
     // Tables that SmallMobs can go under
     TableMask = Impassable | MidImpassable,
-    TableLayer = MidImpassable,
+    TableLayer = MidImpassable | LowImpassable,
 
     // Tabletop machines, windoors, firelocks
     TabletopMachineMask = Impassable | HighImpassable,

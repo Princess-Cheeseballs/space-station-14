@@ -28,6 +28,7 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
 using Content.Shared.Electrocution;
 using Content.Shared.Gravity;
+using Content.Shared.Humanoid;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs;
@@ -65,6 +66,7 @@ public sealed partial class AdminVerbSystem
     [Dependency] private readonly FixtureSystem _fixtures = default!;
     [Dependency] private readonly FlammableSystem _flammableSystem = default!;
     [Dependency] private readonly GhostKickManager _ghostKickManager = default!;
+    [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoid = default!;
     [Dependency] private readonly SharedGodmodeSystem _sharedGodmodeSystem = default!;
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifierSystem = default!;
@@ -692,6 +694,7 @@ public sealed partial class AdminVerbSystem
             Icon = new SpriteSpecifier.Rsi(new ("/Textures/Objects/Fun/Plushies/lizard.rsi"), "icon"),
             Act = () =>
             {
+                _humanoid.SetSpecies(args.Target, "Reptilian");
                 _polymorphSystem.PolymorphEntity(args.Target, "AdminLizardSmite");
             },
             Impact = LogImpact.Extreme,

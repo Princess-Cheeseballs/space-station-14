@@ -49,6 +49,7 @@
       Steel: 185
   - type: StaticPrice
     price: 30
+  - type: PressureVisuals
 
 - type: entity
   abstract: true

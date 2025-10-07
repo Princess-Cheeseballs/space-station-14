@@ -2,8 +2,10 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
+using Content.Server.Destructible;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NPC.Pathfinding;
+using Content.Shared.Armor;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Camera;
 using Content.Shared.CCVar;
@@ -52,6 +54,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
 
+    private EntityQuery<ArmorComponent> _armorQuery;
+    private EntityQuery<DamageableComponent> _damageableQuery;
+    private EntityQuery<DestructibleComponent> _destructibleQuery;
     private EntityQuery<FlammableComponent> _flammableQuery;
     private EntityQuery<PhysicsComponent> _physicsQuery;
     private EntityQuery<ProjectileComponent> _projectileQuery;
@@ -100,6 +105,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         InitAirtightMap();
         InitVisuals();
 
+        _armorQuery = GetEntityQuery<ArmorComponent>();
+        _damageableQuery = GetEntityQuery<DamageableComponent>();
+        _destructibleQuery = GetEntityQuery<DestructibleComponent>();
         _flammableQuery = GetEntityQuery<FlammableComponent>();
         _physicsQuery = GetEntityQuery<PhysicsComponent>();
         _projectileQuery = GetEntityQuery<ProjectileComponent>();

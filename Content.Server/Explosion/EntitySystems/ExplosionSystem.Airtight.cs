@@ -1,9 +1,9 @@
 using Content.Server.Atmos.Components;
 using Content.Server.Destructible;
+using Content.Shared.Armor;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
 using Content.Shared.Explosion;
-using Content.Shared.Explosion.EntitySystems;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Map.Components;
 
@@ -67,8 +67,6 @@ public sealed partial class ExplosionSystem
             _airtightMap[gridId] = new();
 
         query ??= GetEntityQuery<AirtightComponent>();
-        var damageQuery = GetEntityQuery<DamageableComponent>();
-        var destructibleQuery = GetEntityQuery<DestructibleComponent>();
         var anchoredEnumerator = _mapSystem.GetAnchoredEntitiesEnumerator(gridId, grid, tile);
 
         while (anchoredEnumerator.MoveNext(out var uid))
@@ -77,7 +75,7 @@ public sealed partial class ExplosionSystem
                 continue;
 
             blockedDirections |= airtight.AirBlockedDirection;
-            var entityTolerances = GetExplosionTolerance(uid.Value, damageQuery, destructibleQuery);
+            var entityTolerances = GetExplosionTolerance(uid.Value);
             for (var i = 0; i < tolerance.Length; i++)
             {
                 tolerance[i] = Math.Max(tolerance[i], entityTolerances[i]);
@@ -111,22 +109,26 @@ public sealed partial class ExplosionSystem
     /// <summary>
     ///     Return a dictionary that specifies how intense a given explosion type needs to be in order to destroy an entity.
     /// </summary>
-    public float[] GetExplosionTolerance(
-        EntityUid uid,
-        EntityQuery<DamageableComponent> damageQuery,
-        EntityQuery<DestructibleComponent> destructibleQuery)
+    public float[] GetExplosionTolerance(Entity<ArmorComponent?, DamageableComponent?, DestructibleComponent?> entity)
     {
+        var (uid, armorComp, damageableComp, destructibleComp) = entity;
         // How much total damage is needed to destroy this entity? This also includes "break" behaviors. This ASSUMES
         // that this will result in a non-airtight entity.Entities that ONLY break via construction graph node changes
         // are currently effectively "invincible" as far as this is concerned. This really should be done more rigorously.
         var totalDamageTarget = FixedPoint2.MaxValue;
-        if (destructibleQuery.TryGetComponent(uid, out var destructible))
+        if (_destructibleQuery.Resolve(entity, ref destructibleComp))
         {
-            totalDamageTarget = _destructibleSystem.DestroyedAt(uid, destructible);
+            totalDamageTarget = _destructibleSystem.DestroyedAt(uid, destructibleComp);
+        }
+
+        var armor = new DamageModifierSet();
+        if (_armorQuery.Resolve(uid, ref armorComp))
+        {
+            armor = armorComp.Modifiers;
         }
 
         var explosionTolerance = new float[_explosionTypes.Count];
-        if (totalDamageTarget == FixedPoint2.MaxValue || !damageQuery.TryGetComponent(uid, out var damageable))
+        if (totalDamageTarget == FixedPoint2.MaxValue || !_damageableQuery.Resolve(uid, ref damageableComp))
         {
             for (var i = 0; i < explosionTolerance.Length; i++)
             {
@@ -146,19 +148,27 @@ public sealed partial class ExplosionSystem
 
             // evaluate the damage that this damage type would do to this entity
             var damagePerIntensity = FixedPoint2.Zero;
+            var flatReduction = 0f;
+            float modifier;
             foreach (var (type, value) in explosionType.DamagePerIntensity.DamageDict)
             {
-                if (!damageable.Damage.DamageDict.ContainsKey(type))
+                if (!damageableComp.Damage.DamageDict.ContainsKey(type))
                     continue;
+
+                if (!armor.Coefficients.TryGetValue(type, out modifier))
+                    modifier = 1f;
+
+                if (armor.FlatReduction.TryGetValue(type, out var flat))
+                    flatReduction += flat;
 
                 var ev = new GetExplosionResistanceEvent(explosionType.ID);
                 RaiseLocalEvent(uid, ref ev);
 
-                damagePerIntensity += value * Math.Max(0, ev.DamageCoefficient);
+                damagePerIntensity += value * Math.Max(0, ev.DamageCoefficient * modifier);
             }
 
             explosionTolerance[index] = damagePerIntensity > 0
-                ? (float) ((totalDamageTarget - damageable.TotalDamage) / damagePerIntensity)
+                ? (float) ((totalDamageTarget - damageableComp.TotalDamage + flatReduction) / damagePerIntensity)
                 : float.MaxValue;
         }
 

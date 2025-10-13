@@ -1,11 +1,10 @@
-﻿using System.Linq;
-using Content.Shared.Administration.Logs;
+﻿using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Database;
 using Content.Shared.EntityConditions;
-using Content.Shared.Localizations;
 using Content.Shared.Random.Helpers;
+using JetBrains.Annotations;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -68,6 +67,7 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
     /// <param name="target">Entity being targeted by the effects</param>
     /// <param name="effects">Effects we're applying to the entity</param>
     /// <param name="scale">Optional scale multiplier for the effects</param>
+    [PublicAPI]
     public void ApplyEffects(EntityUid target, EntityEffect[] effects, float scale = 1f)
     {
         // do all effects, if conditions apply
@@ -78,13 +78,110 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
     }
 
     /// <summary>
+    /// A variant of <see cref="ApplyEffects"/> which returns a bool.
+    /// </summary>
+    /// <inheritdoc cref="ApplyEffects"/>
+    /// <returns>True if any effect was applied</returns>
+    [PublicAPI]
+    public bool TryApplyEffects(EntityUid target, EntityEffect[] effects, float scale = 1f)
+    {
+        var applied = false;
+        // do all effects, if conditions apply
+        foreach (var effect in effects)
+        {
+            if (TryApplyEffect(target, effect, scale))
+                applied = true;
+        }
+
+        return applied;
+    }
+
+    /// <summary>
+    /// A variant of <see cref="ApplyEffects"/> which returns a bool.
+    /// </summary>
+    /// <inheritdoc cref="ApplyEffects"/>
+    /// <returns>True if all effects were applied</returns>
+    [PublicAPI]
+    public bool TryApplyAllEffects(EntityUid target, EntityEffect[] effects, float scale = 1f)
+    {
+        var applied = true;
+        // do all effects, if conditions apply
+        foreach (var effect in effects)
+        {
+            if (!TryApplyEffect(target, effect, scale))
+                applied = false;
+        }
+
+        return applied;
+    }
+
+    /// <summary>
+    /// Checks if any of the effects in this array can be applied to an entity.
+    /// </summary>
+    /// <param name="target">Entity being targeted by the effects</param>
+    /// <param name="effects">Effects we're applying to the entity</param>
+    /// <param name="scale">Optional scale multiplier for the effects</param>
+    /// <returns>True if any of the effects can be applied.</returns>
+    [PublicAPI]
+    public bool CanApplyEffects(EntityUid target, EntityEffect[] effects, float scale = 1f)
+    {
+        foreach (var effect in effects)
+        {
+            if (CanApplyEffect(target, effect, scale))
+                return true;
+        }
+
+        // None of the effects can be applied.
+        return false;
+    }
+
+    /// <summary>
+    /// Checks that all the effects in this array can be applied to this entity.
+    /// </summary>
+    /// <param name="target">Entity being targeted by the effects</param>
+    /// <param name="effects">Effects we're applying to the entity</param>
+    /// <param name="scale">Optional scale multiplier for the effects</param>
+    /// <returns>True if all the effects can be applied.</returns>
+    [PublicAPI]
+    public bool CanApplyAllEffects(EntityUid target, EntityEffect[] effects, float scale = 1f)
+    {
+        foreach (var effect in effects)
+        {
+            if (!CanApplyEffect(target, effect, scale))
+                return false;
+        }
+
+        // All the effects can be applied!
+        return true;
+    }
+
+    /// <summary>
     /// Applies an entity effect to a target if all conditions pass.
     /// </summary>
     /// <param name="target">Target we're applying an effect to</param>
     /// <param name="effect">Effect we're applying</param>
-    /// <param name="scale">Optional scale multiplier for the effect. Not all </param>
+    /// <param name="scale">Optional scale multiplier for the effect. Not all effects care about scale!</param>
     /// <returns>True if all conditions pass!</returns>
+    [PublicAPI]
     public bool TryApplyEffect(EntityUid target, EntityEffect effect, float scale = 1f)
+    {
+        if (!CanApplyEffect(target, effect, scale))
+            return false;
+
+        ApplyEffect(target, effect, scale);
+        return true;
+    }
+
+
+    /// <summary>
+    /// Checks if this effect can be applied to this entity.
+    /// </summary>
+    /// <param name="target">Target we're trying to apply the effect to</param>
+    /// <param name="effect">Effect we're trying applying</param>
+    /// <param name="scale">Optional scale multiplier for the effect.</param>
+    /// <returns>True if all conditions pass!</returns>
+    [PublicAPI]
+    public bool CanApplyEffect(EntityUid target, EntityEffect effect, float scale = 1f)
     {
         if (scale < effect.MinScale)
             return false;
@@ -102,7 +199,6 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
         if (!_condition.TryConditions(target, effect.Conditions))
             return false;
 
-        ApplyEffect(target, effect, scale);
         return true;
     }
 
@@ -113,6 +209,7 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
     /// <param name="target">Target we're applying an effect to</param>
     /// <param name="effect">Effect we're applying</param>
     /// <param name="scale">Optional scale multiplier for the effect. Not all </param>
+    [PublicAPI]
     public void ApplyEffect(EntityUid target, EntityEffect effect, float scale = 1f)
     {
         // Clamp the scale if the effect doesn't allow scaling.

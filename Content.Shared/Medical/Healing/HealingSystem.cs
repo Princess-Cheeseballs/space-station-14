@@ -5,6 +5,7 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
+using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
@@ -23,13 +24,14 @@ public sealed class HealingSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly MobThresholdSystem _mobThresholdSystem = default!;
     [Dependency] private readonly SharedBloodstreamSystem _bloodstreamSystem = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedStackSystem _stacks = default!;
+    [Dependency] private readonly SharedEntityEffectsSystem _entityEffects = default!;
     [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThresholdSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly SharedStackSystem _stacks = default!;
 
     public override void Initialize()
     {
@@ -56,32 +58,9 @@ public sealed class HealingSystem : EntitySystem
             return;
         }
 
-        TryComp<BloodstreamComponent>(target, out var bloodstream);
+        var effects = healing.Effects;
 
-        // Heal some bloodloss damage.
-        if (healing.BloodlossModifier != 0 && bloodstream != null)
-        {
-            var isBleeding = bloodstream.BleedAmount > 0;
-            _bloodstreamSystem.TryModifyBleedAmount((target.Owner, bloodstream), healing.BloodlossModifier);
-            if (isBleeding != bloodstream.BleedAmount > 0)
-            {
-                var popup = (args.User == target.Owner)
-                    ? Loc.GetString("medical-item-stop-bleeding-self")
-                    : Loc.GetString("medical-item-stop-bleeding", ("target", Identity.Entity(target.Owner, EntityManager)));
-                _popupSystem.PopupClient(popup, target, args.User);
-            }
-        }
-
-        // Restores missing blood
-        if (healing.ModifyBloodLevel != 0 && bloodstream != null)
-            _bloodstreamSystem.TryModifyBloodLevel((target.Owner, bloodstream), healing.ModifyBloodLevel);
-
-        var healed = _damageable.TryChangeDamage(target.Owner, healing.Damage * _damageable.UniversalTopicalsHealModifier, true, origin: args.Args.User);
-
-        if (healed == null && healing.BloodlossModifier != 0)
-            return;
-
-        var total = healed?.GetTotal() ?? FixedPoint2.Zero;
+        _entityEffects.ApplyEffects(target, effects);
 
         // Re-verify that we can heal the damage.
         var dontRepeat = false;
@@ -97,6 +76,8 @@ public sealed class HealingSystem : EntitySystem
             PredictedQueueDel(args.Used.Value);
         }
 
+        // TODO: Admin logs.
+        /*
         if (target.Owner != args.User)
         {
             _adminLogger.Add(LogType.Healed,
@@ -106,12 +87,12 @@ public sealed class HealingSystem : EntitySystem
         {
             _adminLogger.Add(LogType.Healed,
                 $"{ToPrettyString(args.User):user} healed themselves for {total:damage} damage");
-        }
+        }*/
 
         _audio.PlayPredicted(healing.HealingEndSound, target.Owner, args.User);
 
-        // Logic to determine the whether or not to repeat the healing action
-        args.Repeat = HasDamage((args.Used.Value, healing), target) && !dontRepeat;
+        // Logic to determine whether to repeat the healing action
+        args.Repeat = _entityEffects.CanApplyEffects(target.Owner, healing.Effects) && !dontRepeat;
         args.Handled = true;
 
         if (!args.Repeat)
@@ -193,7 +174,7 @@ public sealed class HealingSystem : EntitySystem
         if (TryComp<StackComponent>(healing, out var stack) && stack.Count < 1)
             return false;
 
-        if (!HasDamage(healing, target!))
+        if (_entityEffects.CanApplyEffects(target.Owner, healing.Comp.Effects))
         {
             _popupSystem.PopupClient(Loc.GetString("medical-item-cant-use", ("item", healing.Owner)), healing, user);
             return false;

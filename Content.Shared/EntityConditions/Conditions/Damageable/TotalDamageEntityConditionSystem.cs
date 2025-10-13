@@ -2,7 +2,7 @@
 using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.EntityConditions.Conditions;
+namespace Content.Shared.EntityConditions.Conditions.Damageable;
 
 /// <summary>
 /// Returns true if this entity can take damage and if its total damage is within a specified minimum and maximum.

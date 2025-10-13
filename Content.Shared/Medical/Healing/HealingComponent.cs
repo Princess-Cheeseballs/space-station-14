@@ -1,5 +1,6 @@
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
+using Content.Shared.EntityEffects;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -12,6 +13,9 @@ namespace Content.Shared.Medical.Healing;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class HealingComponent : Component
 {
+    [DataField, AutoNetworkedField]
+    public EntityEffect[] Effects;
+
     /// <remarks>
     /// The amount of damage to heal per use.
     /// </remarks>

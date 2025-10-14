@@ -37,7 +37,7 @@ public sealed partial class FlashEntityEffectSystem : EntityEffectSystem<Transfo
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Flash : EntityEffectBase<Flash>
+public sealed partial class Flash : EntityEffect
 {
     /// <summary>
     ///     Flash range per unit of reagent.

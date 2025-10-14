@@ -20,7 +20,7 @@ public sealed partial class AdjustTemperatureEntityEffectSystem : EntityEffectSy
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AdjustTemperature : EntityEffectBase<AdjustTemperature>
+public sealed partial class AdjustTemperature : EntityEffect
 {
     /// <summary>
     ///     Amount we're adjusting temperature by.

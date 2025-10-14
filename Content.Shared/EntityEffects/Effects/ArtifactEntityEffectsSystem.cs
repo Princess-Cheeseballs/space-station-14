@@ -52,7 +52,7 @@ public sealed partial class ArtifactUnlockEntityEffectSystem : EntityEffectSyste
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ArtifactDurabilityRestore : EntityEffectBase<ArtifactDurabilityRestore>
+public sealed partial class ArtifactDurabilityRestore : EntityEffect
 {
     /// <summary>
     ///     Amount of durability that will be restored per effect interaction.
@@ -65,7 +65,7 @@ public sealed partial class ArtifactDurabilityRestore : EntityEffectBase<Artifac
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ArtifactUnlock : EntityEffectBase<ArtifactUnlock>
+public sealed partial class ArtifactUnlock : EntityEffect
 {
     public override string EntityEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
         Loc.GetString("entity-effect-guidebook-artifact-unlock", ("chance", Probability));

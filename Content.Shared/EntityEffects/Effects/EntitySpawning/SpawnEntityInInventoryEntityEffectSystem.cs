@@ -19,7 +19,7 @@ public sealed partial class SpawnEntityInInventoryEntityEffectSystem : EntityEff
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class SpawnEntityInInventory : EntityEffectBase<SpawnEntityInInventory>
+public sealed partial class SpawnEntityInInventory : EntityEffect
 {
     /// <summary>
     /// Name of the slot we're spawning the item into.

@@ -8,7 +8,7 @@ namespace Content.Shared.EntityEffects.Effects.Solution;
 /// <summary>
 /// Sets the temperature of this solution to a fixed value.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TComp,TEffect}"/>
 public sealed class SetSolutionTemperatureEntityEffectSystem : EntityEffectSystem<SolutionComponent, SetSolutionTemperature>
 {
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
@@ -20,7 +20,7 @@ public sealed class SetSolutionTemperatureEntityEffectSystem : EntityEffectSyste
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class SetSolutionTemperature : EntityEffectBase<SetSolutionTemperature>
+public sealed partial class SetSolutionTemperature : EntityEffect
 {
     /// <summary>
     ///     The temperature to set the solution to.
@@ -38,7 +38,7 @@ public sealed partial class SetSolutionTemperature : EntityEffectBase<SetSolutio
 /// Adjusts the temperature of this solution by a given amount.
 /// The temperature adjustment is modified by scale.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TComp,TEffect}"/>
 public sealed class AdjustSolutionTemperatureEntityEffectSystem : EntityEffectSystem<SolutionComponent, AdjustSolutionTemperature>
 {
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
@@ -53,7 +53,7 @@ public sealed class AdjustSolutionTemperatureEntityEffectSystem : EntityEffectSy
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AdjustSolutionTemperature : EntityEffectBase<AdjustSolutionTemperature>
+public sealed partial class AdjustSolutionTemperature : EntityEffect
 {
     /// <summary>
     ///     The change in temperature.
@@ -116,7 +116,7 @@ public sealed class AdjustSolutionThermalEnergyEntityEffectSystem : EntityEffect
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AdjustSolutionThermalEnergy : EntityEffectBase<AdjustSolutionThermalEnergy>
+public sealed partial class AdjustSolutionThermalEnergy : EntityEffect
 {
     /// <summary>
     ///     The change in thermal energy.

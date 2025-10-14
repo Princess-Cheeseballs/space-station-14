@@ -23,7 +23,7 @@ public sealed partial class EmpEntityEffectSystem : EntityEffectSystem<Transform
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Emp : EntityEffectBase<Emp>
+public sealed partial class Emp : EntityEffect
 {
     /// <summary>
     ///     Impulse range per unit of quantity

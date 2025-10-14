@@ -38,7 +38,7 @@ public sealed partial class GenericStatusEffectEntityEffectSystem : EntityEffect
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class GenericStatusEffect : EntityEffectBase<GenericStatusEffect>
+public sealed partial class GenericStatusEffect : EntityEffect
 {
     [DataField(required: true)]
     public string Key = default!;

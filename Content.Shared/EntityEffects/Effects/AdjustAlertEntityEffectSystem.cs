@@ -37,7 +37,7 @@ public sealed partial class AdjustAlertEntityEffectSysten : EntityEffectSystem<A
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AdjustAlert : EntityEffectBase<AdjustAlert>
+public sealed partial class AdjustAlert : EntityEffect
 {
     /// <summary>
     /// The specific Alert that will be adjusted

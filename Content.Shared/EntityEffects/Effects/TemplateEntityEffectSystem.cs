@@ -15,7 +15,7 @@ public sealed partial class TemplateEntityEffectSystem : EntityEffectSystem<Meta
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Template : EntityEffectBase<Template>
+public sealed partial class Template : EntityEffect
 {
     public override string? EntityEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) => null;
 }

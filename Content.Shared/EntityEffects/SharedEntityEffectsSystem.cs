@@ -1,10 +1,8 @@
-﻿using System.Linq;
-using Content.Shared.Administration.Logs;
+﻿using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Database;
 using Content.Shared.EntityConditions;
-using Content.Shared.Localizations;
 using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -17,10 +15,11 @@ namespace Content.Shared.EntityEffects;
 /// Specifically it handles the receiving of events for causing entity effects, and provides
 /// public API for other systems to take advantage of entity effects.
 /// </summary>
-public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEffectRaiser
+public sealed partial class SharedEntityEffectsSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
+    [Dependency] private readonly IEntityEffectApplier _applier = default!;
     [Dependency] private readonly SharedEntityConditionsSystem _condition = default!;
 
     public override void Initialize()
@@ -131,56 +130,70 @@ public sealed partial class SharedEntityEffectsSystem : EntitySystem, IEntityEff
             );
         }
 
-        effect.RaiseEvent(target, this, scale);
-    }
-
-    /// <summary>
-    /// Raises an effect to an entity. You should not be calling this unless you know what you're doing.
-    /// </summary>
-    public void RaiseEffectEvent<T>(EntityUid target, T effect, float scale) where T : EntityEffectBase<T>
-    {
-        var effectEv = new EntityEffectEvent<T>(effect, scale);
-        RaiseLocalEvent(target, ref effectEv);
+        _applier.ApplyEffect(target, effect, scale);
     }
 }
 
 /// <summary>
-/// This is a basic abstract entity effect containing all the data an entity effect needs to affect entities with effects...
+/// A type of <see cref="EntityEffectSystem{TEffect}"/> which comes with a baked in EntityQuery...
 /// </summary>
-/// <typeparam name="T">The Component that is required for the effect</typeparam>
+/// <typeparam name="TComp">A component which we may want.</typeparam>
 /// <typeparam name="TEffect">The Entity Effect itself</typeparam>
-public abstract partial class EntityEffectSystem<T, TEffect> : EntitySystem where T : Component where TEffect : EntityEffectBase<TEffect>
+public abstract partial class EntityEffectSystem<TComp, TEffect> : EntitySystem, IEntityEffectApplier where TComp : IComponent where TEffect : EntityEffect
 {
-    /// <inheritdoc/>
+    EntityQuery<TComp> _compQuery;
+
     public override void Initialize()
     {
-        SubscribeLocalEvent<T, EntityEffectEvent<TEffect>>(Effect);
+        base.Initialize();
+
+        _compQuery = GetEntityQuery<TComp>();
     }
 
-    protected abstract void Effect(Entity<T> entity, ref EntityEffectEvent<TEffect> args);
+    public void ApplyEffect<T>(EntityUid target, T effect, float scale) where T : EntityEffect
+    {
+        if (effect is not TEffect eff || !_compQuery.TryComp(target, out var comp))
+            return;
+
+        var ev = new EntityEffectEvent<TEffect>(eff, scale);
+        Effect((target, comp), ref ev);
+
+        //Execute(target, eff, scale);
+    }
+
+    protected abstract void Effect(Entity<TComp> entity, ref EntityEffectEvent<TEffect> ev);
+
+    //public abstract void Execute(EntityUid target, TEffect effect, float scale);
 }
+
+/*/// <summary>
+/// This is a basic abstract entity effect containing all the data an entity effect needs to affect entities with effects...
+/// </summary>
+/// <typeparam name="TEffect">The Entity Effect itself</typeparam>
+public abstract partial class EntityEffectSystem<TEffect> : EntitySystem, IEntityEffectApplier where TEffect : EntityEffect
+{
+    public void ApplyEffect<T>(EntityUid target, T effect, float scale) where T : EntityEffect
+    {
+        if (effect is not TEffect eff)
+            return;
+
+        var ev = new EntityEffectEvent<TEffect>(eff, scale);
+        Effect(target, ref ev);
+
+        //Execute(target, eff, scale);
+    }
+
+    protected abstract void Effect(EntityUid uid, ref EntityEffectEvent<TEffect> ev);
+
+    //public abstract void Execute(EntityUid target, TEffect effect, float scale);
+}*/
 
 /// <summary>
 /// Used to raise an EntityEffect without losing the type of effect.
 /// </summary>
-public interface IEntityEffectRaiser
+public interface IEntityEffectApplier
 {
-    void RaiseEffectEvent<T>(EntityUid target, T effect, float scale) where T : EntityEffectBase<T>;
-}
-
-/// <summary>
-/// Used to store an <see cref="EntityEffect"/> so it can be raised without losing the type of the condition.
-/// </summary>
-/// <typeparam name="T">The Condition wer are raising.</typeparam>
-public abstract partial class EntityEffectBase<T> : EntityEffect where T : EntityEffectBase<T>
-{
-    public override void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser, float scale)
-    {
-        if (this is not T type)
-            return;
-
-        raiser.RaiseEffectEvent(target, type, scale);
-    }
+    void ApplyEffect<T>(EntityUid target, T effect, float scale) where T : EntityEffect;
 }
 
 /// <summary>
@@ -189,8 +202,6 @@ public abstract partial class EntityEffectBase<T> : EntityEffect where T : Entit
 [ImplicitDataDefinitionForInheritors]
 public abstract partial class EntityEffect
 {
-    public abstract void RaiseEvent(EntityUid target, IEntityEffectRaiser raiser, float scale);
-
     [DataField]
     public EntityCondition[]? Conditions;
 
@@ -232,12 +243,12 @@ public abstract partial class EntityEffect
 }
 
 /// <summary>
-/// An Event carrying an entity effect.
+/// An Event carrying an entity effect. Useful for if we need to apply an effect to multiple components!
 /// </summary>
 /// <param name="Effect">The Effect</param>
 /// <param name="Scale">A strength scalar for the effect, defaults to 1 and typically only goes under for incomplete reactions.</param>
 [ByRefEvent, Access(typeof(SharedEntityEffectsSystem))]
-public readonly record struct EntityEffectEvent<T>(T Effect, float Scale) where T : EntityEffectBase<T>
+public readonly record struct EntityEffectEvent<T>(T Effect, float Scale) where T : EntityEffect
 {
     /// <summary>
     /// The Condition being raised in this event

@@ -38,7 +38,7 @@ public sealed partial class ModifyParalysisEntityEffectSystem : EntityEffectSyst
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ModifyParalysis : BaseStatusEntityEffect<ModifyParalysis>
+public sealed partial class ModifyParalysis : BaseStatusEntityEffect
 {
     public override string? EntityEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys) =>
         Time == null

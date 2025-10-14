@@ -33,5 +33,5 @@ public sealed partial class SpawnEntityEntityEffectSystem : EntityEffectSystem<T
     }
 }
 
-/// <inheritdoc cref="BaseSpawnEntityEntityEffect{T}"/>
-public sealed partial class SpawnEntity : BaseSpawnEntityEntityEffect<SpawnEntity>;
+/// <inheritdoc cref="BaseSpawnEntityEntityEffect"/>
+public sealed partial class SpawnEntity : BaseSpawnEntityEntityEffect;

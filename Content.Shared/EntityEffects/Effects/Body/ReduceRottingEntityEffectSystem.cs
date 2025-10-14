@@ -21,7 +21,7 @@ public sealed partial class ReduceRottingEntityEffectSystem : EntityEffectSystem
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ReduceRotting : EntityEffectBase<ReduceRotting>
+public sealed partial class ReduceRotting : EntityEffect
 {
     /// <summary>
     /// Number of seconds removed from the rotting timer.

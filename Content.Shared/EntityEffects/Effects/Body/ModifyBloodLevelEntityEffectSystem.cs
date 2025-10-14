@@ -21,7 +21,7 @@ public sealed partial class ModifyBloodLevelEntityEffectSystem : EntityEffectSys
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ModifyBloodLevel : EntityEffectBase<ModifyBloodLevel>
+public sealed partial class ModifyBloodLevel : EntityEffect
 {
     /// <summary>
     /// Amount of bleed we're applying or removing if negative.

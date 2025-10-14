@@ -37,7 +37,7 @@ public sealed partial class SlipifyEntityEffectSystem : EntityEffectSystem<Fixtu
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Slipify : EntityEffectBase<Slipify>
+public sealed partial class Slipify : EntityEffect
 {
     [DataField]
     public SlipperyEffectEntry Slippery = new();

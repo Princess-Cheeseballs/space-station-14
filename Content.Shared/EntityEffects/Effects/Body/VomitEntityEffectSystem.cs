@@ -18,7 +18,7 @@ public sealed partial class VomitEntityEffectSystem : EntityEffectSystem<MetaDat
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Vomit : EntityEffectBase<Vomit>
+public sealed partial class Vomit : EntityEffect
 {
     /// <summary>
     /// How much we adjust our thirst after vomiting.

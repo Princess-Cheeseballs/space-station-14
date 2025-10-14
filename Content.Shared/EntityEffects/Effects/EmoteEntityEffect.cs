@@ -4,7 +4,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.EntityEffects.Effects;
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Emote : EntityEffectBase<Emote>
+public sealed partial class Emote : EntityEffect
 {
     /// <summary>
     ///     The emote the entity will preform.

@@ -3,7 +3,7 @@
 namespace Content.Shared.EntityEffects.Effects;
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class MakeSentient : EntityEffectBase<MakeSentient>
+public sealed partial class MakeSentient : EntityEffect
 {
     /// <summary>
     /// Description for the ghost role created by this effect.

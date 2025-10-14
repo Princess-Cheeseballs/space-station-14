@@ -1,6 +1,6 @@
 namespace Content.Shared.EntityEffects.Effects.Botany.PlantAttributes;
 
-public sealed partial class PlantAdjustToxins : BasePlantAdjustAttribute<PlantAdjustToxins>
+public sealed partial class PlantAdjustToxins : BasePlantAdjustAttribute
 {
     public override string GuidebookAttributeName { get; set; } = "plant-attribute-toxins";
 

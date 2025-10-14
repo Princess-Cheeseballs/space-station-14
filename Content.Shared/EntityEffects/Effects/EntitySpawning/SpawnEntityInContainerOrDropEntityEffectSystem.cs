@@ -38,8 +38,8 @@ public sealed partial class SpawnEntityInContainerOrDropEntityEffectSystem : Ent
     }
 }
 
-/// <inheritdoc cref="BaseSpawnEntityEntityEffect{T}"/>
-public sealed partial class SpawnEntityInContainerOrDrop : BaseSpawnEntityEntityEffect<SpawnEntityInContainerOrDrop>
+/// <inheritdoc cref="BaseSpawnEntityEntityEffect"/>
+public sealed partial class SpawnEntityInContainerOrDrop : BaseSpawnEntityEntityEffect
 {
     /// <summary>
     /// Name of the container we're trying to spawn into.

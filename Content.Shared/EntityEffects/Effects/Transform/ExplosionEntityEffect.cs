@@ -5,7 +5,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.EntityEffects.Effects.Transform;
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ExplosionEffect : EntityEffectBase<ExplosionEffect>
+public sealed partial class ExplosionEffect : EntityEffect
 {
     /// <summary>
     ///     The type of explosion. Determines damage types and tile break chance scaling.

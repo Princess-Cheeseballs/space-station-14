@@ -42,14 +42,14 @@ public sealed partial class CureZombieInfectionEntityEffectsSystem : EntityEffec
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class CauseZombieInfection : EntityEffectBase<CauseZombieInfection>
+public sealed partial class CauseZombieInfection : EntityEffect
 {
     public override string EntityEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
         => Loc.GetString("entity-effect-guidebook-cause-zombie-infection", ("chance", Probability));
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class CureZombieInfection : EntityEffectBase<CureZombieInfection>
+public sealed partial class CureZombieInfection : EntityEffect
 {
     /// <summary>
     /// Do we also protect against future infections?

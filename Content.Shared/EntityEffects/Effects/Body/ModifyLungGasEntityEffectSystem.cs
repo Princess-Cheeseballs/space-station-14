@@ -7,7 +7,7 @@ namespace Content.Shared.EntityEffects.Effects.Body;
 /// Adjust the amount of Moles stored in this set of lungs based on a given dictionary of gasses and ratios.
 /// The amount of gas adjusted is modified by scale.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TComp, TEffect}"/>
 public sealed partial class ModifyLungGasEntityEffectSystem : EntityEffectSystem<LungComponent, ModifyLungGas>
 {
     // TODO: This shouldn't be an entity effect, gasses should just metabolize and make a byproduct by default...
@@ -26,7 +26,7 @@ public sealed partial class ModifyLungGasEntityEffectSystem : EntityEffectSystem
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ModifyLungGas : EntityEffectBase<ModifyLungGas>
+public sealed partial class ModifyLungGas : EntityEffect
 {
     [DataField(required: true)]
     public Dictionary<Gas, float> Ratios = default!;

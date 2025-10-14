@@ -10,7 +10,7 @@ namespace Content.Shared.EntityEffects.Effects.Solution;
 /// Adjust a reagent in this solution by an amount modified by scale.
 /// Quantity is modified by scale.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TComp,TEffect}"/>
 public sealed partial class AdjustReagentEntityEffectSystem : EntityEffectSystem<SolutionComponent, AdjustReagent>
 {
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
@@ -28,7 +28,7 @@ public sealed partial class AdjustReagentEntityEffectSystem : EntityEffectSystem
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AdjustReagent : EntityEffectBase<AdjustReagent>
+public sealed partial class AdjustReagent : EntityEffect
 {
     /// <summary>
     ///     The reagent ID to add or remove.

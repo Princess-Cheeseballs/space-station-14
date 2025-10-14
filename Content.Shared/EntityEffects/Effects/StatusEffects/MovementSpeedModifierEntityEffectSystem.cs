@@ -62,7 +62,7 @@ public sealed partial class MovementSpeedModifierEntityEffectSystem : EntityEffe
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class MovementSpeedModifier : BaseStatusEntityEffect<MovementSpeedModifier>
+public sealed partial class MovementSpeedModifier : BaseStatusEntityEffect
 {
     /// <summary>
     /// How much the entities' walk speed is multiplied by.

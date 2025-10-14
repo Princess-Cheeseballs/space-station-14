@@ -24,7 +24,7 @@ public sealed partial class ElectrocuteEntityEffectSystem : EntityEffectSystem<S
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Electrocute : EntityEffectBase<Electrocute>
+public sealed partial class Electrocute : EntityEffect
 {
     /// <summary>
     /// Time we electrocute this entity

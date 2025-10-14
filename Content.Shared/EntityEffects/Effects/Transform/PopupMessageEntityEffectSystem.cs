@@ -35,7 +35,7 @@ public sealed partial class PopupMessageEntityEffectSystem : EntityEffectSystem<
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class PopupMessage : EntityEffectBase<PopupMessage>
+public sealed partial class PopupMessage : EntityEffect
 {
     /// <summary>
     /// Array of messages that can popup.

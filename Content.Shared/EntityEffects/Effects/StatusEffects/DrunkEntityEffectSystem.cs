@@ -21,7 +21,7 @@ public sealed partial class DrunkEntityEffectSystem : EntityEffectSystem<MetaDat
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Drunk : EntityEffectBase<Drunk>
+public sealed partial class Drunk : EntityEffect
 {
     /// <summary>
     ///     BoozePower is how long each metabolism cycle will make the drunk effect last for.

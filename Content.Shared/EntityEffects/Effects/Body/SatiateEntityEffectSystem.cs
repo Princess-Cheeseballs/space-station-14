@@ -9,10 +9,11 @@ namespace Content.Shared.EntityEffects.Effects.Body;
 /// <summary>
 /// Modifies the thirst level of a given entity, multiplied by scale.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TComp,TEffect}"/>
 public sealed partial class SatiateThirstEntityEffectsSystem : EntityEffectSystem<ThirstComponent, SatiateThirst>
 {
     [Dependency] private readonly ThirstSystem _thirst = default!;
+
     protected override void Effect(Entity<ThirstComponent> entity, ref EntityEffectEvent<SatiateThirst> args)
     {
         _thirst.ModifyThirst(entity, entity.Comp, args.Effect.Factor * args.Scale);
@@ -22,22 +23,23 @@ public sealed partial class SatiateThirstEntityEffectsSystem : EntityEffectSyste
 /// <summary>
 /// Modifies the hunger level of a given entity, multiplied by scale.
 /// </summary>
-/// <inheritdoc cref="EntityEffectSystem{T,TEffect}"/>
+/// <inheritdoc cref="EntityEffectSystem{TEffect}"/>
 public sealed partial class SatiateHungerEntityEffectsSystem : EntityEffectSystem<HungerComponent, SatiateHunger>
 {
     [Dependency] private readonly HungerSystem _hunger = default!;
+
     protected override void Effect(Entity<HungerComponent> entity, ref EntityEffectEvent<SatiateHunger> args)
     {
-        _hunger.ModifyHunger(entity, args.Effect.Factor * args.Scale, entity.Comp);
+        _hunger.ModifyHunger(entity, args.Effect.Factor * args.Scale);
     }
 }
 
 /// <summary>
-/// A type of <see cref="EntityEffectBase{T}"/> made for satiation effects.
+/// A type of <see cref="EntityEffect"/> made for satiation effects.
 /// </summary>
 /// <typeparam name="T">The effect inheriting this BaseEffect</typeparam>
 /// <inheritdoc cref="EntityEffect"/>
-public abstract partial class Satiate<T> : EntityEffectBase<T> where T : EntityEffectBase<T>
+public abstract partial class Satiate<T> : EntityEffect where T : EntityEffect
 {
     public const float AverageSatiation = 3f; // Magic number. Not sure how it was calculated since I didn't make it.
 

@@ -21,7 +21,7 @@ public sealed partial class ResetNarcolepsyEntityEffectSystem : EntityEffectSyst
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ResetNarcolepsy : EntityEffectBase<ResetNarcolepsy>
+public sealed partial class ResetNarcolepsy : EntityEffect
 {
     /// <summary>
     /// The time we set our narcolepsy timer to.

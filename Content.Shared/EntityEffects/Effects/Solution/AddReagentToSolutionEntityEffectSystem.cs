@@ -28,7 +28,7 @@ public sealed class AddReagentToSolutionEntityEffectSystem : EntityEffectSystem<
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class AddReagentToSolution : EntityEffectBase<AddReagentToSolution>
+public sealed partial class AddReagentToSolution : EntityEffect
 {
     /// <summary>
     ///     Prototype of the reagent we're adding.

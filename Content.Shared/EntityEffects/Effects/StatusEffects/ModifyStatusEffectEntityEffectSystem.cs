@@ -40,7 +40,7 @@ public sealed partial class ModifyStatusEffectEntityEffectSystem : EntityEffectS
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class ModifyStatusEffect : BaseStatusEntityEffect<ModifyStatusEffect>
+public sealed partial class ModifyStatusEffect : BaseStatusEntityEffect
 {
     /// <summary>
     /// Prototype of the status effect we're modifying.

@@ -30,7 +30,7 @@ public sealed partial class HealthChangeEntityEffectSystem : EntityEffectSystem<
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class HealthChange : EntityEffectBase<HealthChange>
+public sealed partial class HealthChange : EntityEffect
 {
     /// <summary>
     /// Damage to apply every cycle. Damage Ignores resistances.

@@ -24,7 +24,7 @@ public sealed partial class CleanBloodstreamEntityEffectSystem : EntityEffectSys
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class CleanBloodstream : EntityEffectBase<CleanBloodstream>
+public sealed partial class CleanBloodstream : EntityEffect
 {
     /// <summary>
     ///     Amount of reagent we're cleaning out of our bloodstream.

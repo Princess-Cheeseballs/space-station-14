@@ -52,7 +52,7 @@ public sealed partial class EvenHealthChangeEntityEffectSystem : EntityEffectSys
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class EvenHealthChange : EntityEffectBase<EvenHealthChange>
+public sealed partial class EvenHealthChange : EntityEffect
 {
     /// <summary>
     /// Damage to heal, collected into entire damage groups.

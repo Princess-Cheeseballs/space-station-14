@@ -23,7 +23,7 @@ public sealed partial class JitterEntityEffectSystem : EntityEffectSystem<Status
 }
 
 /// <inheritdoc cref="EntityEffect"/>
-public sealed partial class Jitter : EntityEffectBase<Jitter>
+public sealed partial class Jitter : EntityEffect
 {
     [DataField]
     public float Amplitude = 10.0f;

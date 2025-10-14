@@ -14,26 +14,7 @@ namespace Content.Shared.Medical.Healing;
 public sealed partial class HealingComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public EntityEffect[] Effects;
-
-    /// <remarks>
-    /// The amount of damage to heal per use.
-    /// </remarks>
-    [DataField(required: true), AutoNetworkedField]
-    public DamageSpecifier Damage = default!;
-
-    /// <remarks>
-    /// This should generally be negative,
-    /// since you're, like, trying to heal damage.
-    /// </remarks>
-    [DataField, AutoNetworkedField]
-    public float BloodlossModifier = 0.0f;
-
-    /// <summary>
-    /// Restore missing blood.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ModifyBloodLevel = 0.0f;
+    public EntityEffect[] Effects = [];
 
     /// <remarks>
     /// The supported damage types are specified using a <see cref="DamageContainerPrototype"/>s. For a

@@ -106,38 +106,6 @@ public sealed class HealingSystem : EntitySystem
             args.Args.Delay = healing.Delay * GetScaledHealingPenalty(target.Owner, healing.SelfHealPenaltyMultiplier);
     }
 
-    private bool HasDamage(Entity<HealingComponent> healing, Entity<DamageableComponent> target)
-    {
-        var damageableDict = target.Comp.Damage.DamageDict;
-        var healingDict = healing.Comp.Damage.DamageDict;
-        foreach (var type in healingDict)
-        {
-            if (damageableDict[type.Key].Value > 0)
-            {
-                return true;
-            }
-        }
-
-        if (TryComp<BloodstreamComponent>(target, out var bloodstream))
-        {
-            // Is ent missing blood that we can restore?
-            if (healing.Comp.ModifyBloodLevel > 0
-                && _solutionContainerSystem.ResolveSolution(target.Owner, bloodstream.BloodSolutionName, ref bloodstream.BloodSolution, out var bloodSolution)
-                && bloodSolution.Volume < bloodSolution.MaxVolume)
-            {
-                return true;
-            }
-
-            // Is ent bleeding and can we stop it?
-            if (healing.Comp.BloodlossModifier < 0 && bloodstream.BleedAmount > 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void OnHealingUse(Entity<HealingComponent> healing, ref UseInHandEvent args)
     {
         if (args.Handled)
@@ -174,7 +142,7 @@ public sealed class HealingSystem : EntitySystem
         if (TryComp<StackComponent>(healing, out var stack) && stack.Count < 1)
             return false;
 
-        if (_entityEffects.CanApplyEffects(target.Owner, healing.Comp.Effects))
+        if (!_entityEffects.CanApplyEffects(target.Owner, healing.Comp.Effects))
         {
             _popupSystem.PopupClient(Loc.GetString("medical-item-cant-use", ("item", healing.Owner)), healing, user);
             return false;

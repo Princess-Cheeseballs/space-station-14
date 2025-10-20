@@ -251,11 +251,8 @@ public sealed class NukeSystem : EntitySystem
 
         if (component.Status == NukeStatus.AWAIT_ARM && Transform(uid).Anchored)
             ArmBomb(uid, component);
-
         else
-        {
             DisarmBombDoafter(uid, args.Actor, component);
-        }
     }
 
     #endregion

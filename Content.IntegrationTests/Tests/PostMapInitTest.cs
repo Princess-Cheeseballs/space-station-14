@@ -423,7 +423,6 @@ namespace Content.IntegrationTests.Tests
 
                     Assert.That(
                         shuttleSystem.TryFTLDock(shuttle!.Value.Owner,
-                            entManager.GetComponent<ShuttleComponent>(shuttle!.Value.Owner),
                             targetGrid.Value),
                         $"Unable to dock {shuttlePath} to {mapProto}");
                 }

@@ -266,7 +266,7 @@ public sealed partial class EmergencyShuttleSystem : SharedEmergencyShuttleSyste
             return null;
 
         if (!TryComp(stationShuttle.EmergencyShuttle, out TransformComponent? xform) ||
-            !TryComp<ShuttleComponent>(stationShuttle.EmergencyShuttle, out var shuttle))
+            !HasComp<ShuttleComponent>(stationShuttle.EmergencyShuttle))
         {
             Log.Error($"Attempted to call an emergency shuttle for an uninitialized station? Station: {ToPrettyString(stationUid)}. Shuttle: {ToPrettyString(stationShuttle.EmergencyShuttle)}");
             return null;
@@ -290,7 +290,7 @@ public sealed partial class EmergencyShuttleSystem : SharedEmergencyShuttleSyste
         }
 
         ShuttleDockResultType resultType;
-        if (_shuttle.TryFTLDock(stationShuttle.EmergencyShuttle.Value, shuttle, targetGrid.Value, out var config, DockTag))
+        if (_shuttle.TryFTLDock((stationShuttle.EmergencyShuttle.Value, xform), targetGrid.Value, out var config, DockTag))
         {
             _logger.Add(
                 LogType.EmergencyShuttle,

@@ -692,12 +692,11 @@ public sealed partial class ShuttleSystem
     /// This bypasses FTL travel time.
     /// </summary>
     public bool TryFTLDock(
-        EntityUid shuttleUid,
-        ShuttleComponent component,
-        EntityUid targetUid,
+        Entity<TransformComponent?> shuttleUid,
+        Entity<TransformComponent?> targetUid,
         string? priorityTag = null)
     {
-        return TryFTLDock(shuttleUid, component, targetUid, out _, priorityTag);
+        return TryFTLDock(shuttleUid, targetUid, out _, priorityTag);
     }
 
     /// <summary>
@@ -705,31 +704,30 @@ public sealed partial class ShuttleSystem
     /// This bypasses FTL travel time.
     /// </summary>
     public bool TryFTLDock(
-        EntityUid shuttleUid,
-        ShuttleComponent component,
-        EntityUid targetUid,
+        Entity<TransformComponent?> shuttle,
+        Entity<TransformComponent?> target,
         [NotNullWhen(true)] out DockingConfig? config,
         string? priorityTag = null)
     {
         config = null;
 
-        if (!_xformQuery.TryGetComponent(shuttleUid, out var shuttleXform) ||
-            !_xformQuery.TryGetComponent(targetUid, out var targetXform) ||
-            targetXform.MapUid == null ||
-            !targetXform.MapUid.Value.IsValid())
+        if (!_xformQuery.Resolve(shuttle, ref shuttle.Comp) ||
+            !_xformQuery.Resolve(target, ref target.Comp) ||
+            target.Comp.MapUid == null ||
+            !target.Comp.MapUid.Value.IsValid())
         {
             return false;
         }
 
-        config = _dockSystem.GetDockingConfig(shuttleUid, targetUid, priorityTag);
+        config = _dockSystem.GetDockingConfig(shuttle, target, priorityTag);
 
         if (config != null)
         {
-            FTLDock((shuttleUid, shuttleXform), config);
+            FTLDock((shuttle, shuttle.Comp), config);
             return true;
         }
 
-        TryFTLProximity(shuttleUid, targetUid, shuttleXform, targetXform);
+        TryFTLProximity(shuttle, target);
         return false;
     }
 
@@ -754,23 +752,30 @@ public sealed partial class ShuttleSystem
     /// Tries to get the target position to FTL near the target coordinates.
     /// If the target coordinates have a mapgrid then will try to offset the AABB.
     /// </summary>
+    /// <param name="shuttle"></param>
+    /// <param name="targetCoordinates"></param>
+    /// <param name="coordinates"></param>
+    /// <param name="angle"></param>
     /// <param name="minOffset">Min offset for the final FTL.</param>
     /// <param name="maxOffset">Max offset for the final FTL from the box we spawn.</param>
+    /// <param name="targetXform"></param>
     private bool TryGetFTLProximity(
-        EntityUid shuttleUid,
+        Entity<TransformComponent?> shuttle,
         EntityCoordinates targetCoordinates,
-        out EntityCoordinates coordinates, out Angle angle,
-        float minOffset = 0f, float maxOffset = 64f,
-        TransformComponent? xform = null, TransformComponent? targetXform = null)
+        out EntityCoordinates coordinates,
+        out Angle angle,
+        float minOffset = 0f,
+        float maxOffset = 64f,
+        TransformComponent? targetXform = null)
     {
         DebugTools.Assert(minOffset < maxOffset);
         coordinates = EntityCoordinates.Invalid;
         angle = Angle.Zero;
 
-        if (!Resolve(targetCoordinates.EntityId, ref targetXform) ||
+        if (!_xformQuery.Resolve(targetCoordinates.EntityId, ref targetXform) ||
             targetXform.MapUid == null ||
             !targetXform.MapUid.Value.IsValid() ||
-            !Resolve(shuttleUid, ref xform))
+            !_xformQuery.Resolve(shuttle, ref shuttle.Comp))
         {
             return false;
         }
@@ -778,7 +783,7 @@ public sealed partial class ShuttleSystem
         // We essentially expand the Box2 of the target area until nothing else is added then we know it's valid.
         // Can't just get an AABB of every grid as we may spawn very far away.
         var nearbyGrids = new HashSet<EntityUid>();
-        var shuttleAABB = Comp<MapGridComponent>(shuttleUid).LocalAABB;
+        var shuttleAABB = Comp<MapGridComponent>(shuttle).LocalAABB;
 
         // Start with small point.
         // If our target pos is offset we mot even intersect our target's AABB so we don't include it.
@@ -849,10 +854,10 @@ public sealed partial class ShuttleSystem
         // Now we have a targetAABB. This has already been expanded to account for our fat ass.
         Vector2 spawnPos;
 
-        if (TryComp<PhysicsComponent>(shuttleUid, out var shuttleBody))
+        if (TryComp<PhysicsComponent>(shuttle, out var shuttleBody))
         {
-            _physics.SetLinearVelocity(shuttleUid, Vector2.Zero, body: shuttleBody);
-            _physics.SetAngularVelocity(shuttleUid, 0f, body: shuttleBody);
+            _physics.SetLinearVelocity(shuttle, Vector2.Zero, body: shuttleBody);
+            _physics.SetAngularVelocity(shuttle, 0f, body: shuttleBody);
         }
 
         // TODO: This should prefer the position's angle instead.
@@ -874,7 +879,7 @@ public sealed partial class ShuttleSystem
         var offset = Vector2.Zero;
 
         // Offset it because transform does not correspond to AABB position.
-        if (TryComp(shuttleUid, out MapGridComponent? shuttleGrid))
+        if (TryComp(shuttle, out MapGridComponent? shuttleGrid))
         {
             offset = -shuttleGrid.LocalAABB.Center;
         }
@@ -889,7 +894,7 @@ public sealed partial class ShuttleSystem
         }
 
         // Rotate our localcenter around so we spawn exactly where we "think" we should (center of grid on the dot).
-        var transform = new Transform(_transform.ToWorldPosition(xform.Coordinates), angle);
+        var transform = new Transform(_transform.ToWorldPosition(shuttle.Comp.Coordinates), angle);
         var adjustedOffset = Robust.Shared.Physics.Transform.Mul(transform, offset);
 
         coordinates = new EntityCoordinates(targetXform.MapUid.Value, spawnPos + adjustedOffset);
@@ -899,20 +904,20 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Tries to arrive nearby without overlapping with other grids.
     /// </summary>
-    public bool TryFTLProximity(EntityUid shuttleUid, EntityUid targetUid, TransformComponent? xform = null, TransformComponent? targetXform = null)
+    public bool TryFTLProximity(Entity<TransformComponent?> shuttle, Entity<TransformComponent?> target)
     {
-        if (!Resolve(targetUid, ref targetXform) ||
-            targetXform.MapUid == null ||
-            !targetXform.MapUid.Value.IsValid() ||
-            !Resolve(shuttleUid, ref xform))
+        if (!_xformQuery.Resolve(target, ref target.Comp) ||
+            target.Comp.MapUid == null ||
+            !target.Comp.MapUid.Value.IsValid() ||
+            !_xformQuery.Resolve(shuttle, ref shuttle.Comp))
         {
             return false;
         }
 
-        if (!TryGetFTLProximity(shuttleUid, new EntityCoordinates(targetUid, Vector2.Zero), out var coords, out var angle, xform: xform, targetXform: targetXform))
+        if (!TryGetFTLProximity(shuttle, new EntityCoordinates(target, Vector2.Zero), out var coords, out var angle, targetXform: target.Comp))
             return false;
 
-        _transform.SetCoordinates(shuttleUid, xform, coords, rotation: angle);
+        _transform.SetCoordinates(shuttle, shuttle.Comp, coords, rotation: angle);
         return true;
     }
 

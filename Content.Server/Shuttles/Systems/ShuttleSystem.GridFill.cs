@@ -70,7 +70,7 @@ public sealed partial class ShuttleSystem
         if (_loader.TryLoadGrid(mapId, component.Path, out var ent))
         {
             if (HasComp<ShuttleComponent>(ent))
-                TryFTLProximity(ent.Value, targetGrid.Value);
+                TryFTLProximity(ent.Value.Owner, targetGrid.Value);
 
             _station.AddGridToStation(uid, ent.Value);
         }
@@ -139,7 +139,7 @@ public sealed partial class ShuttleSystem
         if (_loader.TryLoadGrid(mapId, path, out var grid))
         {
             if (HasComp<ShuttleComponent>(grid))
-                TryFTLProximity(grid.Value, targetGrid);
+                TryFTLProximity(grid.Value.Owner, targetGrid);
 
             if (group.NameGrid)
             {

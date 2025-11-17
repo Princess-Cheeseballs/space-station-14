@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Verbs;
@@ -5,9 +6,7 @@ using Content.Shared.Examine;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Storage;
 using JetBrains.Annotations;
-using Robust.Shared.Collections;
 using Robust.Shared.Containers;
-using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -19,16 +18,29 @@ public abstract class SharedItemSystem : EntitySystem
     [Dependency] private   readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] protected readonly SharedContainerSystem Container = default!;
 
+    private EntityQuery<ItemComponent> _itemQuery;
+
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeLocalEvent<ItemComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<ItemComponent, GetVerbsEvent<InteractionVerb>>(AddPickupVerb);
         SubscribeLocalEvent<ItemComponent, InteractHandEvent>(OnHandInteract);
         SubscribeLocalEvent<ItemComponent, AfterAutoHandleStateEvent>(OnItemAutoState);
-
         SubscribeLocalEvent<ItemComponent, ExaminedEvent>(OnExamine);
 
         SubscribeLocalEvent<ItemToggleSizeComponent, ItemToggledEvent>(OnItemToggle);
+
+        _itemQuery = GetEntityQuery<ItemComponent>();
+    }
+
+    private void OnComponentInit(Entity<ItemComponent> item, ref ComponentInit args)
+    {
+        if (item.Comp.Shape is not { } shape)
+            return;
+
+        UpdateWeight(item);
+        Dirty(item);
     }
 
     private void OnItemAutoState(EntityUid uid, ItemComponent component, ref AfterAutoHandleStateEvent args)
@@ -38,37 +50,39 @@ public abstract class SharedItemSystem : EntitySystem
 
     #region Public API
 
-    public void SetSize(EntityUid uid, ProtoId<ItemSizePrototype> size, ItemComponent? component = null)
+    public void SetSize(Entity<ItemComponent?> item, ProtoId<ItemSizePrototype> size)
     {
-        if (!Resolve(uid, ref component, false) || component.Size == size)
+        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Size == size)
             return;
 
-        component.Size = size;
-        Dirty(uid, component);
-        var ev = new ItemSizeChangedEvent(uid);
-        RaiseLocalEvent(uid, ref ev, broadcast: true);
-    }
+        item.Comp.Size = size;
+        item.Comp.Weight = null;
 
-    public void SetShape(EntityUid uid, List<Box2i>? shape, ItemComponent? component = null)
-    {
-        if (!Resolve(uid, ref component, false) || component.Shape == shape)
-            return;
-
-        component.Shape = shape;
-        Dirty(uid, component);
-        var ev = new ItemSizeChangedEvent(uid);
-        RaiseLocalEvent(uid, ref ev, broadcast: true);
-    }
-
-    public void SetBulk(Entity<ItemComponent?> item, int bulk)
-    {
-        if (!Resolve(item, ref item.Comp, false) || GetItemSizeWeight(item.Comp) == bulk)
-            return;
-
-        item.Comp.Bulk = bulk;
         Dirty(item);
-        var ev = new ItemBulkChangedEvent();
+        var ev = new ItemSizeChangedEvent(item);
         RaiseLocalEvent(item, ref ev, broadcast: true);
+    }
+
+    public void SetShape(Entity<ItemComponent?> item, List<Box2i>? shape)
+    {
+        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Shape == shape)
+            return;
+
+        item.Comp.Shape = shape;
+        UpdateWeight((item, item.Comp));
+
+        Dirty(item);
+        var ev = new ItemSizeChangedEvent(item);
+        RaiseLocalEvent(item, ref ev, broadcast: true);
+    }
+
+    /// <remarks>This method is private since we want the weight directly linked to the shape of the item.</remarks>
+    private void UpdateWeight(Entity<ItemComponent> item)
+    {
+        if (item.Comp.Shape is not { } shape)
+            return;
+
+        item.Comp.Weight = shape.Sum(box => box.Area);
     }
 
     /// <summary>
@@ -78,7 +92,7 @@ public abstract class SharedItemSystem : EntitySystem
     [PublicAPI]
     public void SetStoredOffset(EntityUid uid, Vector2i newOffset, ItemComponent? component = null)
     {
-        if (!Resolve(uid, ref component, false))
+        if (!_itemQuery.Resolve(uid, ref component, false))
             return;
 
         component.StoredOffset = newOffset;
@@ -87,7 +101,7 @@ public abstract class SharedItemSystem : EntitySystem
 
     public void SetHeldPrefix(EntityUid uid, string? heldPrefix, bool force = false, ItemComponent? component = null)
     {
-        if (!Resolve(uid, ref component, false))
+        if (!_itemQuery.Resolve(uid, ref component, false))
             return;
 
         if (!force && component.HeldPrefix == heldPrefix)
@@ -103,7 +117,7 @@ public abstract class SharedItemSystem : EntitySystem
     /// </summary>
     public void CopyVisuals(EntityUid uid, ItemComponent otherItem, ItemComponent? item = null)
     {
-        if (!Resolve(uid, ref item))
+        if (!_itemQuery.Resolve(uid, ref item))
             return;
 
         item.RsiPath = otherItem.RsiPath;
@@ -121,7 +135,7 @@ public abstract class SharedItemSystem : EntitySystem
         if (args.Handled)
             return;
 
-        args.Handled = _handsSystem.TryPickup(args.User, uid, null, animateUser: false);
+        args.Handled = _handsSystem.TryPickup(args.User, uid, animateUser: false);
     }
 
     private void AddPickupVerb(EntityUid uid, ItemComponent component, GetVerbsEvent<InteractionVerb> args)
@@ -134,8 +148,7 @@ public abstract class SharedItemSystem : EntitySystem
             return;
 
         InteractionVerb verb = new();
-        verb.Act = () => _handsSystem.TryPickupAnyHand(args.User, args.Target, checkActionBlocker: false,
-            handsComp: args.Hands, item: component);
+        verb.Act = () => _handsSystem.TryPickupAnyHand(args.User, args.Target, checkActionBlocker: false, handsComp: args.Hands, item: component);
         verb.Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/pickup.svg.192dpi.png"));
 
         // if the item already in a container (that is not the same as the user's), then change the text.
@@ -180,13 +193,19 @@ public abstract class SharedItemSystem : EntitySystem
     }
 
     [PublicAPI]
-    public int GetItemSizeWeight(ItemComponent item)
+    public int GetItemWeight(Entity<ItemComponent?> item)
     {
-        return item.Bulk ?? GetItemSizeWeight(item.Size);
+        return _itemQuery.Resolve(item, ref item.Comp) ? GetItemWeight(item.Comp) : 0;
     }
 
     [PublicAPI]
-    public int GetItemSizeWeight(ProtoId<ItemSizePrototype> size)
+    public int GetItemWeight(ItemComponent item)
+    {
+        return item.Weight ?? GetItemWeight(item.Size);
+    }
+
+    [PublicAPI]
+    public int GetItemWeight(ProtoId<ItemSizePrototype> size)
     {
         return GetSizePrototype(size).Weight;
     }
@@ -223,7 +242,7 @@ public abstract class SharedItemSystem : EntitySystem
     /// </summary>
     public IReadOnlyList<Box2i> GetAdjustedItemShape(Entity<ItemComponent?> entity, Angle rotation, Vector2i position)
     {
-        if (!Resolve(entity, ref entity.Comp))
+        if (!_itemQuery.Resolve(entity, ref entity.Comp))
             return [];
 
         var adjustedShapes = new List<Box2i>();
@@ -254,7 +273,7 @@ public abstract class SharedItemSystem : EntitySystem
     /// </summary>
     private void OnItemToggle(EntityUid uid, ItemToggleSizeComponent itemToggleSize, ItemToggledEvent args)
     {
-        if (!TryComp(uid, out ItemComponent? item))
+        if (!_itemQuery.TryComp(uid, out var item))
             return;
 
         if (args.Activated)
@@ -262,30 +281,30 @@ public abstract class SharedItemSystem : EntitySystem
             if (itemToggleSize.ActivatedShape != null)
             {
                 // Set the deactivated shape to the default item's shape before it gets changed.
-                itemToggleSize.DeactivatedShape ??= new List<Box2i>(GetItemShape(item));
-                Dirty(uid, itemToggleSize);
-                SetShape(uid, itemToggleSize.ActivatedShape, item);
+                itemToggleSize.DeactivatedShape ??= [..GetItemShape(item)];
+                SetShape((uid, item), itemToggleSize.ActivatedShape);
             }
 
             if (itemToggleSize.ActivatedSize != null)
             {
                 // Set the deactivated size to the default item's size before it gets changed.
                 itemToggleSize.DeactivatedSize ??= item.Size;
-                Dirty(uid, itemToggleSize);
-                SetSize(uid, (ProtoId<ItemSizePrototype>) itemToggleSize.ActivatedSize, item);
+                SetSize((uid, item), itemToggleSize.ActivatedSize.Value);
             }
         }
         else
         {
             if (itemToggleSize.DeactivatedShape != null)
             {
-                SetShape(uid, itemToggleSize.DeactivatedShape, item);
+                SetShape((uid, item), itemToggleSize.DeactivatedShape);
             }
 
             if (itemToggleSize.DeactivatedSize != null)
             {
-                SetSize(uid, (ProtoId<ItemSizePrototype>) itemToggleSize.DeactivatedSize, item);
+                SetSize((uid, item), itemToggleSize.DeactivatedSize.Value);
             }
         }
+
+        Dirty(uid, itemToggleSize);
     }
 }

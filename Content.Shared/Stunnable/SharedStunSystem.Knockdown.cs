@@ -83,7 +83,6 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<KnockedDownComponent, DidEquipHandEvent>(OnHandEquipped);
         SubscribeLocalEvent<KnockedDownComponent, DidUnequipHandEvent>(OnHandUnequipped);
         SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
-        SubscribeLocalEvent<HandsComponent, KnockedDownRefreshEvent>(OnHandsKnockdownRefresh);
 
         // Handling Alternative Inputs
         SubscribeAllEvent<ForceStandUpEvent>(OnForceStandup);
@@ -92,10 +91,6 @@ public abstract partial class SharedStunSystem
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.ToggleKnockdown, InputCmdHandler.FromDelegate(HandleToggleKnockdown, handle: false))
             .Register<SharedStunSystem>();
-
-        Subs.CVar(_config, CCVars.CrawlingMinBulk, value => { _minWeight = (int)value; }, true);
-        Subs.CVar(_config, CCVars.CrawlingGhostBulk, value => { _weightMod = (int)value; }, true);
-        Subs.CVar(_config, CCVars.CrawlingMaxBulk, value => { _maxWeight = value; }, true);
     }
 
     public override void Update(float frameTime)
@@ -580,31 +575,6 @@ public abstract partial class SharedStunSystem
     private void OnHandUnequipped(Entity<KnockedDownComponent> entity, ref DidUnequipHandEvent args)
     {
         RefreshKnockedMovement(entity);
-    }
-
-    private void OnHandsKnockdownRefresh(Entity<HandsComponent> ent, ref KnockedDownRefreshEvent args)
-    {
-        var free = _hands.CountFreeHands((ent, ent.Comp));
-        // If all our hands are empty, full move speed!
-        if (free == ent.Comp.Count)
-            return;
-
-        var weight = _hands.CountHeldItemsWeight((ent, ent.Comp));
-
-        // If we're below the weight where we start taking speed penalties, just fuggetabout it!
-        if (weight <= _minWeight)
-            return;
-
-        // If all our hands are free or weight is less than min weight we shouldn't be here.
-        // Effectively We get two values:
-        // One is the total weight plus our weight modifier (which is ghost weight minus min weight)
-        // And the other is our hand count minus free hands.
-        // We multiply these values together to get an encumbrance, if you have more hands free you can better manage the weight you're carrying.
-        // Then we divide by the max weight and clamp to get our modifier.
-        var modifier =  Math.Max(0f, 1f - (weight + _weightMod) * (ent.Comp.Count - free) / _maxWeight);
-        Log.Debug($"Appliyng a speed modifier of {modifier} to {ToPrettyString(ent)} from an item weight total of {weight} and empty hand count of {free}");
-
-        args.SpeedModifier *= modifier;
     }
 
     #endregion

@@ -586,7 +586,7 @@ public abstract class SharedStorageSystem : EntitySystem
                 }
 
                 _entList.Add(entity);
-                delay += ItemSystem.GetItemSizeWeight(itemComp);
+                delay += ItemSystem.GetItemWeight(itemComp);
 
                 if (_entList.Count >= StorageComponent.AreaPickupLimit)
 
@@ -1073,7 +1073,7 @@ public abstract class SharedStorageSystem : EntitySystem
         }
 
         var maxSize = GetMaxItemSize((uid, storageComp));
-        var size = ItemSystem.GetItemSizeWeight(item);
+        var size = ItemSystem.GetItemWeight(item);
         if (size > maxSize.Weight)
         {
             reason = "comp-storage-too-big";

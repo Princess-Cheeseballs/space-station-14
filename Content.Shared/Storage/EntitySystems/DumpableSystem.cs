@@ -111,7 +111,7 @@ public sealed class DumpableSystem : EntitySystem
             if (!_itemQuery.TryGetComponent(entity, out var itemComp))
                 continue;
 
-            delay += _item.GetItemSizeWeight(itemComp);
+            delay += _item.GetItemWeight(itemComp);
         }
 
         delay *= (float) dumpable.DelayPerItem.TotalSeconds * dumpable.Multiplier;

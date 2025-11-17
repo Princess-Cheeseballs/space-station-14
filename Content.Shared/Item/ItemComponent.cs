@@ -44,11 +44,11 @@ public sealed partial class ItemComponent : Component
     public List<Box2i>? Shape;
 
     /// <summary>
-    /// An optional override for the weight of an item, typically useful if an item has a unique shape, or should be
-    /// heavier/bulkier despite its small size.
+    /// Saved value of our item's bulk based on the shape of our item.
+    /// If the shape is null this value will also be null.
     /// </summary>
-    [DataField, AutoNetworkedField]
-    public int? Bulk;
+    [ViewVariables, AutoNetworkedField]
+    public int? Weight;
 
     /// <summary>
     /// A sprite used to depict this entity specifically when it is displayed in the storage UI.
@@ -60,7 +60,7 @@ public sealed partial class ItemComponent : Component
     /// An additional angle offset, in degrees, applied to the visual depiction of the item when displayed in the storage UI.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public float StoredRotation = 0;
+    public float StoredRotation;
 
     /// <summary>
     /// An additional offset, in pixels, applied to the visual depiction of the item when displayed in the storage UI.

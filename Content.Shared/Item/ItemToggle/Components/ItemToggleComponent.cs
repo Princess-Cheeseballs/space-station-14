@@ -10,7 +10,7 @@ namespace Content.Shared.Item.ItemToggle.Components;
 /// If you need extended functionality (e.g. requiring power) then add a new component and use events:
 /// ItemToggleActivateAttemptEvent, ItemToggleDeactivateAttemptEvent, ItemToggledEvent.
 /// </remarks>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
 public sealed partial class ItemToggleComponent : Component
 {
     /// <summary>
@@ -50,6 +50,7 @@ public sealed partial class ItemToggleComponent : Component
     /// /// <remarks>
     /// If server-side systems affect the item's toggle, like charge/fuel systems, then the item is not predictable.
     /// </remarks>
+    // TODO: Explode this with hammers. We only need predicted power cells and then this can be nuked!
     [DataField, AutoNetworkedField]
     public bool Predictable = true;
 

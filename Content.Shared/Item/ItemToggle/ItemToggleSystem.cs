@@ -6,7 +6,6 @@ using Content.Shared.Temperature;
 using Content.Shared.Toggleable;
 using Content.Shared.Verbs;
 using Content.Shared.Wieldable;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 
@@ -131,10 +130,7 @@ public sealed class ItemToggleSystem : EntitySystem
     /// <returns>false if the attempt fails for any reason</returns>
     public bool TrySetActive(Entity<ItemToggleComponent?> ent, bool active, EntityUid? user = null, bool predicted = true, bool showPopup = true)
     {
-        if (active)
-            return TryActivate(ent, user, predicted: predicted, showPopup);
-        else
-            return TryDeactivate(ent, user, predicted: predicted, showPopup);
+        return active ? TryActivate(ent, user, predicted: predicted, showPopup) : TryDeactivate(ent, user, predicted: predicted, showPopup);
     }
 
     /// <summary>
@@ -145,19 +141,11 @@ public sealed class ItemToggleSystem : EntitySystem
         if (!_query.Resolve(ent, ref ent.Comp, false))
             return false;
 
-        var uid = ent.Owner;
-        var comp = ent.Comp;
-        if (comp.Activated)
+        if (ent.Comp.Activated)
             return true;
 
         var attempt = new ItemToggleActivateAttemptEvent(user);
-        RaiseLocalEvent(uid, ref attempt);
-
-        if (!comp.Predictable)
-            predicted = false;
-
-        if (!predicted && _netManager.IsClient)
-            return false;
+        RaiseLocalEvent(ent, ref attempt);
 
         if (attempt.Cancelled)
         {
@@ -165,22 +153,24 @@ public sealed class ItemToggleSystem : EntitySystem
                 return false;
 
             if (predicted)
-                _audio.PlayPredicted(comp.SoundFailToActivate, uid, user);
-            else
-                _audio.PlayPvs(comp.SoundFailToActivate, uid);
-
-            if (showPopup && attempt.Popup != null && user != null)
             {
-                if (predicted)
-                    _popup.PopupClient(attempt.Popup, uid, user.Value);
-                else
-                    _popup.PopupEntity(attempt.Popup, uid, user.Value);
+                _audio.PlayPredicted(ent.Comp.SoundFailToActivate, ent, user);
+
+                if (showPopup && attempt.Popup != null && user != null)
+                    _popup.PopupPredicted(attempt.Popup, ent, user.Value);
+            }
+            else if (_netManager.IsServer)
+            {
+                _audio.PlayPvs(ent.Comp.SoundFailToActivate, ent);
+
+                if (showPopup && attempt.Popup != null && user != null)
+                    _popup.PopupEntity(attempt.Popup, ent, user.Value);
             }
 
             return false;
         }
 
-        Activate((uid, comp), predicted, user, showPopup);
+        Activate((ent, ent.Comp), predicted, user, showPopup);
         return true;
     }
 
@@ -192,37 +182,29 @@ public sealed class ItemToggleSystem : EntitySystem
         if (!_query.Resolve(ent, ref ent.Comp, false))
             return false;
 
-        var uid = ent.Owner;
-        var comp = ent.Comp;
-        if (!comp.Activated)
+        if (!ent.Comp.Activated)
             return true;
 
-        if (!comp.Predictable)
-            predicted = false;
-
         var attempt = new ItemToggleDeactivateAttemptEvent(user);
-        RaiseLocalEvent(uid, ref attempt);
-
-        if (!predicted && _netManager.IsClient)
-            return false;
+        RaiseLocalEvent(ent, ref attempt);
 
         if (attempt.Cancelled)
         {
             if (attempt.Silent)
                 return false;
 
-            if (showPopup && attempt.Popup != null && user != null)
-            {
-                if (predicted)
-                    _popup.PopupClient(attempt.Popup, uid, user.Value);
-                else
-                    _popup.PopupEntity(attempt.Popup, uid, user.Value);
-            }
+            if (!showPopup || attempt.Popup == null || user == null)
+                return false;
+
+            if (predicted)
+                _popup.PopupClient(attempt.Popup, ent, user.Value);
+            else if (_netManager.IsServer)
+                _popup.PopupEntity(attempt.Popup, ent, user.Value);
 
             return false;
         }
 
-        Deactivate((uid, comp), predicted, user, showPopup);
+        Deactivate((ent, ent.Comp), predicted, user, showPopup);
         return true;
     }
 

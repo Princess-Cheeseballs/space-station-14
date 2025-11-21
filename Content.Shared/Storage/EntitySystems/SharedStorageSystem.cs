@@ -16,10 +16,8 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Item;
-using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Lock;
 using Content.Shared.Materials;
-using Content.Shared.Placeable;
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
 using Content.Shared.Storage.Components;
@@ -72,6 +70,9 @@ public abstract class SharedStorageSystem : EntitySystem
     [Dependency] protected readonly SharedUserInterfaceSystem UI = default!;
     [Dependency] private   readonly TagSystem _tag = default!;
     [Dependency] protected readonly UseDelaySystem UseDelay = default!;
+
+    // TODO: Move this back to client only
+    [Dependency] protected readonly IGameTiming _timing = default!;
 
     private EntityQuery<ItemComponent> _itemQuery;
     private EntityQuery<StackComponent> _stackQuery;
@@ -166,7 +167,7 @@ public abstract class SharedStorageSystem : EntitySystem
         SubscribeAllEvent<StorageInsertItemIntoLocationEvent>(OnInsertItemIntoLocation);
         SubscribeAllEvent<StorageSaveItemLocationEvent>(OnSaveItemLocation);
 
-        SubscribeLocalEvent<ItemSizeChangedEvent>(OnItemSizeChanged);
+        SubscribeLocalEvent<ItemComponent, ItemSizeChangedEvent>(OnItemSizeChanged);
 
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.OpenBackpack, InputCmdHandler.FromDelegate(HandleOpenBackpack, handle: false))
@@ -178,21 +179,12 @@ public abstract class SharedStorageSystem : EntitySystem
         UpdatePrototypeCache();
     }
 
-    private void OnItemSizeChanged(ref ItemSizeChangedEvent ev)
+    private void OnItemSizeChanged(Entity<ItemComponent> item, ref ItemSizeChangedEvent ev)
     {
-        var itemEnt = new Entity<ItemComponent?>(ev.Entity, null);
-
-        if (!TryGetStorageLocation(itemEnt, out var container, out var storage, out var loc))
-        {
+        if (!TryGetStorage(item.AsNullable(), out var container, out var storage))
             return;
-        }
 
         UpdateOccupied((container.Owner, storage));
-
-        if (!ItemFitsInGridLocation((itemEnt.Owner, itemEnt.Comp), (container.Owner, storage), loc))
-        {
-            ContainerSystem.Remove(itemEnt.Owner, container, force: true);
-        }
     }
 
     private void OnNestedStorageCvar(bool obj)
@@ -225,6 +217,8 @@ public abstract class SharedStorageSystem : EntitySystem
             storedItems[GetNetEntity(ent)] = location;
         }
 
+        Log.Debug($"This state was generated at {_timing.CurTime}.");
+
         args.State = new StorageComponentState()
         {
             Grid = new List<Box2i>(component.Grid),
@@ -240,6 +234,7 @@ public abstract class SharedStorageSystem : EntitySystem
             StorageOpenSound = component.StorageOpenSound,
             StorageCloseSound = component.StorageCloseSound,
             DefaultStorageOrientation = component.DefaultStorageOrientation,
+            TimeSpan = _timing.CurTime,
         };
     }
 
@@ -393,21 +388,29 @@ public abstract class SharedStorageSystem : EntitySystem
         UI.SetUi((target, targetUI), StorageComponent.StorageUiKey.Key, new InterfaceData("StorageBoundUserInterface"));
     }
 
+    public bool TryGetStorage(EntityUid item,
+        [NotNullWhen(true)] out BaseContainer? container,
+        [NotNullWhen(true)] out StorageComponent? storage)
+    {
+        storage = null;
+        return ContainerSystem.TryGetContainingContainer(item, out container) &&
+               container.ID == StorageComponent.ContainerId &&
+               TryComp(container.Owner, out storage);
+    }
+
     /// <summary>
     /// Tries to get the storage location of an item.
     /// </summary>
-    public bool TryGetStorageLocation(Entity<ItemComponent?> itemEnt, [NotNullWhen(true)] out BaseContainer? container, [NotNullWhen(true)] out StorageComponent? storage, out ItemStorageLocation loc)
+    public bool TryGetStorageLocation(Entity<ItemComponent?> itemEnt,
+        [NotNullWhen(true)] out BaseContainer? container,
+        [NotNullWhen(true)] out StorageComponent? storage,
+        out ItemStorageLocation loc)
     {
         loc = default;
-        storage = null;
 
-        if (!ContainerSystem.TryGetContainingContainer(itemEnt.Owner, out container) ||
-            container.ID != StorageComponent.ContainerId ||
-            !TryComp(container.Owner, out storage) ||
-            !_itemQuery.Resolve(itemEnt, ref itemEnt.Comp, false))
-        {
+        if (!TryGetStorage(itemEnt, out container, out storage)
+            || !_itemQuery.Resolve(itemEnt, ref itemEnt.Comp, false))
             return false;
-        }
 
         loc = storage.StoredItems[itemEnt];
         return true;
@@ -1602,6 +1605,22 @@ public abstract class SharedStorageSystem : EntitySystem
         Vector2i position,
         Angle rotation)
     {
+        return ItemFitsInGridLocation(
+            itemEnt,
+            storageEnt,
+            position,
+            ItemSystem.GetAdjustedItemShape(itemEnt, rotation, position));
+    }
+
+    /// <summary>
+    /// Checks if an item fits into a specific spot on a storage grid.
+    /// </summary>
+    public bool ItemFitsInGridLocation(
+        Entity<ItemComponent?> itemEnt,
+        Entity<StorageComponent?> storageEnt,
+        Vector2i position,
+        IReadOnlyList<Box2i> shape)
+    {
         if (!Resolve(itemEnt, ref itemEnt.Comp) || !Resolve(storageEnt, ref storageEnt.Comp))
             return false;
 
@@ -1609,7 +1628,6 @@ public abstract class SharedStorageSystem : EntitySystem
         if (!gridBounds.Contains(position))
             return false;
 
-        var itemShape = ItemSystem.GetAdjustedItemShape(itemEnt, rotation, position);
         // Ignore the item's existing location for fitting purposes.
         _ignored.Clear();
 
@@ -1618,7 +1636,7 @@ public abstract class SharedStorageSystem : EntitySystem
             AddOccupied(itemEnt, existing, _ignored);
         }
 
-        return ItemFitsInGridLocation(storageEnt.Comp.OccupiedGrid, itemShape, _ignored);
+        return ItemFitsInGridLocation(storageEnt.Comp.OccupiedGrid, shape, _ignored);
     }
 
     /// <summary>
@@ -1659,15 +1677,15 @@ public abstract class SharedStorageSystem : EntitySystem
         ent.Comp.OccupiedGrid.Clear();
         RemoveOccupied(ent.Comp.Grid, ent.Comp.OccupiedGrid);
 
-        Dirty(ent);
-
         foreach (var (stent, storedItem) in ent.Comp.StoredItems)
         {
             if (!_itemQuery.TryGetComponent(stent, out var itemComp))
                 continue;
 
-            AddOccupiedEntity(ent, (stent, itemComp), storedItem);
+            AddOccupied((stent, itemComp), storedItem, ent.Comp.OccupiedGrid);
         }
+
+        Dirty(ent);
     }
 
     private void AddOccupiedEntity(Entity<StorageComponent> storageEnt, Entity<ItemComponent?> itemEnt, ItemStorageLocation location)
@@ -2015,5 +2033,6 @@ public abstract class SharedStorageSystem : EntitySystem
         public SoundSpecifier? StorageOpenSound;
         public SoundSpecifier? StorageCloseSound;
         public StorageDefaultOrientation? DefaultStorageOrientation;
+        public TimeSpan? TimeSpan;
     }
 }

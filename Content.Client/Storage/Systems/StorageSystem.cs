@@ -7,19 +7,18 @@ using Content.Shared.Storage.EntitySystems;
 using Robust.Client.Player;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
-using Robust.Shared.Timing;
 
 namespace Content.Client.Storage.Systems;
 
 public sealed class StorageSystem : SharedStorageSystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly EntityPickupAnimationSystem _entityPickupAnimation = default!;
 
     private Dictionary<EntityUid, ItemStorageLocation> _oldStoredItems = new();
 
     private List<(StorageBoundUserInterface Bui, bool Value)> _queuedBuis = new();
+    private HashSet<Entity<StorageComponent>> _queuedStorage = new();
 
     public override void Initialize()
     {
@@ -30,55 +29,57 @@ public sealed class StorageSystem : SharedStorageSystem
         SubscribeAllEvent<AnimateInsertingEntitiesEvent>(HandleAnimatingInsertingEntities);
     }
 
-    private void OnStorageHandleState(EntityUid uid, StorageComponent component, ref ComponentHandleState args)
+    private void OnStorageHandleState(Entity<StorageComponent> entity, ref ComponentHandleState args)
     {
         if (args.Current is not StorageComponentState state)
             return;
 
-        component.Grid.Clear();
-        component.Grid.AddRange(state.Grid);
-        component.MaxItemSize = state.MaxItemSize;
-        component.Whitelist = state.Whitelist;
-        component.Blacklist = state.Blacklist;
-        component.StorageInsertSound = state.StorageInsertSound;
-        component.StorageRemoveSound = state.StorageRemoveSound;
-        component.StorageOpenSound = state.StorageOpenSound;
-        component.StorageCloseSound = state.StorageCloseSound;
-        component.DefaultStorageOrientation = state.DefaultStorageOrientation;
+        Log.Debug($"Storage component state handled. State generated at {state.TimeSpan} and read at {_timing.CurTime}");
+
+        entity.Comp.Grid.Clear();
+        entity.Comp.Grid.AddRange(state.Grid);
+        entity.Comp.MaxItemSize = state.MaxItemSize;
+        entity.Comp.Whitelist = state.Whitelist;
+        entity.Comp.Blacklist = state.Blacklist;
+        entity.Comp.StorageInsertSound = state.StorageInsertSound;
+        entity.Comp.StorageRemoveSound = state.StorageRemoveSound;
+        entity.Comp.StorageOpenSound = state.StorageOpenSound;
+        entity.Comp.StorageCloseSound = state.StorageCloseSound;
+        entity.Comp.DefaultStorageOrientation = state.DefaultStorageOrientation;
 
         _oldStoredItems.Clear();
 
-        foreach (var item in component.StoredItems)
+        foreach (var item in entity.Comp.StoredItems)
         {
             _oldStoredItems.Add(item.Key, item.Value);
         }
 
-        component.StoredItems.Clear();
+        entity.Comp.StoredItems.Clear();
 
         foreach (var (nent, location) in state.StoredItems)
         {
-            var ent = EnsureEntity<StorageComponent>(nent, uid);
-            component.StoredItems[ent] = location;
+            var ent = EnsureEntity<StorageComponent>(nent, entity.Owner);
+            entity.Comp.StoredItems[ent] = location;
         }
 
-        component.SavedLocations.Clear();
+        entity.Comp.SavedLocations.Clear();
 
         foreach (var loc in state.SavedLocations)
         {
-            component.SavedLocations[loc.Key] = new(loc.Value);
+            entity.Comp.SavedLocations[loc.Key] = new(loc.Value);
         }
 
-        UpdateOccupied((uid, component));
+        _queuedStorage.Add(entity);
 
-        var uiDirty = !component.StoredItems.SequenceEqual(_oldStoredItems);
+        var uiDirty = !entity.Comp.StoredItems.SequenceEqual(_oldStoredItems);
 
-        if (uiDirty && UI.TryGetOpenUi<StorageBoundUserInterface>(uid, StorageComponent.StorageUiKey.Key, out var storageBui))
+        if (uiDirty && UI.TryGetOpenUi<StorageBoundUserInterface>(entity.Owner, StorageComponent.StorageUiKey.Key, out var storageBui))
         {
             storageBui.Refresh();
             // Make sure nesting still updated.
             var player = _player.LocalEntity;
 
-            if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((uid, null, null), out var container) &&
+            if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((entity.Owner, null, null), out var container) &&
                 UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner, StorageComponent.StorageUiKey.Key, out var containerBui))
             {
                 _queuedBuis.Add((containerBui, false));
@@ -166,10 +167,12 @@ public sealed class StorageSystem : SharedStorageSystem
     {
         base.Update(frameTime);
 
-        if (!_timing.IsFirstTimePredicted)
+        foreach (var storage in _queuedStorage)
         {
-            return;
+            UpdateOccupied(storage);
         }
+
+        _queuedStorage.Clear();
 
         // This update loop exists just to synchronize with UISystem and avoid 1-tick delays.
         // If deferred opens / closes ever get removed you can dump this.

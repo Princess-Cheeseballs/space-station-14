@@ -15,8 +15,8 @@ namespace Content.Shared.Item;
 [Access(typeof(SharedItemSystem)), AutoGenerateComponentState(true)]
 public sealed partial class ItemComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
     [Access(typeof(SharedItemSystem))]
+    [DataField, AutoNetworkedField]
     public ProtoId<ItemSizePrototype> Size = "Small";
 
     [Access(typeof(SharedItemSystem))]
@@ -24,7 +24,6 @@ public sealed partial class ItemComponent : Component
     public Dictionary<HandLocation, List<PrototypeLayerData>> InhandVisuals = new();
 
     [Access(typeof(SharedItemSystem))]
-    [ViewVariables(VVAccess.ReadWrite)]
     [DataField, AutoNetworkedField]
     public string? HeldPrefix;
 
@@ -32,7 +31,6 @@ public sealed partial class ItemComponent : Component
     ///     Rsi of the sprite shown on the player when this item is in their hands. Used to generate a default entry for <see cref="InhandVisuals"/>
     /// </summary>
     [Access(typeof(SharedItemSystem))]
-    [ViewVariables(VVAccess.ReadWrite)]
     [DataField("sprite")]
     public string? RsiPath;
 
@@ -40,6 +38,7 @@ public sealed partial class ItemComponent : Component
     /// An optional override for the shape of the item within the grid storage.
     /// If null, a default shape will be used based on <see cref="Size"/>.
     /// </summary>
+    [Access(typeof(SharedItemSystem))]
     [DataField, AutoNetworkedField]
     public List<Box2i>? Shape;
 
@@ -47,6 +46,7 @@ public sealed partial class ItemComponent : Component
     /// Saved value of our item's bulk based on the shape of our item.
     /// If the shape is null this value will also be null.
     /// </summary>
+    [Access(typeof(SharedItemSystem))]
     [ViewVariables, AutoNetworkedField]
     public int? Weight;
 

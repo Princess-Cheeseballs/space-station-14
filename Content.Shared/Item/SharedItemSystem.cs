@@ -5,6 +5,7 @@ using Content.Shared.Verbs;
 using Content.Shared.Examine;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Storage;
+using Content.Shared.Storage.EntitySystems;
 using JetBrains.Annotations;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
@@ -15,8 +16,9 @@ namespace Content.Shared.Item;
 public abstract class SharedItemSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private   readonly SharedHandsSystem _handsSystem = default!;
     [Dependency] protected readonly SharedContainerSystem Container = default!;
+    [Dependency] private   readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly SharedStorageSystem _storage = default!;
 
     private EntityQuery<ItemComponent> _itemQuery;
 
@@ -30,17 +32,15 @@ public abstract class SharedItemSystem : EntitySystem
         SubscribeLocalEvent<ItemComponent, ExaminedEvent>(OnExamine);
 
         SubscribeLocalEvent<ItemToggleSizeComponent, ItemToggledEvent>(OnItemToggle);
+        SubscribeLocalEvent<ItemToggleSizeComponent, ItemToggleActivateAttemptEvent>(OnItemActivateAttempt);
+        SubscribeLocalEvent<ItemToggleSizeComponent, ItemToggleDeactivateAttemptEvent>(OnItemDeactivateAttempt);
 
         _itemQuery = GetEntityQuery<ItemComponent>();
     }
 
     private void OnComponentInit(Entity<ItemComponent> item, ref ComponentInit args)
     {
-        if (item.Comp.Shape is not { } shape)
-            return;
-
         UpdateWeight(item);
-        Dirty(item);
     }
 
     private void OnItemAutoState(EntityUid uid, ItemComponent component, ref AfterAutoHandleStateEvent args)
@@ -50,30 +50,40 @@ public abstract class SharedItemSystem : EntitySystem
 
     #region Public API
 
-    public void SetSize(Entity<ItemComponent?> item, ProtoId<ItemSizePrototype> size)
+    public bool TrySetSize(Entity<ItemComponent?> item, ProtoId<ItemSizePrototype> size)
     {
-        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Size == size)
-            return;
+        if (!CanSetSize(item, size))
+            return false;
 
-        item.Comp.Size = size;
-        item.Comp.Weight = null;
-
-        Dirty(item);
-        var ev = new ItemSizeChangedEvent(item);
-        RaiseLocalEvent(item, ref ev, broadcast: true);
+        SetSize(item, size);
+        return true;
     }
 
-    public void SetShape(Entity<ItemComponent?> item, List<Box2i>? shape)
+    public bool TrySetShape(Entity<ItemComponent?> item, List<Box2i> shape)
     {
-        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Shape == shape)
-            return;
+        if (!CanSetShape(item, shape))
+            return false;
 
-        item.Comp.Shape = shape;
-        UpdateWeight((item, item.Comp));
+        SetShape(item, shape);
+        return true;
+    }
 
-        Dirty(item);
-        var ev = new ItemSizeChangedEvent(item);
-        RaiseLocalEvent(item, ref ev, broadcast: true);
+    public bool CanSetSize(Entity<ItemComponent?> item, ProtoId<ItemSizePrototype> size)
+    {
+        // Doesn't exist, so don't do it!
+        if (!_prototype.Resolve(size, out var proto))
+            return false;
+
+        return CanSetShape(item, proto.DefaultShape);
+    }
+
+    public bool CanSetShape(Entity<ItemComponent?> item, IReadOnlyList<Box2i> shape)
+    {
+        // Not stored in anything, nothing to limit it here.
+        if (!_storage.TryGetStorageLocation(item, out var container, out var storage, out var loc))
+            return true;
+
+        return _storage.ItemFitsInGridLocation(item, (container.Owner, storage), loc.Position, GetAdjustedShapes(shape, loc.Rotation, loc.Position));
     }
 
     /// <remarks>This method is private since we want the weight directly linked to the shape of the item.</remarks>
@@ -129,6 +139,32 @@ public abstract class SharedItemSystem : EntitySystem
     }
 
     #endregion
+
+    private void SetSize(Entity<ItemComponent?> item, ProtoId<ItemSizePrototype> size)
+    {
+        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Size == size)
+            return;
+
+        item.Comp.Size = size;
+        item.Comp.Weight = null;
+
+        Dirty(item);
+        var ev = new ItemSizeChangedEvent(item);
+        RaiseLocalEvent(item, ref ev, broadcast: true);
+    }
+
+    private void SetShape(Entity<ItemComponent?> item, List<Box2i> shape)
+    {
+        if (!_itemQuery.Resolve(item, ref item.Comp, false) || item.Comp.Shape == shape)
+            return;
+
+        item.Comp.Shape = shape;
+        UpdateWeight((item, item.Comp));
+
+        Dirty(item);
+        var ev = new ItemSizeChangedEvent(item);
+        RaiseLocalEvent(item, ref ev, broadcast: true);
+    }
 
     private void OnHandInteract(EntityUid uid, ItemComponent component, InteractHandEvent args)
     {
@@ -250,9 +286,21 @@ public abstract class SharedItemSystem : EntitySystem
         return adjustedShapes;
     }
 
+    public IReadOnlyList<Box2i> GetAdjustedShapes(IReadOnlyList<Box2i> shapes, Angle rotation, Vector2i position)
+    {
+        var adjustedShapes = new List<Box2i>();
+        GetAdjustedShapes(adjustedShapes, shapes, rotation, position);
+        return adjustedShapes;
+    }
+
     public void GetAdjustedItemShape(List<Box2i> adjustedShapes, Entity<ItemComponent?> entity, Angle rotation, Vector2i position)
     {
         var shapes = GetItemShape(entity);
+        GetAdjustedShapes(adjustedShapes, shapes, rotation, position);
+    }
+
+    public void GetAdjustedShapes(List<Box2i> adjustedShapes, IReadOnlyList<Box2i> shapes, Angle rotation, Vector2i position)
+    {
         var boundingShape = shapes.GetBoundingBox();
         var boundingCenter = ((Box2) boundingShape).Center;
         var matty = Matrix3Helpers.CreateTransform(boundingCenter, rotation);
@@ -268,43 +316,63 @@ public abstract class SharedItemSystem : EntitySystem
         }
     }
 
+    private void OnItemActivateAttempt(Entity<ItemToggleSizeComponent> item, ref ItemToggleActivateAttemptEvent args)
+    {
+        if ((item.Comp.ActivatedSize is not { } size || CanSetSize(item.Owner, size))
+            && (item.Comp.ActivatedShape is not { } shape || CanSetShape(item.Owner, shape)))
+            return;
+
+        args.Cancelled = true;
+        args.Popup = "Activation failure test message!";
+    }
+
+    private void OnItemDeactivateAttempt(Entity<ItemToggleSizeComponent> item, ref ItemToggleDeactivateAttemptEvent args)
+    {
+        if ((item.Comp.DeactivatedSize is not { } size || CanSetSize(item.Owner, size))
+            && (item.Comp.DeactivatedShape is not { } shape || CanSetShape(item.Owner, shape)))
+            return;
+
+        args.Cancelled = true;
+        args.Popup = "Deactivation failure test message!";
+    }
+
     /// <summary>
     /// Used to update the Item component on item toggle (specifically size).
     /// </summary>
-    private void OnItemToggle(EntityUid uid, ItemToggleSizeComponent itemToggleSize, ItemToggledEvent args)
+    private void OnItemToggle(Entity<ItemToggleSizeComponent> entity, ref ItemToggledEvent args)
     {
-        if (!_itemQuery.TryComp(uid, out var item))
+        if (!_itemQuery.TryComp(entity, out var item))
             return;
 
         if (args.Activated)
         {
-            if (itemToggleSize.ActivatedShape != null)
+            if (entity.Comp.ActivatedShape != null)
             {
                 // Set the deactivated shape to the default item's shape before it gets changed.
-                itemToggleSize.DeactivatedShape ??= [..GetItemShape(item)];
-                SetShape((uid, item), itemToggleSize.ActivatedShape);
+                entity.Comp.DeactivatedShape ??= [..GetItemShape(item)];
+                SetShape((entity, item), entity.Comp.ActivatedShape);
             }
 
-            if (itemToggleSize.ActivatedSize != null)
+            if (entity.Comp.ActivatedSize != null)
             {
                 // Set the deactivated size to the default item's size before it gets changed.
-                itemToggleSize.DeactivatedSize ??= item.Size;
-                SetSize((uid, item), itemToggleSize.ActivatedSize.Value);
+                entity.Comp.DeactivatedSize ??= item.Size;
+                SetSize((entity, item), entity.Comp.ActivatedSize.Value);
             }
         }
         else
         {
-            if (itemToggleSize.DeactivatedShape != null)
+            if (entity.Comp.DeactivatedShape != null)
             {
-                SetShape((uid, item), itemToggleSize.DeactivatedShape);
+                SetShape((entity, item), entity.Comp.DeactivatedShape);
             }
 
-            if (itemToggleSize.DeactivatedSize != null)
+            if (entity.Comp.DeactivatedSize != null)
             {
-                SetSize((uid, item), itemToggleSize.DeactivatedSize.Value);
+                SetSize((entity, item), entity.Comp.DeactivatedSize.Value);
             }
         }
 
-        Dirty(uid, itemToggleSize);
+        Dirty(entity);
     }
 }

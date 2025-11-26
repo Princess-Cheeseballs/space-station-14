@@ -14,7 +14,7 @@ namespace Content.Shared.Storage
     /// <summary>
     /// Handles generic storage with window, such as backpacks.
     /// </summary>
-    [RegisterComponent, NetworkedComponent]
+    [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
     public sealed partial class StorageComponent : Component
     {
         public static string ContainerId = "storagebase";
@@ -33,7 +33,7 @@ namespace Content.Shared.Storage
         /// <summary>
         /// A dictionary storing each entity to its position within the storage grid.
         /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
+        [DataField, AutoNetworkedField]
         public Dictionary<EntityUid, ItemStorageLocation> StoredItems = new();
 
         /// <summary>
@@ -47,13 +47,13 @@ namespace Content.Shared.Storage
         /// <summary>
         /// A list of boxes that comprise a combined grid that determines the location that items can be stored.
         /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
+        [DataField, AutoNetworkedField]
         public List<Box2i> Grid = new();
 
         /// <summary>
         /// The maximum size item that can be inserted into this storage,
         /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
+        [DataField, AutoNetworkedField]
         [Access(typeof(SharedStorageSystem))]
         public ProtoId<ItemSizePrototype>? MaxItemSize;
 
@@ -101,37 +101,37 @@ namespace Content.Shared.Storage
         /// <summary>
         /// Whitelist for entities that can go into the storage.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public EntityWhitelist? Whitelist;
 
         /// <summary>
         /// Blacklist for entities that can go into storage.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public EntityWhitelist? Blacklist;
 
         /// <summary>
         /// Sound played whenever an entity is inserted into storage.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public SoundSpecifier? StorageInsertSound = new SoundCollectionSpecifier("storageRustle");
 
         /// <summary>
         /// Sound played whenever an entity is removed from storage.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public SoundSpecifier? StorageRemoveSound;
 
         /// <summary>
         /// Sound played whenever the storage window is opened.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public SoundSpecifier? StorageOpenSound = new SoundCollectionSpecifier("storageRustle");
 
         /// <summary>
         /// Sound played whenever the storage window is closed.
         /// </summary>
-        [DataField]
+        [DataField, AutoNetworkedField]
         public SoundSpecifier? StorageCloseSound;
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Content.Shared.Storage
         /// Horizontal - items are stored laying down
         /// Vertical - items are stored standing up
         /// </summary>
-        [DataField, ViewVariables(VVAccess.ReadWrite)]
+        [DataField, AutoNetworkedField]
         public StorageDefaultOrientation? DefaultStorageOrientation;
 
         /// <summary>

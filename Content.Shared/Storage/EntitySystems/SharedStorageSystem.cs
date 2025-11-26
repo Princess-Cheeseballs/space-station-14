@@ -30,7 +30,6 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
-using Robust.Shared.GameStates;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
@@ -139,7 +138,6 @@ public abstract class SharedStorageSystem : EntitySystem
         SubscribeLocalEvent<StorageComponent, ComponentRemove>(OnRemove);
         SubscribeLocalEvent<StorageComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<StorageComponent, GetVerbsEvent<ActivationVerb>>(AddUiVerb);
-        SubscribeLocalEvent<StorageComponent, ComponentGetState>(OnStorageGetState);
         SubscribeLocalEvent<StorageComponent, ComponentInit>(OnComponentInit, before: new[] { typeof(SharedContainerSystem) });
         SubscribeLocalEvent<StorageComponent, GetVerbsEvent<UtilityVerb>>(AddTransferVerbs);
         SubscribeLocalEvent<StorageComponent, InteractUsingEvent>(OnInteractUsing, after: new[] { typeof(ItemSlotsSystem) });
@@ -204,33 +202,6 @@ public abstract class SharedStorageSystem : EntitySystem
     {
         UseDelay.SetLength(entity.Owner, entity.Comp.QuickInsertCooldown, QuickInsertUseDelayID);
         UseDelay.SetLength(entity.Owner, entity.Comp.OpenUiCooldown, OpenUiUseDelayID);
-    }
-
-    private void OnStorageGetState(EntityUid uid, StorageComponent component, ref ComponentGetState args)
-    {
-        var storedItems = new Dictionary<NetEntity, ItemStorageLocation>();
-
-        foreach (var (ent, location) in component.StoredItems)
-        {
-            storedItems[GetNetEntity(ent)] = location;
-        }
-
-        args.State = new StorageComponentState()
-        {
-            Grid = new List<Box2i>(component.Grid),
-            MaxItemSize = component.MaxItemSize,
-            StoredItems = storedItems,
-            SavedLocations = component.SavedLocations,
-            Whitelist = component.Whitelist,
-            Blacklist = component.Blacklist,
-            QuickInsert = component.QuickInsert,
-            AreaInsert = component.AreaInsert,
-            StorageInsertSound = component.StorageInsertSound,
-            StorageRemoveSound = component.StorageRemoveSound,
-            StorageOpenSound = component.StorageOpenSound,
-            StorageCloseSound = component.StorageCloseSound,
-            DefaultStorageOrientation = component.DefaultStorageOrientation,
-        };
     }
 
     public override void Shutdown()
@@ -898,9 +869,6 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntInserted(Entity<StorageComponent> entity, ref EntInsertedIntoContainerMessage args)
     {
-        if (Timing.ApplyingState)
-            return;
-
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;
@@ -926,9 +894,6 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntRemoved(Entity<StorageComponent> entity, ref EntRemovedFromContainerMessage args)
     {
-        if (Timing.ApplyingState)
-            return;
-
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;

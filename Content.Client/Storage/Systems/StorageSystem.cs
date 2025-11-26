@@ -23,11 +23,26 @@ public sealed class StorageSystem : SharedStorageSystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<StorageComponent, ComponentHandleState>(OnStorageHandleState);
+        SubscribeLocalEvent<StorageComponent, AfterAutoHandleStateEvent>(OnAfterAutoHandleState);
         SubscribeNetworkEvent<PickupAnimationEvent>(HandlePickupAnimation);
         SubscribeAllEvent<AnimateInsertingEntitiesEvent>(HandleAnimatingInsertingEntities);
     }
 
+    private void OnAfterAutoHandleState(Entity<StorageComponent> entity, ref AfterAutoHandleStateEvent args)
+    {
+        if (!UI.TryGetOpenUi<StorageBoundUserInterface>(entity.Owner, StorageComponent.StorageUiKey.Key, out var storageBui))
+            return;
+
+        storageBui.Refresh();
+        // Make sure nesting still updated.
+        var player = _player.LocalEntity;
+
+        if (NestedStorage && player != null && ContainerSystem.TryGetContainingContainer((entity.Owner, null, null), out var container) &&
+            UI.TryGetOpenUi<StorageBoundUserInterface>(container.Owner, StorageComponent.StorageUiKey.Key, out var containerBui))
+            _queuedBuis.Add((containerBui, false));
+    }
+
+    /*
     private void OnStorageHandleState(Entity<StorageComponent> entity, ref ComponentHandleState args)
     {
         if (args.Current is not StorageComponentState state)
@@ -82,7 +97,7 @@ public sealed class StorageSystem : SharedStorageSystem
                 _queuedBuis.Add((containerBui, false));
             }
         }
-    }
+    }*/
 
     public override void UpdateUI(Entity<StorageComponent?> entity)
     {

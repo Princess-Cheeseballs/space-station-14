@@ -33,6 +33,8 @@ public sealed class StorageSystem : SharedStorageSystem
         if (!UI.TryGetOpenUi<StorageBoundUserInterface>(entity.Owner, StorageComponent.StorageUiKey.Key, out var storageBui))
             return;
 
+        UpdateOccupied(entity);
+
         storageBui.Refresh();
         // Make sure nesting still updated.
         var player = _player.LocalEntity;

@@ -45,16 +45,6 @@ public sealed partial class ItemToggleComponent : Component
     public string VerbToggleOff = "item-toggle-deactivate";
 
     /// <summary>
-    ///     Whether the item's toggle can be predicted by the client.
-    /// </summary>
-    /// /// <remarks>
-    /// If server-side systems affect the item's toggle, like charge/fuel systems, then the item is not predictable.
-    /// </remarks>
-    // TODO: Explode this with hammers. We only need predicted power cells and then this can be nuked!
-    [DataField, AutoNetworkedField]
-    public bool Predictable = true;
-
-    /// <summary>
     ///     The noise this item makes when it is toggled on.
     /// </summary>
     [DataField, AutoNetworkedField]
@@ -129,9 +119,8 @@ public record struct ItemToggleDeactivateAttemptEvent(EntityUid? User)
 /// Raised directed on an entity any sort of toggle is complete.
 /// </summary>
 [ByRefEvent]
-public readonly record struct ItemToggledEvent(bool Predicted, bool Activated, EntityUid? User)
+public readonly record struct ItemToggledEvent(bool Activated, EntityUid? User)
 {
-    public readonly bool Predicted = Predicted;
     public readonly bool Activated = Activated;
     public readonly EntityUid? User = User;
 }

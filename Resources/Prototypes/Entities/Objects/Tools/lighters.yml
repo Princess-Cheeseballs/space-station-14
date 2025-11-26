@@ -7,7 +7,6 @@
   - type: IgnitionSource
     ignited: false
   - type: ItemToggle
-    predictable: false
     soundActivate:
       collection: lighterOnSounds
     soundDeactivate:
@@ -141,7 +140,6 @@
       visible: false
       shader: unshaded
   - type: ItemToggle
-    predictable: false
     soundActivate:
       path: /Audio/Items/Lighters/zippo_open.ogg
       params:
@@ -242,7 +240,6 @@
   id: BaseBrandedLighter
   components:
   - type: ItemToggle
-    predictable: false
     soundActivate:
       path: /Audio/Items/Lighters/zippo_open.ogg
       params:

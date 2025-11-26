@@ -52,7 +52,6 @@
     deactivatedSoundOnHitNoDamage:
       collection: MetalThud
   - type: ItemToggle
-    predictable: false
     soundActivate:
       collection: lighterOnSounds
     soundDeactivate:

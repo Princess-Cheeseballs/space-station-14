@@ -33,8 +33,6 @@ public sealed class StorageSystem : SharedStorageSystem
         if (args.Current is not StorageComponentState state)
             return;
 
-        Log.Debug($"Storage component state handled. State generated at {state.TimeSpan} and read at {Timing.CurTime}");
-
         entity.Comp.Grid.Clear();
         entity.Comp.Grid.AddRange(state.Grid);
         entity.Comp.MaxItemSize = state.MaxItemSize;

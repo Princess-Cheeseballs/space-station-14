@@ -215,8 +215,6 @@ public abstract class SharedStorageSystem : EntitySystem
             storedItems[GetNetEntity(ent)] = location;
         }
 
-        Log.Debug($"This state was generated at {Timing.CurTime}.");
-
         args.State = new StorageComponentState()
         {
             Grid = new List<Box2i>(component.Grid),
@@ -232,7 +230,6 @@ public abstract class SharedStorageSystem : EntitySystem
             StorageOpenSound = component.StorageOpenSound,
             StorageCloseSound = component.StorageCloseSound,
             DefaultStorageOrientation = component.DefaultStorageOrientation,
-            TimeSpan = Timing.CurTime,
         };
     }
 
@@ -2038,6 +2035,5 @@ public abstract class SharedStorageSystem : EntitySystem
         public SoundSpecifier? StorageOpenSound;
         public SoundSpecifier? StorageCloseSound;
         public StorageDefaultOrientation? DefaultStorageOrientation;
-        public TimeSpan? TimeSpan;
     }
 }

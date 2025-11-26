@@ -54,7 +54,7 @@ public sealed class ItemToggleSystem : EntitySystem
         if (!ent.Comp.Activated)
             return;
 
-        var ev = new ItemToggledEvent(Predicted: ent.Comp.Predictable, Activated: ent.Comp.Activated, User: null);
+        var ev = new ItemToggledEvent(Activated: ent.Comp.Activated, User: null);
         RaiseLocalEvent(ent, ref ev);
     }
 
@@ -65,7 +65,7 @@ public sealed class ItemToggleSystem : EntitySystem
 
         args.Handled = true;
 
-        Toggle((ent, ent.Comp), args.User, predicted: ent.Comp.Predictable);
+        Toggle((ent, ent.Comp), args.User);
     }
 
     private void OnActivateVerb(Entity<ItemToggleComponent> ent, ref GetVerbsEvent<ActivationVerb> args)
@@ -97,7 +97,7 @@ public sealed class ItemToggleSystem : EntitySystem
             Text = !ent.Comp.Activated ? Loc.GetString(ent.Comp.VerbToggleOn) : Loc.GetString(ent.Comp.VerbToggleOff),
             Act = () =>
             {
-                Toggle((ent.Owner, ent.Comp), user, predicted: ent.Comp.Predictable);
+                Toggle((ent.Owner, ent.Comp), user);
             }
         });
     }
@@ -108,7 +108,7 @@ public sealed class ItemToggleSystem : EntitySystem
             return;
 
         args.Handled = true;
-        Toggle((ent.Owner, ent.Comp), args.User, predicted: ent.Comp.Predictable);
+        Toggle((ent.Owner, ent.Comp), args.User);
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public sealed class ItemToggleSystem : EntitySystem
         UpdateVisuals((uid, comp));
         Dirty(uid, comp);
 
-        var toggleUsed = new ItemToggledEvent(predicted, Activated: true, user);
+        var toggleUsed = new ItemToggledEvent(Activated: true, user);
         RaiseLocalEvent(uid, ref toggleUsed);
     }
 
@@ -257,7 +257,7 @@ public sealed class ItemToggleSystem : EntitySystem
         UpdateVisuals((uid, comp));
         Dirty(uid, comp);
 
-        var toggleUsed = new ItemToggledEvent(predicted, Activated: false, user);
+        var toggleUsed = new ItemToggledEvent(Activated: false, user);
         RaiseLocalEvent(uid, ref toggleUsed);
     }
 
@@ -332,9 +332,7 @@ public sealed class ItemToggleSystem : EntitySystem
         if (comp.ActiveSound != null && comp.PlayingStream == null)
         {
             var loop = comp.ActiveSound.Params.WithLoop(true);
-            var stream = args.Predicted
-                ? _audio.PlayPredicted(comp.ActiveSound, uid, args.User, loop)
-                : _audio.PlayPvs(comp.ActiveSound, uid, loop);
+            var stream = _audio.PlayPredicted(comp.ActiveSound, uid, args.User, loop);
             if (stream?.Entity is {} entity)
                 comp.PlayingStream = entity;
         }

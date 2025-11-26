@@ -90,4 +90,5 @@ public sealed partial class CCVars
         [CVarControl(AdminFlags.VarEdit)]
         public static readonly CVarDef<float> PlaytestStaminaDamageModifier =
             CVarDef.Create("playtest.stamina_damage_modifier", 1f, CVar.SERVER | CVar.REPLICATED);
+
 }

@@ -40,8 +40,8 @@ namespace Content.IntegrationTests.Tests
                         !proto.TryGetComponent<ItemComponent>("Item", out var item))
                         continue;
 
-                    Assert.That(itemSys.GetSizePrototype(storage.MaxItemSize.Value).Weight,
-                        Is.LessThanOrEqualTo(itemSys.GetItemWeight(item)),
+                    Assert.That(itemSys.GetSizePrototype(storage.MaxItemSize.Value),
+                        Is.LessThanOrEqualTo(itemSys.GetSizePrototype(item.Size)),
                         $"Found storage arbitrage on {proto.ID}");
                 }
             });
@@ -154,8 +154,8 @@ namespace Content.IntegrationTests.Tests
                         if (entryItem == null)
                             continue;
 
-                        Assert.That(itemSys.GetItemWeight(entryItem),
-                            Is.LessThanOrEqualTo(protoMan.Index(maxSize.Value).Weight),
+                        Assert.That(itemSys.GetSizePrototype(entryItem.Size),
+                            Is.LessThanOrEqualTo(protoMan.Index(maxSize.Value)),
                             $"Entity {proto.ID} has storage-fill item, {entry.PrototypeId}, that is too large");
                     }
                 }

@@ -48,6 +48,7 @@ namespace Content.Shared.Storage.EntitySystems;
 public abstract class SharedStorageSystem : EntitySystem
 {
     [Dependency] private   readonly IConfigurationManager _cfg = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
     [Dependency] private   readonly IPrototypeManager _prototype = default!;
     [Dependency] protected readonly IRobustRandom Random = default!;
     [Dependency] private   readonly ISharedAdminLogManager _adminLog = default!;
@@ -70,9 +71,6 @@ public abstract class SharedStorageSystem : EntitySystem
     [Dependency] protected readonly SharedUserInterfaceSystem UI = default!;
     [Dependency] private   readonly TagSystem _tag = default!;
     [Dependency] protected readonly UseDelaySystem UseDelay = default!;
-
-    // TODO: Move this back to client only
-    [Dependency] protected readonly IGameTiming _timing = default!;
 
     private EntityQuery<ItemComponent> _itemQuery;
     private EntityQuery<StackComponent> _stackQuery;
@@ -217,7 +215,7 @@ public abstract class SharedStorageSystem : EntitySystem
             storedItems[GetNetEntity(ent)] = location;
         }
 
-        Log.Debug($"This state was generated at {_timing.CurTime}.");
+        Log.Debug($"This state was generated at {Timing.CurTime}.");
 
         args.State = new StorageComponentState()
         {
@@ -234,7 +232,7 @@ public abstract class SharedStorageSystem : EntitySystem
             StorageOpenSound = component.StorageOpenSound,
             StorageCloseSound = component.StorageCloseSound,
             DefaultStorageOrientation = component.DefaultStorageOrientation,
-            TimeSpan = _timing.CurTime,
+            TimeSpan = Timing.CurTime,
         };
     }
 
@@ -381,7 +379,6 @@ public abstract class SharedStorageSystem : EntitySystem
         targetComp.ShowVerb = source.Comp.ShowVerb;
 
         UpdateOccupied((target, targetComp));
-        Dirty(target, targetComp);
 
         var targetUI = EnsureComp<UserInterfaceComponent>(target);
 
@@ -904,6 +901,9 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntInserted(Entity<StorageComponent> entity, ref EntInsertedIntoContainerMessage args)
     {
+        if (Timing.ApplyingState)
+            return;
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;
@@ -929,6 +929,9 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntRemoved(Entity<StorageComponent> entity, ref EntRemovedFromContainerMessage args)
     {
+        if (Timing.ApplyingState)
+            return;
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;
@@ -1075,16 +1078,7 @@ public abstract class SharedStorageSystem : EntitySystem
             return true;
         }
 
-        var maxSize = GetMaxItemSize((uid, storageComp));
-        var size = ItemSystem.GetItemWeight(item);
-        if (size > maxSize.Weight)
-        {
-            reason = "comp-storage-too-big";
-            return false;
-        }
-
-        if (TryComp<StorageComponent>(insertEnt, out var insertStorage)
-            && GetMaxItemSize((insertEnt, insertStorage)) >= maxSize)
+        if (ItemTooBig((uid, storageComp), (insertEnt, item)))
         {
             reason = "comp-storage-too-big";
             return false;
@@ -1110,6 +1104,17 @@ public abstract class SharedStorageSystem : EntitySystem
 
         reason = null;
         return true;
+    }
+
+    public bool ItemTooBig(Entity<StorageComponent?> storage, Entity<ItemComponent?> item)
+    {
+        var maxSize = GetMaxItemSize(storage);
+        var size = ItemSystem.GetItemWeight(item);
+        if (size > maxSize.Weight)
+            return true;
+
+        return TryComp<StorageComponent>(item, out var insertStorage)
+               && GetMaxItemSize((item, insertStorage)) >= maxSize;
     }
 
     /// <summary>

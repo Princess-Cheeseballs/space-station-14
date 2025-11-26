@@ -18,7 +18,6 @@ public sealed class StorageSystem : SharedStorageSystem
     private Dictionary<EntityUid, ItemStorageLocation> _oldStoredItems = new();
 
     private List<(StorageBoundUserInterface Bui, bool Value)> _queuedBuis = new();
-    private HashSet<Entity<StorageComponent>> _queuedStorage = new();
 
     public override void Initialize()
     {
@@ -34,7 +33,7 @@ public sealed class StorageSystem : SharedStorageSystem
         if (args.Current is not StorageComponentState state)
             return;
 
-        Log.Debug($"Storage component state handled. State generated at {state.TimeSpan} and read at {_timing.CurTime}");
+        Log.Debug($"Storage component state handled. State generated at {state.TimeSpan} and read at {Timing.CurTime}");
 
         entity.Comp.Grid.Clear();
         entity.Comp.Grid.AddRange(state.Grid);
@@ -69,7 +68,7 @@ public sealed class StorageSystem : SharedStorageSystem
             entity.Comp.SavedLocations[loc.Key] = new(loc.Value);
         }
 
-        _queuedStorage.Add(entity);
+        UpdateOccupied(entity);
 
         var uiDirty = !entity.Comp.StoredItems.SequenceEqual(_oldStoredItems);
 
@@ -115,7 +114,7 @@ public sealed class StorageSystem : SharedStorageSystem
     public override void PlayPickupAnimation(EntityUid uid, EntityCoordinates initialCoordinates, EntityCoordinates finalCoordinates,
         Angle initialRotation, EntityUid? user = null)
     {
-        if (!_timing.IsFirstTimePredicted)
+        if (!Timing.IsFirstTimePredicted)
             return;
 
         PickupAnimation(uid, initialCoordinates, finalCoordinates, initialRotation);
@@ -128,7 +127,7 @@ public sealed class StorageSystem : SharedStorageSystem
 
     public void PickupAnimation(EntityUid item, EntityCoordinates initialCoords, EntityCoordinates finalCoords, Angle initialAngle)
     {
-        if (!_timing.IsFirstTimePredicted)
+        if (!Timing.IsFirstTimePredicted)
             return;
 
         if (TransformSystem.InRange(finalCoords, initialCoords, 0.1f) ||
@@ -166,13 +165,6 @@ public sealed class StorageSystem : SharedStorageSystem
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
-
-        foreach (var storage in _queuedStorage)
-        {
-            UpdateOccupied(storage);
-        }
-
-        _queuedStorage.Clear();
 
         // This update loop exists just to synchronize with UISystem and avoid 1-tick delays.
         // If deferred opens / closes ever get removed you can dump this.

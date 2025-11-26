@@ -1,14 +1,12 @@
 using Content.Shared.Alert;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CCVar;
-using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Gravity;
 using Content.Shared.Hands;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Input;
 using Content.Shared.Movement.Events;
@@ -31,24 +29,14 @@ namespace Content.Shared.Stunnable;
 /// </summary>
 public abstract partial class SharedStunSystem
 {
-
-    // Mininum weight for modifiers
-    private static int _minWeight;
-
-    // Amount of extra bulk we add or subtract to the bulk used in slowdown calculations
-    private static int _weightMod;
-
-    // Maximum adjusted weight (so weight minus minweight) for maximum penalty
-    private static float _maxWeight;
-
     private EntityQuery<CrawlerComponent> _crawlerQuery;
 
-    [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly StandingStateSystem _standingState = default!;
+    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
 
     public static readonly ProtoId<AlertPrototype> KnockdownAlert = "Knockdown";
 
@@ -66,7 +54,7 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<KnockedDownComponent, BuckleAttemptEvent>(OnBuckleAttempt);
         SubscribeLocalEvent<KnockedDownComponent, StandAttemptEvent>(OnStandAttempt);
 
-        // Updating movement a friction
+        // Updating movement and friction
         SubscribeLocalEvent<KnockedDownComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshKnockedSpeed);
         SubscribeLocalEvent<KnockedDownComponent, RefreshFrictionModifiersEvent>(OnRefreshFriction);
         SubscribeLocalEvent<KnockedDownComponent, TileFrictionEvent>(OnKnockedTileFriction);
@@ -78,11 +66,11 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<CrawlerComponent, KnockedDownRefreshEvent>(OnKnockdownRefresh);
         SubscribeLocalEvent<CrawlerComponent, DamageChangedEvent>(OnDamaged);
         SubscribeLocalEvent<KnockedDownComponent, WeightlessnessChangedEvent>(OnWeightlessnessChanged);
-        SubscribeLocalEvent<GravityAffectedComponent, KnockDownAttemptEvent>(OnKnockdownAttempt);
-        SubscribeLocalEvent<GravityAffectedComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
         SubscribeLocalEvent<KnockedDownComponent, DidEquipHandEvent>(OnHandEquipped);
         SubscribeLocalEvent<KnockedDownComponent, DidUnequipHandEvent>(OnHandUnequipped);
-        SubscribeLocalEvent<HandsComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
+        SubscribeLocalEvent<KnockedDownComponent, HandCountChangedEvent>(OnHandCountChanged);
+        SubscribeLocalEvent<GravityAffectedComponent, KnockDownAttemptEvent>(OnKnockdownAttempt);
+        SubscribeLocalEvent<GravityAffectedComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
 
         // Handling Alternative Inputs
         SubscribeAllEvent<ForceStandUpEvent>(OnForceStandup);
@@ -271,7 +259,7 @@ public abstract partial class SharedStunSystem
     private void ToggleKnockdown(Entity<CrawlerComponent?, KnockedDownComponent?> entity)
     {
         // We resolve here instead of using TryCrawling to be extra sure someone without crawler can't stand up early.
-        if (!Resolve(entity, ref entity.Comp1, false) || !_config.GetCVar(CCVars.MovementCrawling))
+        if (!Resolve(entity, ref entity.Comp1, false) || !_cfgManager.GetCVar(CCVars.MovementCrawling))
             return;
 
         if (!Resolve(entity, ref entity.Comp2, false))
@@ -296,7 +284,7 @@ public abstract partial class SharedStunSystem
         if (!KnockdownOver((entity, entity.Comp)))
             return false;
 
-        if (!_crawlerQuery.TryComp(entity, out var crawler) || !_config.GetCVar(CCVars.MovementCrawling))
+        if (!_crawlerQuery.TryComp(entity, out var crawler) || !_cfgManager.GetCVar(CCVars.MovementCrawling))
         {
             // If we can't crawl then just have us sit back up...
             // In case you're wondering, the KnockdownOverCheck, returns if we're able to move, so if next update is null.
@@ -395,7 +383,7 @@ public abstract partial class SharedStunSystem
 
     private void OnForceStandup(ForceStandUpEvent msg, EntitySessionEventArgs args)
     {
-        if (args.SenderSession.AttachedEntity is not {} user)
+        if (args.SenderSession.AttachedEntity is not { } user)
             return;
 
         ForceStandUp(user);
@@ -537,6 +525,30 @@ public abstract partial class SharedStunSystem
         RemCompDeferred<KnockedDownComponent>(entity);
     }
 
+    private void OnHandEquipped(Entity<KnockedDownComponent> entity, ref DidEquipHandEvent args)
+    {
+        if (GameTiming.ApplyingState)
+            return; // The result of the change is already networked separately in the same game state
+
+        RefreshKnockedMovement(entity);
+    }
+
+    private void OnHandUnequipped(Entity<KnockedDownComponent> entity, ref DidUnequipHandEvent args)
+    {
+        if (GameTiming.ApplyingState)
+            return; // The result of the change is already networked separately in the same game state
+
+        RefreshKnockedMovement(entity);
+    }
+
+    private void OnHandCountChanged(Entity<KnockedDownComponent> entity, ref HandCountChangedEvent args)
+    {
+        if (GameTiming.ApplyingState)
+            return; // The result of the change is already networked separately in the same game state
+
+        RefreshKnockedMovement(entity);
+    }
+
     private void OnKnockdownAttempt(Entity<GravityAffectedComponent> entity, ref KnockDownAttemptEvent args)
     {
         // Directed, targeted moth attack.
@@ -549,32 +561,6 @@ public abstract partial class SharedStunSystem
         // Get up instantly if weightless
         if (entity.Comp.Weightless)
             args.DoAfterTime = TimeSpan.Zero;
-    }
-
-    /// <summary>
-    /// Reduces the time it takes to stand up based on the number of hands we have available.
-    /// </summary>
-    private void OnGetStandUpTime(Entity<HandsComponent> ent, ref GetStandUpTimeEvent time)
-    {
-        if (!HasComp<KnockedDownComponent>(ent))
-            return;
-
-        var hands = _hands.CountFreeHands(ent.Owner);
-
-        if (hands == 0)
-            return;
-
-        time.DoAfterTime *= (float)ent.Comp.Count / (hands + ent.Comp.Count);
-    }
-
-    private void OnHandEquipped(Entity<KnockedDownComponent> entity, ref DidEquipHandEvent args)
-    {
-        RefreshKnockedMovement(entity);
-    }
-
-    private void OnHandUnequipped(Entity<KnockedDownComponent> entity, ref DidUnequipHandEvent args)
-    {
-        RefreshKnockedMovement(entity);
     }
 
     #endregion
@@ -623,6 +609,7 @@ public abstract partial class SharedStunSystem
 
         ent.Comp.SpeedModifier = ev.SpeedModifier;
         ent.Comp.FrictionModifier = ev.FrictionModifier;
+        Dirty(ent);
 
         _movementSpeedModifier.RefreshMovementSpeedModifiers(ent);
         _movementSpeedModifier.RefreshFrictionModifiers(ent);

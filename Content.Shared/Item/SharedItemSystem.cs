@@ -148,9 +148,9 @@ public abstract class SharedItemSystem : EntitySystem
         item.Comp.Size = size;
         item.Comp.Weight = null;
 
-        Dirty(item);
         var ev = new ItemSizeChangedEvent(item);
         RaiseLocalEvent(item, ref ev, broadcast: true);
+        Dirty(item);
     }
 
     private void SetShape(Entity<ItemComponent?> item, List<Box2i> shape)
@@ -161,9 +161,9 @@ public abstract class SharedItemSystem : EntitySystem
         item.Comp.Shape = shape;
         UpdateWeight((item, item.Comp));
 
-        Dirty(item);
         var ev = new ItemSizeChangedEvent(item);
         RaiseLocalEvent(item, ref ev, broadcast: true);
+        Dirty(item);
     }
 
     private void OnHandInteract(EntityUid uid, ItemComponent component, InteractHandEvent args)

@@ -869,6 +869,9 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntInserted(Entity<StorageComponent> entity, ref EntInsertedIntoContainerMessage args)
     {
+        if (Timing.ApplyingState)
+            return;
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;
@@ -894,6 +897,9 @@ public abstract class SharedStorageSystem : EntitySystem
 
     private void OnEntRemoved(Entity<StorageComponent> entity, ref EntRemovedFromContainerMessage args)
     {
+        if (Timing.ApplyingState)
+            return;
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (entity.Comp.Container == null)
             return;

@@ -16,6 +16,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Item;
+using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Lock;
 using Content.Shared.Materials;
 using Content.Shared.Popups;
@@ -1652,8 +1653,13 @@ public abstract class SharedStorageSystem : EntitySystem
 
         foreach (var (stent, storedItem) in ent.Comp.StoredItems)
         {
-            if (!_itemQuery.TryGetComponent(stent, out var itemComp))
+            if (!_itemQuery.TryComp(stent, out var itemComp))
                 continue;
+
+            if (TryComp<ItemToggleComponent>(stent, out var toggle))
+            {
+                Log.Debug($"Item with toggle detected. Currently Active {toggle.Activated}");
+            }
 
             AddOccupied((stent, itemComp), storedItem, ent.Comp.OccupiedGrid);
         }

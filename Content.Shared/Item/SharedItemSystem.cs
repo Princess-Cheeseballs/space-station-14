@@ -364,11 +364,13 @@ public abstract class SharedItemSystem : EntitySystem
         {
             if (entity.Comp.DeactivatedShape != null)
             {
+                entity.Comp.ActivatedShape ??= item.Shape;
                 SetShape((entity, item), entity.Comp.DeactivatedShape);
             }
 
             if (entity.Comp.DeactivatedSize != null)
             {
+                entity.Comp.ActivatedSize ??= item.Size;
                 SetSize((entity, item), entity.Comp.DeactivatedSize.Value);
             }
         }

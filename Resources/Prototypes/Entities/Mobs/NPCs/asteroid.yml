@@ -24,6 +24,11 @@
     - RadiationProtection
     - Adrenaline
   - type: StandingState
+  - type: Armor
+    modifiers:
+      coefficients:
+        Piercing: 0.6
+        Radiation: 0.0 # No more dying from radioactive barrels
   - type: Tag
     tags:
     - DoorBumpOpener
@@ -87,6 +92,11 @@
     - Goliath
     - FootstepSound
   - type: NoSlip
+  - type: Armor
+    modifiers:
+      coefficients:
+        Piercing: 0.5 # Goliath is tougher than most other mobs
+        Radiation: 0.0
   - type: Butcherable
     spawned:
     - id: FoodMeatGoliath

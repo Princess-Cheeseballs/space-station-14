@@ -25,18 +25,15 @@ public abstract class SharedDamageMarkerSystem : EntitySystem
         SubscribeLocalEvent<DamageMarkerComponent, AttackedEvent>(OnMarkerAttacked);
     }
 
-    private void OnMarkerAttacked(EntityUid uid, DamageMarkerComponent component, AttackedEvent args)
+    private void OnMarkerAttacked(Entity<DamageMarkerComponent> entity, ref AttackedEvent args)
     {
-        if (component.Marker != args.Used)
-            return;
-
-        args.BonusDamage += component.Damage;
-        RemCompDeferred<DamageMarkerComponent>(uid);
-        _audio.PlayPredicted(component.Sound, uid, args.User);
+        args.BonusDamage += entity.Comp.Damage;
+        RemCompDeferred<DamageMarkerComponent>(entity);
+        _audio.PlayPredicted(entity.Comp.Sound, entity, args.User);
 
         if (TryComp<LeechOnMarkerComponent>(args.Used, out var leech))
         {
-            _damageable.TryChangeDamage(args.User, leech.Leech, true, false, origin: args.Used);
+            _damageable.TryChangeDamage(args.User, entity.Comp.Damage * leech.Modifier, true, false, origin: args.Used);
         }
     }
 

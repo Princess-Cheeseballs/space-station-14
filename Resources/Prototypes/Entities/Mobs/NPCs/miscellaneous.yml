@@ -102,26 +102,23 @@
     - reagents: [ Water ]
       methods: [ Touch ]
       effects:
-      - !type:HealthChange
-        damage:
-          groups:
-            Brute: -0.15
+      - !type:EvenHealthChange
+        groups:
+          Brute: -0.10
     - reagents: [ Blood ]
       methods: [ Touch ]
       effects:
-      - !type:HealthChange
+      - !type:EvenHealthChange
         damage:
-          groups:
-            Brute: -0.25
-            Burn: -0.25
+          Brute: -0.15
+          Burn: -0.15
     - reagents: [ RobustHarvest ]
       methods: [ Touch ]
       effects:
-      - !type:HealthChange
+      - !type:EvenHealthChange
         damage:
-          groups:
-            Brute: -1
-            Burn: -1
+          Brute: -0.6
+          Burn: -0.6
     - reagents: [ WeedKiller, PlantBGone ]
       methods: [ Touch ]
       effects:

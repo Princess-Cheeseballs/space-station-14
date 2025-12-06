@@ -80,11 +80,10 @@
       # even if it's a meme - I did research
       methods: [ Touch ]
       effects: # TODO: when magic is around - make a milk transformation to a skeleton monster
-      - !type:HealthChange
-        damage:
-          groups:
-            Burn: -1 # healing obviously up to discussion
-            Brute: -0.75 # these groups are the only 2 possible ways to damage a skeleton
+      - !type:EvenHealthChange
+        groups:
+          Burn: -0.5 # healing obviously up to discussion
+          Brute: -0.5 # these groups are the only 2 possible ways to damage a skeleton
       - !type:PopupMessage
         type: Local
         visualType: Large

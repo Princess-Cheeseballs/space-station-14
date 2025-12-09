@@ -35,7 +35,6 @@ public sealed class SuicideSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<DamageableComponent, SuicideEvent>(OnDamageableSuicide);
         SubscribeLocalEvent<MobStateComponent, SuicideEvent>(OnEnvironmentalSuicide);
         SubscribeLocalEvent<MindContainerComponent, SuicideGhostEvent>(OnSuicideGhost);
     }
@@ -67,11 +66,12 @@ public sealed class SuicideSystem : EntitySystem
         if (!suicideGhostEvent.Handled || _tagSystem.HasTag(victim, CannotSuicideTag))
             return false;
 
-        // TODO: fix this
-        // This is a handled event, but the result is never used
         // It looks like TriggerOnMobstateChange is supposed to prevent you from suiciding
         var suicideEvent = new SuicideEvent(victim);
         RaiseLocalEvent(victim, suicideEvent);
+
+        if (!suicideEvent.Handled)
+            return false;
 
         // Since the player is already dead the log will not contain their username.
         if (session != null)
@@ -146,31 +146,5 @@ public sealed class SuicideSystem : EntitySystem
             args.Handled = suicideByEnvironmentEvent.Handled;
             return;
         }
-    }
-
-    /// <summary>
-    /// Default suicide behavior for any kind of entity that can take damage
-    /// </summary>
-    private void OnDamageableSuicide(Entity<DamageableComponent> victim, ref SuicideEvent args)
-    {
-        if (args.Handled)
-            return;
-
-        var othersMessage = Loc.GetString("suicide-command-default-text-others", ("name", Identity.Entity(victim, EntityManager)));
-        _popup.PopupEntity(othersMessage, victim, Filter.PvsExcept(victim), true);
-
-        var selfMessage = Loc.GetString("suicide-command-default-text-self");
-        _popup.PopupEntity(selfMessage, victim, victim);
-
-        if (args.DamageSpecifier != null)
-        {
-            _suicide.ApplyLethalDamage(victim, args.DamageSpecifier);
-            args.Handled = true;
-            return;
-        }
-
-        args.DamageType ??= "Bloodloss";
-        _suicide.ApplyLethalDamage(victim, args.DamageType);
-        args.Handled = true;
     }
 }

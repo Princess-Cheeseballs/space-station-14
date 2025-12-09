@@ -785,6 +785,7 @@
     - state: janitor
     - state: icon-light-replacer
   - type: ItemBorgModule
+    canThrow: true # Let them throw soap...
     hands:
     - item: LightReplacer
     - item: BorgTrashBag

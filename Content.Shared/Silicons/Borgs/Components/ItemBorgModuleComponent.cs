@@ -36,6 +36,12 @@ public sealed partial class ItemBorgModuleComponent : Component
     /// </summary>
     [DataField]
     public string HoldingContainer = "holding_container";
+
+    /// <summary>
+    /// Can hands in this module throw items? This is here to prevent borgs from throwing bombs and other nastiness...
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool CanThrow;
 }
 
 /// <summary>

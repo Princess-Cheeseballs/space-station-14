@@ -12,348 +12,347 @@ using Robust.Client.UserInterface.RichText;
 using Content.Client.UserInterface.RichText;
 using Robust.Shared.Input;
 
-namespace Content.Client.Paper.UI
+namespace Content.Client.Paper.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class PaperWindow : BaseWindow
 {
-    [GenerateTypedNameReferences]
-    public sealed partial class PaperWindow : BaseWindow
+    [Dependency] private readonly IInputManager _inputManager = default!;
+    [Dependency] private readonly IResourceCache _resCache = default!;
+
+    private static Color DefaultTextColor = new(25, 25, 25);
+
+    // <summary>
+    // Size of resize handles around the paper
+    private const int DRAG_MARGIN_SIZE = 16;
+
+    // We keep a reference to the paper content texture that we create
+    // so that we can modify it later.
+    private StyleBoxTexture _paperContentTex = new();
+
+    // The number of lines that the content image represents.
+    // See PaperVisualsComponent.ContentImageNumLines.
+    private float _paperContentLineScale = 1.0f;
+
+    // If paper limits the size in one or both axes, it'll affect whether
+    // we're able to resize this UI or not. Default to everything enabled:
+    private DragMode _allowedResizeModes = ~DragMode.None;
+
+    private readonly Type[] _allowedTags = new Type[] {
+        typeof(BoldItalicTag),
+        typeof(BoldTag),
+        typeof(BulletTag),
+        typeof(ColorTag),
+        typeof(HeadingTag),
+        typeof(ItalicTag),
+        typeof(MonoTag)
+    };
+
+    public event Action<string>? OnSaved;
+
+    private int _MaxInputLength = -1;
+    public int MaxInputLength
     {
-        [Dependency] private readonly IInputManager _inputManager = default!;
-        [Dependency] private readonly IResourceCache _resCache = default!;
+        get
+        {
+            return _MaxInputLength;
+        }
+        set
+        {
+            _MaxInputLength = value;
+            UpdateFillState();
+        }
+    }
 
-        private static Color DefaultTextColor = new(25, 25, 25);
+    public PaperWindow()
+    {
+        IoCManager.InjectDependencies(this);
+        RobustXamlLoader.Load(this);
 
-        // <summary>
-        // Size of resize handles around the paper
-        private const int DRAG_MARGIN_SIZE = 16;
+        // We can't configure the RichTextLabel contents from xaml, so do it here:
+        BlankPaperIndicator.SetMessage(Loc.GetString("paper-ui-blank-page-message"), null, DefaultTextColor);
 
-        // We keep a reference to the paper content texture that we create
-        // so that we can modify it later.
-        private StyleBoxTexture _paperContentTex = new();
+        // Hook up the close button:
+        CloseButton.OnPressed += _ => Close();
 
-        // The number of lines that the content image represents.
-        // See PaperVisualsComponent.ContentImageNumLines.
-        private float _paperContentLineScale = 1.0f;
-
-        // If paper limits the size in one or both axes, it'll affect whether
-        // we're able to resize this UI or not. Default to everything enabled:
-        private DragMode _allowedResizeModes = ~DragMode.None;
-
-        private readonly Type[] _allowedTags = new Type[] {
-            typeof(BoldItalicTag),
-            typeof(BoldTag),
-            typeof(BulletTag),
-            typeof(ColorTag),
-            typeof(HeadingTag),
-            typeof(ItalicTag),
-            typeof(MonoTag)
+        Input.OnKeyBindDown += args => // Solution while TextEdit don't have events
+        {
+            if (args.Function == EngineKeyFunctions.MultilineTextSubmit)
+            {
+                // SaveButton is disabled when we hit the max input limit. Just check
+                // that flag instead of trying to calculate the input length again
+                if (!SaveButton.Disabled)
+                {
+                    RunOnSaved();
+                    args.Handle();
+                }
+            }
         };
 
-        public event Action<string>? OnSaved;
-
-        private int _MaxInputLength = -1;
-        public int MaxInputLength
+        Input.OnTextChanged += args =>
         {
-            get
-            {
-                return _MaxInputLength;
-            }
-            set
-            {
-                _MaxInputLength = value;
-                UpdateFillState();
-            }
-        }
+            UpdateFillState();
+        };
 
-        public PaperWindow()
+        SaveButton.OnPressed += _ =>
         {
-            IoCManager.InjectDependencies(this);
-            RobustXamlLoader.Load(this);
+            RunOnSaved();
+        };
 
-            // We can't configure the RichTextLabel contents from xaml, so do it here:
-            BlankPaperIndicator.SetMessage(Loc.GetString("paper-ui-blank-page-message"), null, DefaultTextColor);
+        SaveButton.Text = Loc.GetString("paper-ui-save-button",
+            ("keybind", _inputManager.GetKeyFunctionButtonString(EngineKeyFunctions.MultilineTextSubmit)));
+    }
 
-            // Hook up the close button:
-            CloseButton.OnPressed += _ => Close();
+    /// <summary>
+    ///     Initialize this UI according to <code>visuals</code> Initializes
+    ///     textures, recalculates sizes, and applies some layout rules.
+    /// </summary>
+    public void InitVisuals(EntityUid entity, PaperVisualsComponent visuals)
+    {
+        // Randomize the placement of any stamps based on the entity UID
+        // so that there's some variety in different papers.
+        StampDisplay.PlacementSeed = (int)entity;
 
-            Input.OnKeyBindDown += args => // Solution while TextEdit don't have events
+        // Initialize the background:
+        PaperBackground.ModulateSelfOverride = visuals.BackgroundModulate;
+        var backgroundImage = visuals.BackgroundImagePath != null? _resCache.GetResource<TextureResource>(visuals.BackgroundImagePath) : null;
+        if (backgroundImage != null)
+        {
+            var backgroundImageMode = visuals.BackgroundImageTile ? StyleBoxTexture.StretchMode.Tile : StyleBoxTexture.StretchMode.Stretch;
+            var backgroundPatchMargin = visuals.BackgroundPatchMargin;
+            PaperBackground.PanelOverride = new StyleBoxTexture
             {
-                if (args.Function == EngineKeyFunctions.MultilineTextSubmit)
-                {
-                    // SaveButton is disabled when we hit the max input limit. Just check
-                    // that flag instead of trying to calculate the input length again
-                    if (!SaveButton.Disabled)
-                    {
-                        RunOnSaved();
-                        args.Handle();
-                    }
-                }
+                Texture = backgroundImage,
+                TextureScale = visuals.BackgroundScale,
+                Mode = backgroundImageMode,
+                PatchMarginLeft = backgroundPatchMargin.Left,
+                PatchMarginBottom = backgroundPatchMargin.Bottom,
+                PatchMarginRight = backgroundPatchMargin.Right,
+                PatchMarginTop = backgroundPatchMargin.Top
             };
 
-            Input.OnTextChanged += args =>
+        }
+        else
+        {
+            PaperBackground.PanelOverride = null;
+        }
+
+
+        // Then the header:
+        if (visuals.HeaderImagePath != null)
+        {
+            HeaderImage.TexturePath = visuals.HeaderImagePath;
+            HeaderImage.MinSize = HeaderImage.TextureNormal?.Size ?? Vector2.Zero;
+        }
+
+        HeaderImage.ModulateSelfOverride = visuals.HeaderImageModulate;
+        HeaderImage.Margin = new Thickness(visuals.HeaderMargin.Left, visuals.HeaderMargin.Top,
+            visuals.HeaderMargin.Right, visuals.HeaderMargin.Bottom);
+
+        // Then the footer
+        if (visuals.FooterImagePath is {} path)
+        {
+            FooterImage.TexturePath = path.ToString();
+            FooterImage.MinSize = FooterImage.TextureNormal?.Size ?? Vector2.Zero;
+        }
+
+        FooterImage.ModulateSelfOverride = visuals.FooterImageModulate;
+        FooterImage.Margin = new Thickness(visuals.FooterMargin.Left, visuals.FooterMargin.Top,
+            visuals.FooterMargin.Right, visuals.FooterMargin.Bottom);
+
+        PaperContent.ModulateSelfOverride = visuals.ContentImageModulate;
+        WrittenTextLabel.ModulateSelfOverride = visuals.FontAccentColor;
+        FillStatus.ModulateSelfOverride = visuals.FontAccentColor;
+
+        var contentImage = visuals.ContentImagePath != null ? _resCache.GetResource<TextureResource>(visuals.ContentImagePath) : null;
+        if (contentImage != null)
+        {
+            // Setup the paper content texture, but keep a reference to it, as we can't set
+            // some font-related properties here. We'll fix those up later, in Draw()
+            _paperContentTex = new StyleBoxTexture
             {
-                UpdateFillState();
+                Texture = contentImage,
+                Mode = StyleBoxTexture.StretchMode.Tile,
             };
-
-            SaveButton.OnPressed += _ =>
-            {
-                RunOnSaved();
-            };
-
-            SaveButton.Text = Loc.GetString("paper-ui-save-button",
-                ("keybind", _inputManager.GetKeyFunctionButtonString(EngineKeyFunctions.MultilineTextSubmit)));
+            PaperContent.PanelOverride = _paperContentTex;
+            _paperContentLineScale = visuals.ContentImageNumLines;
         }
 
-        /// <summary>
-        ///     Initialize this UI according to <code>visuals</code> Initializes
-        ///     textures, recalculates sizes, and applies some layout rules.
-        /// </summary>
-        public void InitVisuals(EntityUid entity, PaperVisualsComponent visuals)
+        PaperContent.Margin = new Thickness(
+            visuals.ContentMargin.Left, visuals.ContentMargin.Top,
+            visuals.ContentMargin.Right, visuals.ContentMargin.Bottom);
+
+        if (visuals.MaxWritableArea != null)
         {
-            // Randomize the placement of any stamps based on the entity UID
-            // so that there's some variety in different papers.
-            StampDisplay.PlacementSeed = (int)entity;
+            var a = (Vector2)visuals.MaxWritableArea;
+            // Paper has requested that this has a maximum area that you can write on.
+            // So, we'll make the window non-resizable and fix the size of the content.
+            // Ideally, would like to be able to allow resizing only one direction.
+            ScrollingContents.MinSize = Vector2.Zero;
+            ScrollingContents.MinSize = a;
 
-            // Initialize the background:
-            PaperBackground.ModulateSelfOverride = visuals.BackgroundModulate;
-            var backgroundImage = visuals.BackgroundImagePath != null? _resCache.GetResource<TextureResource>(visuals.BackgroundImagePath) : null;
-            if (backgroundImage != null)
+            if (a.X > 0.0f)
             {
-                var backgroundImageMode = visuals.BackgroundImageTile ? StyleBoxTexture.StretchMode.Tile : StyleBoxTexture.StretchMode.Stretch;
-                var backgroundPatchMargin = visuals.BackgroundPatchMargin;
-                PaperBackground.PanelOverride = new StyleBoxTexture
-                {
-                    Texture = backgroundImage,
-                    TextureScale = visuals.BackgroundScale,
-                    Mode = backgroundImageMode,
-                    PatchMarginLeft = backgroundPatchMargin.Left,
-                    PatchMarginBottom = backgroundPatchMargin.Bottom,
-                    PatchMarginRight = backgroundPatchMargin.Right,
-                    PatchMarginTop = backgroundPatchMargin.Top
-                };
+                ScrollingContents.MaxWidth = a.X;
+                _allowedResizeModes &= ~(DragMode.Left | DragMode.Right);
 
-            }
-            else
-            {
-                PaperBackground.PanelOverride = null;
+                // Since this dimension has been specified by the user, we
+                // need to undo the SetSize which was configured in the xaml.
+                // Controls use NaNs to indicate unset for this value.
+                // This is leaky - there should be a method for this
+                SetWidth = float.NaN;
             }
 
-
-            // Then the header:
-            if (visuals.HeaderImagePath != null)
+            if (a.Y > 0.0f)
             {
-                HeaderImage.TexturePath = visuals.HeaderImagePath;
-                HeaderImage.MinSize = HeaderImage.TextureNormal?.Size ?? Vector2.Zero;
+                ScrollingContents.MaxHeight = a.Y;
+                _allowedResizeModes &= ~(DragMode.Top | DragMode.Bottom);
+                SetHeight = float.NaN;
             }
+        }
+    }
 
-            HeaderImage.ModulateSelfOverride = visuals.HeaderImageModulate;
-            HeaderImage.Margin = new Thickness(visuals.HeaderMargin.Left, visuals.HeaderMargin.Top,
-                    visuals.HeaderMargin.Right, visuals.HeaderMargin.Bottom);
+    /// <summary>
+    ///     Control interface. We'll mostly rely on the children to do the drawing
+    ///     but in order to get lines on paper to match up with the rich text labels,
+    ///     we need to do a small calculation to sync them up.
+    /// </summary>
+    protected override void Draw(DrawingHandleScreen handle)
+    {
+        // Now do the deferred setup of the written area. At the point
+        // that InitVisuals runs, the label hasn't had it's style initialized
+        // so we need to get some info out now:
+        if (WrittenTextLabel.TryGetStyleProperty<Font>("font", out var font))
+        {
+            float fontLineHeight = font.GetLineHeight(1.0f);
+            // This positions the texture so the font baseline is on the bottom:
+            _paperContentTex.ExpandMarginTop = font.GetDescent(UIScale);
+            // And this scales the texture so that it's a single text line:
+            var scaleY = (_paperContentLineScale * fontLineHeight) / _paperContentTex.Texture?.Height ?? fontLineHeight;
+            _paperContentTex.TextureScale = new Vector2(1, scaleY);
 
-            // Then the footer
-            if (visuals.FooterImagePath is {} path)
+            // Now, we might need to add some padding to the text to ensure
+            // that, even if a header is specified, the text will line up with
+            // where the content image expects the font to be rendered (i.e.,
+            // adjusting the height of the header image shouldn't cause the
+            // text to be offset from a line)
             {
-                FooterImage.TexturePath = path.ToString();
-                FooterImage.MinSize = FooterImage.TextureNormal?.Size ?? Vector2.Zero;
-            }
-
-            FooterImage.ModulateSelfOverride = visuals.FooterImageModulate;
-            FooterImage.Margin = new Thickness(visuals.FooterMargin.Left, visuals.FooterMargin.Top,
-                    visuals.FooterMargin.Right, visuals.FooterMargin.Bottom);
-
-            PaperContent.ModulateSelfOverride = visuals.ContentImageModulate;
-            WrittenTextLabel.ModulateSelfOverride = visuals.FontAccentColor;
-            FillStatus.ModulateSelfOverride = visuals.FontAccentColor;
-
-            var contentImage = visuals.ContentImagePath != null ? _resCache.GetResource<TextureResource>(visuals.ContentImagePath) : null;
-            if (contentImage != null)
-            {
-                // Setup the paper content texture, but keep a reference to it, as we can't set
-                // some font-related properties here. We'll fix those up later, in Draw()
-                _paperContentTex = new StyleBoxTexture
-                {
-                    Texture = contentImage,
-                    Mode = StyleBoxTexture.StretchMode.Tile,
-                };
-                PaperContent.PanelOverride = _paperContentTex;
-                _paperContentLineScale = visuals.ContentImageNumLines;
-            }
-
-            PaperContent.Margin = new Thickness(
-                    visuals.ContentMargin.Left, visuals.ContentMargin.Top,
-                    visuals.ContentMargin.Right, visuals.ContentMargin.Bottom);
-
-            if (visuals.MaxWritableArea != null)
-            {
-                var a = (Vector2)visuals.MaxWritableArea;
-                // Paper has requested that this has a maximum area that you can write on.
-                // So, we'll make the window non-resizable and fix the size of the content.
-                // Ideally, would like to be able to allow resizing only one direction.
-                ScrollingContents.MinSize = Vector2.Zero;
-                ScrollingContents.MinSize = a;
-
-                if (a.X > 0.0f)
-                {
-                    ScrollingContents.MaxWidth = a.X;
-                    _allowedResizeModes &= ~(DragMode.Left | DragMode.Right);
-
-                    // Since this dimension has been specified by the user, we
-                    // need to undo the SetSize which was configured in the xaml.
-                    // Controls use NaNs to indicate unset for this value.
-                    // This is leaky - there should be a method for this
-                    SetWidth = float.NaN;
-                }
-
-                if (a.Y > 0.0f)
-                {
-                    ScrollingContents.MaxHeight = a.Y;
-                    _allowedResizeModes &= ~(DragMode.Top | DragMode.Bottom);
-                    SetHeight = float.NaN;
-                }
+                var headerHeight = HeaderImage.Size.Y + HeaderImage.Margin.Top + HeaderImage.Margin.Bottom;
+                var headerInLines = headerHeight / (fontLineHeight * _paperContentLineScale);
+                var paddingRequiredInLines = (float)Math.Ceiling(headerInLines) - headerInLines;
+                var verticalMargin = fontLineHeight * paddingRequiredInLines * _paperContentLineScale;
+                TextAlignmentPadding.Margin = new Thickness(0.0f, verticalMargin, 0.0f, 0.0f);
             }
         }
 
-        /// <summary>
-        ///     Control interface. We'll mostly rely on the children to do the drawing
-        ///     but in order to get lines on paper to match up with the rich text labels,
-        ///     we need to do a small calculation to sync them up.
-        /// </summary>
-        protected override void Draw(DrawingHandleScreen handle)
+        base.Draw(handle);
+    }
+
+    /// <summary>
+    ///     Initialize the paper contents, i.e. the text typed by the
+    ///     user and any stamps that have peen put on the page.
+    /// </summary>
+    public void Populate(PaperComponent.PaperBoundUserInterfaceState state)
+    {
+        bool isEditing = state.Mode == PaperComponent.PaperAction.Write;
+        bool wasEditing = InputContainer.Visible;
+        InputContainer.Visible = isEditing;
+        EditButtons.Visible = isEditing;
+
+        var msg = new FormattedMessage();
+        msg.AddMarkupPermissive(state.Text);
+
+        // For premade documents, we want to be able to edit them rather than
+        // replace them.
+        var shouldCopyText = 0 == Input.TextLength && 0 != state.Text.Length;
+        if (!wasEditing || shouldCopyText)
         {
-            // Now do the deferred setup of the written area. At the point
-            // that InitVisuals runs, the label hasn't had it's style initialized
-            // so we need to get some info out now:
-            if (WrittenTextLabel.TryGetStyleProperty<Font>("font", out var font))
-            {
-                float fontLineHeight = font.GetLineHeight(1.0f);
-                // This positions the texture so the font baseline is on the bottom:
-                _paperContentTex.ExpandMarginTop = font.GetDescent(UIScale);
-                // And this scales the texture so that it's a single text line:
-                var scaleY = (_paperContentLineScale * fontLineHeight) / _paperContentTex.Texture?.Height ?? fontLineHeight;
-                _paperContentTex.TextureScale = new Vector2(1, scaleY);
-
-                // Now, we might need to add some padding to the text to ensure
-                // that, even if a header is specified, the text will line up with
-                // where the content image expects the font to be rendered (i.e.,
-                // adjusting the height of the header image shouldn't cause the
-                // text to be offset from a line)
-                {
-                    var headerHeight = HeaderImage.Size.Y + HeaderImage.Margin.Top + HeaderImage.Margin.Bottom;
-                    var headerInLines = headerHeight / (fontLineHeight * _paperContentLineScale);
-                    var paddingRequiredInLines = (float)Math.Ceiling(headerInLines) - headerInLines;
-                    var verticalMargin = fontLineHeight * paddingRequiredInLines * _paperContentLineScale;
-                    TextAlignmentPadding.Margin = new Thickness(0.0f, verticalMargin, 0.0f, 0.0f);
-                }
-            }
-
-            base.Draw(handle);
+            // We can get repeated messages with state.Mode == Write if another
+            // player opens the UI for reading. In this case, don't update the
+            // text input, as this player is currently writing new text and we
+            // don't want to lose any text they already input.
+            Input.TextRope = Rope.Leaf.Empty;
+            Input.CursorPosition = new TextEdit.CursorPos();
+            Input.InsertAtCursor(state.Text);
         }
 
-        /// <summary>
-        ///     Initialize the paper contents, i.e. the text typed by the
-        ///     user and any stamps that have peen put on the page.
-        /// </summary>
-        public void Populate(PaperComponent.PaperBoundUserInterfaceState state)
+        for (var i = 0; i <= state.StampedBy.Count * 3 + 1; i++)
         {
-            bool isEditing = state.Mode == PaperComponent.PaperAction.Write;
-            bool wasEditing = InputContainer.Visible;
-            InputContainer.Visible = isEditing;
-            EditButtons.Visible = isEditing;
+            msg.AddMarkupPermissive("\r\n");
+        }
+        WrittenTextLabel.SetMessage(msg, _allowedTags, DefaultTextColor);
 
-            var msg = new FormattedMessage();
-            msg.AddMarkupPermissive(state.Text);
+        WrittenTextLabel.Visible = !isEditing && state.Text.Length > 0;
+        BlankPaperIndicator.Visible = !isEditing && state.Text.Length == 0;
 
-            // For premade documents, we want to be able to edit them rather than
-            // replace them.
-            var shouldCopyText = 0 == Input.TextLength && 0 != state.Text.Length;
-            if (!wasEditing || shouldCopyText)
-            {
-                // We can get repeated messages with state.Mode == Write if another
-                // player opens the UI for reading. In this case, don't update the
-                // text input, as this player is currently writing new text and we
-                // don't want to lose any text they already input.
-                Input.TextRope = Rope.Leaf.Empty;
-                Input.CursorPosition = new TextEdit.CursorPos();
-                Input.InsertAtCursor(state.Text);
-            }
+        StampDisplay.RemoveAllChildren();
+        StampDisplay.RemoveStamps();
+        foreach(var stamper in state.StampedBy)
+        {
+            StampDisplay.AddStamp(new StampWidget{ StampInfo = stamper });
+        }
+    }
 
-            for (var i = 0; i <= state.StampedBy.Count * 3 + 1; i++)
-            {
-                msg.AddMarkupPermissive("\r\n");
-            }
-            WrittenTextLabel.SetMessage(msg, _allowedTags, DefaultTextColor);
+    /// <summary>
+    ///     BaseWindow interface. Allow users to drag UI around by grabbing
+    ///     anywhere on the page (like FancyWindow) but try to calculate
+    ///     reasonable dragging bounds because this UI can have round corners,
+    ///     and it can be hard to judge where to click to resize.
+    /// </summary>
+    protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
+    {
+        var mode = DragMode.None;
 
-            WrittenTextLabel.Visible = !isEditing && state.Text.Length > 0;
-            BlankPaperIndicator.Visible = !isEditing && state.Text.Length == 0;
-
-            StampDisplay.RemoveAllChildren();
-            StampDisplay.RemoveStamps();
-            foreach(var stamper in state.StampedBy)
-            {
-                StampDisplay.AddStamp(new StampWidget{ StampInfo = stamper });
-            }
+        // Be quite generous with resize margins:
+        if (relativeMousePos.Y < DRAG_MARGIN_SIZE)
+        {
+            mode |= DragMode.Top;
+        }
+        else if (relativeMousePos.Y > Size.Y - DRAG_MARGIN_SIZE)
+        {
+            mode |= DragMode.Bottom;
         }
 
-        /// <summary>
-        ///     BaseWindow interface. Allow users to drag UI around by grabbing
-        ///     anywhere on the page (like FancyWindow) but try to calculate
-        ///     reasonable dragging bounds because this UI can have round corners,
-        ///     and it can be hard to judge where to click to resize.
-        /// </summary>
-        protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
+        if (relativeMousePos.X < DRAG_MARGIN_SIZE)
         {
-            var mode = DragMode.None;
-
-            // Be quite generous with resize margins:
-            if (relativeMousePos.Y < DRAG_MARGIN_SIZE)
-            {
-                mode |= DragMode.Top;
-            }
-            else if (relativeMousePos.Y > Size.Y - DRAG_MARGIN_SIZE)
-            {
-                mode |= DragMode.Bottom;
-            }
-
-            if (relativeMousePos.X < DRAG_MARGIN_SIZE)
-            {
-                mode |= DragMode.Left;
-            }
-            else if (relativeMousePos.X > Size.X - DRAG_MARGIN_SIZE)
-            {
-                mode |= DragMode.Right;
-            }
-
-            if((mode & _allowedResizeModes) == DragMode.None)
-            {
-                return DragMode.Move;
-            }
-            return mode & _allowedResizeModes;
+            mode |= DragMode.Left;
+        }
+        else if (relativeMousePos.X > Size.X - DRAG_MARGIN_SIZE)
+        {
+            mode |= DragMode.Right;
         }
 
-        private void RunOnSaved()
+        if((mode & _allowedResizeModes) == DragMode.None)
         {
-            // Prevent further saving while text processing still in
-            SaveButton.Disabled = true;
-            OnSaved?.Invoke(Rope.Collapse(Input.TextRope));
+            return DragMode.Move;
         }
+        return mode & _allowedResizeModes;
+    }
 
-        private void UpdateFillState()
+    private void RunOnSaved()
+    {
+        // Prevent further saving while text processing still in
+        SaveButton.Disabled = true;
+        OnSaved?.Invoke(Rope.Collapse(Input.TextRope));
+    }
+
+    private void UpdateFillState()
+    {
+        if (MaxInputLength != -1)
         {
-            if (MaxInputLength != -1)
-            {
-                var inputLength = Input.TextLength;
+            var inputLength = Input.TextLength;
 
-                FillStatus.Text = Loc.GetString("paper-ui-fill-level",
-                    ("currentLength", inputLength),
-                    ("maxLength", MaxInputLength));
+            FillStatus.Text = Loc.GetString("paper-ui-fill-level",
+                ("currentLength", inputLength),
+                ("maxLength", MaxInputLength));
 
-                // Disable the save button if we've gone over the limit
-                SaveButton.Disabled = inputLength > MaxInputLength;
-            }
-            else
-            {
-                FillStatus.Text = "";
-                SaveButton.Disabled = false;
-            }
+            // Disable the save button if we've gone over the limit
+            SaveButton.Disabled = inputLength > MaxInputLength;
+        }
+        else
+        {
+            FillStatus.Text = "";
+            SaveButton.Disabled = false;
         }
     }
 }

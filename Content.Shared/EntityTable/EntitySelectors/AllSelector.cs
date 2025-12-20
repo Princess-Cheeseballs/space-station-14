@@ -1,3 +1,4 @@
+using System.Linq;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.EntityTable.EntitySelectors;
@@ -30,7 +31,7 @@ public sealed partial class AllSelector : EntityTableSelector
         {
             foreach (var (spawn, prob) in child.ListSpawns(entMan, proto, ctx))
             {
-                yield return (spawn, prob * Prob);
+                yield return (spawn, prob);
             }
         }
     }

@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Shared.EntityTable.Conditions;
 using Content.Shared.EntityTable.ValueSelector;
 using JetBrains.Annotations;
@@ -83,17 +84,14 @@ public abstract partial class EntityTableSelector
         return success;
     }
 
-    /// <summary>
-    /// Gets the spawns in a given table, ignoring the requirements for the table.
-    /// This should only be used for debugging!
-    /// </summary>
-    public IEnumerable<(EntProtoId spawn, double)> ListSpawns(IEntityManager entMan,
+    public IEnumerable<(EntProtoId spawn, double prob)> ListSpawns(IEntityManager entMan,
         IPrototypeManager proto,
-        EntityTableContext ctx)
+        EntityTableContext ctx,
+        float mod = 1f)
     {
         foreach (var (spawn, prob) in ListSpawnsImplementation(entMan, proto, ctx))
         {
-            yield return (spawn, prob * Prob);
+            yield return (spawn, prob * Prob * Rolls.Odds() * mod);
         }
     }
 

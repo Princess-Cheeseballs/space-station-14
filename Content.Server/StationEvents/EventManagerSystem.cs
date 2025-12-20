@@ -74,13 +74,64 @@ public sealed class EventManagerSystem : EntitySystem
     /// <inheritdoc cref="TryBuildLimitedEvents(IEnumerable{EntProtoId},out Dictionary{EntityPrototype,StationEventComponent},TimeSpan?,int?)"/>
     public bool TryListLimitedEvents(
         EntityTableSelector limitedEventsTable,
-        out Dictionary<EntityPrototype, StationEventComponent> limitedEvents,
+        out Dictionary<EntityPrototype, (StationEventComponent comp, float prob)> limitedEvents,
         TimeSpan? currentTime = null,
         int? playerCount = null)
     {
         var selectedEvents = _entityTable.ListSpawns(limitedEventsTable);
 
-        return TryBuildLimitedEvents(selectedEvents, out limitedEvents, currentTime, playerCount);
+        return TryListLimitedEvents(selectedEvents, out limitedEvents, currentTime, playerCount);
+    }
+
+    /// <summary>
+    /// Builds a dictionary of valid event prototypes from a list of <see cref="EntProtoId"/>.
+    /// Dictionary output consists of the valid prototype as the key, and the <see cref="StationEventComponent"/> as the value.
+    /// </summary>
+    /// <param name="selectedEvents">List of events we're selecting from.</param>
+    /// <param name="limitedEvents">Dictionary we're outputting.</param>
+    /// <param name="currentTime">Optional override for station time.</param>
+    /// <param name="playerCount">Optional override for playerCount.</param>
+    /// <returns>Returns true if the provided EntProtoId list has at least one prototype with a StationEventComp that can successfully run!</returns>
+    public bool TryListLimitedEvents(
+        IEnumerable<(EntProtoId proto, double prob)> selectedEvents,
+        out Dictionary<EntityPrototype, (StationEventComponent comp, float prob)> limitedEvents,
+        TimeSpan? currentTime = null,
+        int? playerCount = null)
+    {
+        limitedEvents = new Dictionary<EntityPrototype, (StationEventComponent comp, float prob)>();
+
+        playerCount ??= _playerManager.PlayerCount;
+
+        // playerCount does a lock so we'll just keep the variable here
+        currentTime ??= GameTicker.RoundDuration();
+
+        foreach (var (eventid, prob) in selectedEvents)
+        {
+            if (!_prototype.Resolve(eventid, out var eventproto))
+            {
+                Log.Warning("An event ID has no prototype index!");
+                continue;
+            }
+
+            if (limitedEvents.ContainsKey(eventproto)) // This stops it from dying if you add duplicate entries in a fucked table
+                continue;
+
+            if (eventproto.Abstract)
+                continue;
+
+            if (!eventproto.TryGetComponent<StationEventComponent>(out var stationEvent, EntityManager.ComponentFactory))
+                continue;
+
+            if (!CanRun(eventproto, stationEvent, playerCount.Value, currentTime.Value))
+                continue;
+
+            limitedEvents.Add(eventproto, (stationEvent, (float)prob));
+        }
+
+        if (!limitedEvents.Any())
+            return false;
+
+        return true;
     }
 
     /// <inheritdoc cref="TryBuildLimitedEvents(IEnumerable{EntProtoId},out Dictionary{EntityPrototype,StationEventComponent},TimeSpan?,int?)"/>

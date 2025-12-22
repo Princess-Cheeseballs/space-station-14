@@ -2,18 +2,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.Events;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Containers;
 using Content.Shared.Examine;
 using Content.Shared.FixedPoint;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Localizations;
-using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Verbs;
 using JetBrains.Annotations;
@@ -25,38 +23,6 @@ using Robust.Shared.Utility;
 using Dependency = Robust.Shared.IoC.DependencyAttribute;
 
 namespace Content.Shared.Chemistry.EntitySystems;
-
-/// <summary>
-/// The event raised whenever a solution entity is modified.
-/// </summary>
-/// <remarks>
-/// Raised after chemcial reactions and <see cref="SolutionOverflowEvent"/> are handled.
-/// </remarks>
-/// <param name="Solution">The solution entity that has been modified.</param>
-[ByRefEvent]
-public readonly partial record struct SolutionChangedEvent(Entity<SolutionComponent> Solution);
-
-/// <summary>
-/// The event raised whenever a solution entity is filled past its capacity.
-/// </summary>
-/// <param name="Solution">The solution entity that has been overfilled.</param>
-/// <param name="Overflow">The amount by which the solution entity has been overfilled.</param>
-[ByRefEvent]
-public partial record struct SolutionOverflowEvent(Entity<SolutionComponent> Solution, FixedPoint2 Overflow)
-{
-    /// <summary>The solution entity that has been overfilled.</summary>
-    public readonly Entity<SolutionComponent> Solution = Solution;
-    /// <summary>The amount by which the solution entity has been overfilled.</summary>
-    public readonly FixedPoint2 Overflow = Overflow;
-    /// <summary>Whether any of the event handlers for this event have handled overflow behaviour.</summary>
-    public bool Handled = false;
-}
-
-[ByRefEvent]
-public partial record struct SolutionAccessAttemptEvent(string SolutionName)
-{
-    public bool Cancelled;
-}
 
 /// <summary>
 /// Part of Chemistry system deal with SolutionContainers

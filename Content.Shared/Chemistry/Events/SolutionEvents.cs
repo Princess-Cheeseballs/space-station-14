@@ -33,3 +33,6 @@ public partial record struct SolutionAccessAttemptEvent(string SolutionName)
 {
     public bool Cancelled;
 }
+
+[ByRefEvent]
+public partial record struct SolutionRelayedEvent<T>(T Event);

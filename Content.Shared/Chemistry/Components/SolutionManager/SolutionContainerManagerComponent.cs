@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.FixedPoint;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 
@@ -9,7 +10,7 @@ namespace Content.Shared.Chemistry.Components.SolutionManager;
 /// <para>Every solution entity this maps should have a <see cref="SolutionComponent"/> to track its state and a <see cref="ContainedSolutionComponent"/> to track its container.</para>
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-[Access(typeof(SharedSolutionContainerSystem))]
+[Access(typeof(SharedSolutionContainerSystem), typeof(SharedSolutionsSystem))]
 public sealed partial class SolutionContainerManagerComponent : Component
 {
     /// <summary>

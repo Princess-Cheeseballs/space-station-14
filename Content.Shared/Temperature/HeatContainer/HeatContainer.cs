@@ -1,5 +1,6 @@
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.EntitySystems;
+using Content.Shared.Sprite;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Temperature.HeatContainer;
@@ -43,7 +44,7 @@ public partial struct HeatContainer : IRobustCloneable<HeatContainer>
     [ViewVariables]
     public float InternalEnergy => Temperature * HeatCapacity;
 
-    public HeatContainer(float heatCapacity, float temperature)
+    public HeatContainer(float heatCapacity, float temperature = Atmospherics.T20C)
     {
         HeatCapacity = heatCapacity;
         Temperature = temperature;

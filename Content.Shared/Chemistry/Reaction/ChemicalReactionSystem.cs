@@ -6,6 +6,7 @@ using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.Temperature.HeatContainer;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
@@ -172,7 +173,7 @@ namespace Content.Shared.Chemistry.Reaction
             var (uid, comp) = soln;
             var solution = comp.Solution;
 
-            var energy = reaction.ConserveEnergy ? solution.GetThermalEnergy(_prototypeManager) : 0;
+            var energy = reaction.ConserveEnergy ? solution.ThermalEnergy : 0;
 
             //Remove reactants
             foreach (var reactant in reaction.Reactants)

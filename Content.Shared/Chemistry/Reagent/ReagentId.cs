@@ -2,6 +2,7 @@ using Content.Shared.FixedPoint;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 using System.Linq;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Chemistry.Reagent;
 
@@ -23,7 +24,7 @@ public partial struct ReagentId : IEquatable<ReagentId>
     [DataField("data")]
     public List<ReagentData>? Data { get; private set; } = new();
 
-    public ReagentId(string prototype, List<ReagentData>? data)
+    public ReagentId(ProtoId<ReagentPrototype> prototype, List<ReagentData>? data = null)
     {
         Prototype = prototype;
         Data = data ?? new();

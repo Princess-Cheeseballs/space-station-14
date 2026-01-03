@@ -1,6 +1,7 @@
 using Content.Shared.Chemistry.Components;
-using Content.Shared.Kitchen.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Kitchen.Components;
 using Content.Shared.FixedPoint;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -143,7 +144,7 @@ public abstract partial class SharedSolutionContainerSystem
         if (!TryGetDrainableSolution(uid, out _, out var solution))
             return 0;
 
-        return PercentFull(solution);
+        return PercentFull(solution.Value);
     }
 
     #region Static Methods

@@ -1,4 +1,5 @@
 ﻿using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Chemistry.Reagent;
@@ -11,14 +12,17 @@ namespace Content.Shared.Chemistry.Reagent;
 public partial struct ReagentQuantity : IEquatable<ReagentQuantity>, IRobustCloneable<ReagentQuantity>
 {
     [DataField("Quantity", required: true)]
-    public FixedPoint2 Quantity { get; private set; }
+    public FixedPoint2 Quantity;
 
     [IncludeDataField]
     [ViewVariables]
     public ReagentId Reagent { get; private set; }
 
-    public ReagentQuantity(string reagentId, FixedPoint2 quantity, List<ReagentData>? data = null)
-        : this(new ReagentId(reagentId, data), quantity)
+    public ReagentQuantity(ProtoId<ReagentPrototype> reagentId, FixedPoint2 quantity, List<ReagentData>? data = null) : this(new ReagentId(reagentId, data), quantity)
+    {
+    }
+
+    public ReagentQuantity(ReagentPrototype reagent, FixedPoint2 quantity, List<ReagentData>? data = null) : this(new ReagentId(reagent.ID, data), quantity)
     {
     }
 
@@ -70,6 +74,28 @@ public partial struct ReagentQuantity : IEquatable<ReagentQuantity>, IRobustClon
     {
         id = Reagent;
         quantity = Quantity;
+    }
+
+    public void Add(ReagentQuantity other)
+    {
+        if (Reagent == other.Reagent)
+            Add(other.Quantity);
+    }
+
+    public void Add(FixedPoint2 quantity)
+    {
+        Quantity += quantity;
+    }
+
+    public void Remove(ReagentQuantity other)
+    {
+        if (Reagent == other.Reagent)
+            Remove(other.Quantity);
+    }
+
+    public void Remove(FixedPoint2 quantity)
+    {
+        Quantity -= FixedPoint2.Min(quantity, Quantity);
     }
 
     public bool Equals(ReagentQuantity other)

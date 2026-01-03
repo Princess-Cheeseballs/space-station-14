@@ -1,5 +1,7 @@
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Materials;
+using Content.Shared.Temperature.Components;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Chemistry.Components;
@@ -9,7 +11,7 @@ namespace Content.Shared.Chemistry.Components;
 /// <para>If the entity is used to represent a collection of reagents inside of a container such as a beaker, syringe, bloodstream, food, or similar the entity is tracked by a <see cref="SolutionContainerManagerComponent"/> on the container and has a <see cref="ContainedSolutionComponent"/> tracking which container it's in.</para>
 /// </summary>
 /// <remarks>
-/// <para>Once reagents and materials have been merged this component should be depricated in favor of using a combination of <see cref="PhysicalCompositionComponent"/> and <see cref="Content.Server.Temperature.Components.TemperatureComponent"/>. May require minor reworks to both.</para>
+/// <para>Once reagents and materials have been merged this component should be depricated in favor of using a combination of <see cref="PhysicalCompositionComponent"/> and <see cref="TemperatureComponent"/>. May require minor reworks to both.</para>
 /// </remarks>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class SolutionComponent : Component

@@ -12,6 +12,10 @@ public static partial class HeatContainerHelpers
     [PublicAPI]
     public static void Merge(this ref HeatContainer cA, HeatContainer cB)
     {
+        var capacity = cA.HeatCapacity + cB.HeatCapacity;
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
+
         var merged = new HeatContainer
         {
             HeatCapacity = cA.HeatCapacity + cB.HeatCapacity,
@@ -54,6 +58,8 @@ public static partial class HeatContainerHelpers
             totalHeatCapacity += c.HeatCapacity;
             totalEnergy += c.InternalEnergy;
         }
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(totalHeatCapacity);
 
         var result = new HeatContainer
         {

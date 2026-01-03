@@ -13,16 +13,30 @@ public static partial class HeatContainerHelpers
     [PublicAPI]
     public static HeatContainer Split(this ref HeatContainer c, float fraction = 0.5f)
     {
-        fraction = Math.Clamp(fraction, 0f, 1f);
-        var newHeatCapacity = c.HeatCapacity * fraction;
+        if (fraction <= 0 || fraction >= 1)
+            throw new ArgumentOutOfRangeException(nameof(fraction), "Param must be between 0 and 1");
+
+        return c.Subtract(c.HeatCapacity * fraction);
+    }
+
+    /// <summary>
+    /// Splits a <see cref="HeatContainer"/> into two.
+    /// </summary>
+    /// <param name="c">The <see cref="HeatContainer"/> to split. This will be modified to contain the remaining heat capacity.</param>
+    /// <param name="capacity">How much of the heat capacity we're taking from a HeatContainer.</param>
+    /// <returns>A new <see cref="HeatContainer"/> containing the specified fraction of the original container's heat capacity and the same temperature.</returns>
+    [PublicAPI]
+    public static HeatContainer Subtract(this ref HeatContainer c, float capacity)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(capacity, c.HeatCapacity);
 
         var newContainer = new HeatContainer
         {
-            HeatCapacity = newHeatCapacity,
+            HeatCapacity = capacity,
             Temperature = c.Temperature,
         };
 
-        c.HeatCapacity -= newHeatCapacity;
+        c.HeatCapacity -= capacity;
 
         return newContainer;
     }

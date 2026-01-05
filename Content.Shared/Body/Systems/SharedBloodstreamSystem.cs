@@ -409,19 +409,19 @@ public abstract class SharedBloodstreamSystem : EntitySystem
 
         foreach (var (referenceReagent, referenceQuantity) in ent.Comp.BloodReferenceSolution)
         {
-            var error = referenceQuantity * referenceFactor - bloodSolution.GetTotalPrototypeQuantity(referenceReagent.Prototype);
+            var error = referenceQuantity * referenceFactor - bloodSolution.Value.GetTotal(referenceReagent.Prototype);
             var adjustedAmount = amount * referenceQuantity / ent.Comp.BloodReferenceSolution.Volume;
 
             if (error > 0)
             {
                 error = FixedPoint2.Min(error, adjustedAmount);
-                bloodSolution.AddReagent(referenceReagent, error);
+                bloodSolution.Value.Add(referenceReagent, error, PrototypeManager);
             }
             else if (error < 0)
             {
                 // invert the error since we're removing reagents...
                 error = FixedPoint2.Min( -error, adjustedAmount);
-                bloodSolution.RemoveReagent(referenceReagent, error);
+                bloodSolution.Value.Remove(referenceReagent, error, PrototypeManager);
             }
         }
 

@@ -22,6 +22,7 @@ public sealed partial class BloodstreamComponent : Component
 {
     public const string DefaultBloodSolutionName = "bloodstream";
     public const string DefaultBloodTemporarySolutionName = "bloodstreamTemporary";
+    public static ProtoId<ReagentPrototype> DefaultBloodReagent = "blood";
 
     /// <summary>
     /// The next time that blood level will be updated and bloodloss damage dealt.
@@ -150,7 +151,7 @@ public sealed partial class BloodstreamComponent : Component
     /// Slime-people might use slime as their blood or something like that.
     /// </remarks>
     [DataField, AutoNetworkedField]
-    public Solution BloodReferenceSolution = new([new("Blood", 300)]);
+    public Solution BloodReferenceSolution = new(DefaultBloodReagent, 300);
 
     /// <summary>
     /// Caches the blood data of an entity.

@@ -11,7 +11,7 @@ using Robust.Shared.Utility;
 namespace Content.Shared.Chemistry.Reagent;
 
 /// <summary>
-///     A solution of reagents.
+///     A struct which stores reagents and energy (heat).
 /// </summary>
 [Serializable, NetSerializable]
 [DataDefinition]
@@ -33,23 +33,23 @@ public partial struct Solution : IEnumerable<ReagentQuantity>, ISerializationHoo
     /// </summary>
     /// <remarks>This is private to ensure that modifications to temperature don't try to go over the solution.</remarks>
     [DataField]
-    private HeatContainer _heat = new (0);
+    public HeatContainer Heat = new (0);
 
     /// <inheritdoc cref="HeatContainer.Temperature"/>
     [ViewVariables]
-    public float Temperature => _heat.Temperature;
+    public float Temperature => Heat.Temperature;
 
     /// <inheritdoc cref="HeatContainer.Temperature"/>
     [ViewVariables]
-    public float TemperatureC => _heat.TemperatureC;
+    public float TemperatureC => Heat.TemperatureC;
 
     /// <inheritdoc cref="HeatContainer.HeatCapacity"/>
     [ViewVariables]
-    public float HeatCapacity => _heat.HeatCapacity;
+    public float HeatCapacity => Heat.HeatCapacity;
 
     /// <inheritdoc cref="HeatContainer.InternalEnergy"/>
     [ViewVariables]
-    public float ThermalEnergy => _heat.InternalEnergy;
+    public float ThermalEnergy => Heat.InternalEnergy;
 
     /// <summary>
     ///     The calculated total volume of all reagents in the solution (ex. Total volume of liquid in beaker).
@@ -58,64 +58,10 @@ public partial struct Solution : IEnumerable<ReagentQuantity>, ISerializationHoo
     public FixedPoint2 Volume { get; set; }
 
     /// <summary>
-    ///     Maximum volume this solution supports.
-    /// </summary>
-    /// <remarks>
-    ///     A value of zero means the maximum will automatically be set equal to the current volume during
-    ///     initialization. Note that most solution methods ignore max volume altogether, but various solution
-    ///     systems use this.
-    /// </remarks>
-    [DataField("maxVol")]
-    public FixedPoint2 MaxVolume { get; set; } = FixedPoint2.Zero;
-
-    public float FillFraction => MaxVolume == 0 ? 1 : Volume.Float() / MaxVolume.Float();
-
-    /// <summary>
-    ///     Volume needed to fill this container.
-    /// </summary>
-    [ViewVariables]
-    public FixedPoint2 AvailableVolume => MaxVolume - Volume;
-
-    /// <summary>
     ///     If reactions will be checked for when adding reagents to the container.
     /// </summary>
     [DataField]
     public bool CanReact { get; set; } = true;
-
-    /// <summary>
-    ///     If true, then <see cref="HeatCapacity"/> needs to be recomputed.
-    /// </summary>
-    [ViewVariables] private bool _heatCapacityDirty = true;
-
-    [ViewVariables(VVAccess.ReadWrite)]
-    private int _heatCapacityUpdateCounter;
-
-    // This value is arbitrary btw.
-    private const int HeatCapacityUpdateInterval = 15;
-
-    private void RecalculateHeatCapacity(IPrototypeManager? protoMan)
-    {
-        IoCManager.Resolve(ref protoMan);
-        // TODO: Do we even need to do this shit???
-        DebugTools.Assert(_heatCapacityDirty);
-        _heatCapacityDirty = false;
-        _heat.HeatCapacity = 0;
-        foreach (var (reagent, quantity) in Contents)
-        {
-            _heat.HeatCapacity += (float)quantity * protoMan.Index<ReagentPrototype>(reagent.Prototype).SpecificHeat;
-        }
-
-        _heatCapacityUpdateCounter = 0;
-    }
-
-    public void CheckRecalculateHeatCapacity()
-    {
-        // For performance, we have a few ways for heat capacity to get modified without a full recalculation.
-        // To avoid these drifting too much due to float error, we mark it as dirty after N such operations,
-        // so it will be recalculated.
-        if (++_heatCapacityUpdateCounter >= HeatCapacityUpdateInterval)
-            _heatCapacityDirty = true;
-    }
 
     /// <summary>
     ///     Constructs an empty solution (ex. an empty beaker).
@@ -138,46 +84,88 @@ public partial struct Solution : IEnumerable<ReagentQuantity>, ISerializationHoo
     /// <param name="prototype">The prototype ID of the reagent to add.</param>
     /// <param name="quantity">The quantity in milli-units.</param>
     /// <param name="data"></param>
-    public Solution([ForbidLiteral] string prototype, FixedPoint2 quantity, List<ReagentData>? data = null) : this(1)
+    public Solution([ForbidLiteral] ProtoId<ReagentPrototype> prototype, FixedPoint2 quantity, List<ReagentData>? data = null) : this(1)
     {
-        AddReagent(new ReagentId(prototype, data), quantity);
+        this.Add(new ReagentId(prototype, data), quantity, null); // TODO: Force people to pass protoman?
     }
 
-    public Solution(IEnumerable<ReagentQuantity> reagents, bool setMaxVol = true)
+    public Solution(IEnumerable<ReagentQuantity> reagents, IPrototypeManager protoMan)
     {
         Contents = new(reagents);
-        Volume = FixedPoint2.Zero;
-        foreach (var reagent in Contents)
-        {
-            Volume += reagent.Quantity;
-        }
 
-        if (setMaxVol)
-            MaxVolume = Volume;
-
+        this.Update(protoMan);
         ValidateSolution();
     }
 
     public Solution(Solution solution)
     {
-        Contents = new(solution.Contents.Count);
-        foreach (var item in solution.Contents)
-        {
-            Contents.Add(item.Clone());
-        }
-
+        Contents = solution.Contents;
         Volume = solution.Volume;
-        MaxVolume = solution.MaxVolume;
-        _heat = solution._heat;
+        Heat = solution.Heat;
         CanReact = solution.CanReact;
-        _heatCapacityDirty = solution._heatCapacityDirty;
-        _heatCapacityUpdateCounter = solution._heatCapacityUpdateCounter;
         ValidateSolution();
     }
 
     public Solution Clone()
     {
         return new Solution(this);
+    }
+
+    /// <summary>
+    /// Destroys this solution and all its contents.
+    /// </summary>
+    public void Clear()
+    {
+        this = new Solution();
+    }
+
+    public IEnumerator<ReagentQuantity> GetEnumerator()
+    {
+        return Contents.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    [AssertionMethod]
+    public void ValidateSolution()
+    {
+        // sandbox forbids: [Conditional("DEBUG")]
+#if DEBUG
+        // Correct volume
+        DebugTools.Assert(Contents.Select(x => x.Quantity).Sum() == Volume);
+
+        // All reagents have at least some reagent present.
+        DebugTools.Assert(!Contents.Any(x => x.Quantity <= FixedPoint2.Zero));
+
+        // No duplicate reagents iDs
+        DebugTools.Assert(Contents.Select(x => x.Reagent).ToHashSet().Count == Contents.Count);
+
+        var cur = HeatCapacity;
+        this.UpdateHeatCapacity(null); // TODO: Cache heat capacity or pass ProtoMan
+        DebugTools.Assert(MathHelper.CloseTo(HeatCapacity, cur, tolerance: 0.01));
+#endif
+    }
+
+    void ISerializationHooks.AfterDeserialization()
+    {
+        Volume = FixedPoint2.Zero;
+        foreach (var reagent in Contents)
+        {
+            Volume += reagent.Quantity;
+        }
+    }
+
+    public ReagentQuantity this[ReagentId id]
+    {
+        get
+        {
+            if (!this.TryGet(out var quantity, id))
+                throw new KeyNotFoundException(id.ToString());
+            return quantity;
+        }
     }
 }
 

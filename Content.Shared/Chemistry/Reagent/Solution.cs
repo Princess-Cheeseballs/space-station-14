@@ -179,13 +179,5 @@ public partial struct Solution : IEnumerable<ReagentQuantity>, ISerializationHoo
     {
         return new Solution(this);
     }
-
-    /// <summary>
-    /// Destroys this solution and all its contents.
-    /// </summary>
-    private void Destroy()
-    {
-        this = new Solution();
-    }
 }
 

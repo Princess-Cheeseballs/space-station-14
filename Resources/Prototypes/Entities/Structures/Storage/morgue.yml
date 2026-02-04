@@ -71,6 +71,7 @@
   - type: Transform
     anchored: true
   - type: AntiRottingContainer
+    requiresPower: true
   - type: StaticPrice
     price: 200
 

@@ -1,8 +1,10 @@
-﻿using Content.Shared.Examine;
+﻿using Content.Shared.Buckle.Components;
+using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Power;
 using Content.Shared.Rejuvenate;
 using Robust.Shared.Containers;
 using Robust.Shared.Timing;
@@ -28,6 +30,10 @@ public abstract class SharedRottingSystem : EntitySystem
         SubscribeLocalEvent<RottingComponent, MobStateChangedEvent>(OnRottingMobStateChanged);
         SubscribeLocalEvent<RottingComponent, RejuvenateEvent>(OnRejuvenate);
         SubscribeLocalEvent<RottingComponent, ExaminedEvent>(OnExamined);
+
+        SubscribeLocalEvent<BuckleComponent, IsRottingEvent>(OnIsRotting);
+        SubscribeLocalEvent<AntiRotOnBuckleComponent, PowerChangedEvent>(OnPowerChanged);
+        SubscribeLocalEvent<AntiRottingContainerComponent, PowerChangedEvent>(OnContainerPowerChanged);
     }
 
     private void OnPerishableMapInit(Entity<PerishableComponent> ent, ref MapInitEvent args)
@@ -91,6 +97,25 @@ public abstract class SharedRottingSystem : EntitySystem
         args.PushMarkup(Loc.GetString(description, ("target", Identity.Entity(uid, EntityManager))));
     }
 
+    private void OnIsRotting(EntityUid uid, BuckleComponent buckle, ref IsRottingEvent args)
+    {
+        if (args.Handled)
+            return;
+        args.Handled |= buckle is { Buckled: true, BuckledTo: not null } &&
+                       TryComp<AntiRotOnBuckleComponent>(buckle.BuckledTo.Value, out var antiRot) &&
+                       antiRot.Enabled;
+    }
+
+    private void OnPowerChanged(Entity<AntiRotOnBuckleComponent> entity, ref PowerChangedEvent args)
+    {
+        entity.Comp.Enabled = !entity.Comp.RequiresPower || args.Powered;
+    }
+
+    private void OnContainerPowerChanged(Entity<AntiRottingContainerComponent> entity, ref PowerChangedEvent args)
+    {
+        entity.Comp.Enabled = !entity.Comp.RequiresPower || args.Powered;
+    }
+
     /// <summary>
     /// Return an integer from 0 to maxStage representing how close to rotting an entity is. Used to
     /// generate examine messages for items that are starting to rot.
@@ -117,7 +142,8 @@ public abstract class SharedRottingSystem : EntitySystem
             return false;
 
         if (_container.TryGetOuterContainer(uid, Transform(uid), out var container) &&
-            HasComp<AntiRottingContainerComponent>(container.Owner))
+            TryComp<AntiRottingContainerComponent>(container.Owner, out var antiRot)
+            && antiRot.Enabled)
         {
             return false;
         }

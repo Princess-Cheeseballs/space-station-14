@@ -77,7 +77,6 @@
           True: {visible: false}
           False: {visible: true}
   - type: Pullable
-  - type: AntiRottingContainer
   - type: ContainerContainer
     containers:
       entity_storage: !type:Container

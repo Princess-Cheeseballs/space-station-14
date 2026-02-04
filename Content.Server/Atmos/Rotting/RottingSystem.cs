@@ -36,7 +36,7 @@ public sealed class RottingSystem : SharedRottingSystem
             return;
 
         var molsToDump = perishable.MolsPerSecondPerUnitMass * physics.FixturesMass * (float)component.TotalRotTime.TotalSeconds;
-        var tileMix = _atmosphere.GetTileMixture(uid, excite: true);
+        var tileMix = _atmosphere.GetContainingMixture(uid, excite: true);
         tileMix?.AdjustMoles(Gas.Ammonia, molsToDump);
     }
 
@@ -128,7 +128,7 @@ public sealed class RottingSystem : SharedRottingSystem
             // We need a way to get the mass of the mob alone without armor etc in the future
             // or just remove the mass mechanics altogether because they aren't good.
             var molRate = perishable.MolsPerSecondPerUnitMass * (float)rotting.RotUpdateRate.TotalSeconds;
-            var tileMix = _atmosphere.GetTileMixture(uid, excite: true);
+            var tileMix = _atmosphere.GetContainingMixture(uid, excite: true);
             tileMix?.AdjustMoles(Gas.Ammonia, molRate * physics.FixturesMass);
         }
     }

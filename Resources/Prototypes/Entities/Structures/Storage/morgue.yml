@@ -1,12 +1,11 @@
 - type: entity
+  parent: BaseMachinePowered
   id: Morgue
   name: morgue
   description: Used to store bodies until someone fetches them. Includes a high-tech alert system for false-positives!
   placement:
     mode: SnapgridCenter
   components:
-  - type: Pullable
-  - type: Anchorable
   - type: Sprite
     sprite: Structures/Storage/morgue.rsi
     layers:
@@ -20,10 +19,6 @@
       visible: false
       map: ["enum.MorgueVisualLayers.Light"]
       shader: unshaded
-  - type: Clickable
-  - type: InteractionOutline
-  - type: Physics
-    bodyType: Static
   - type: Fixtures
     fixtures:
       fix1:
@@ -69,9 +64,14 @@
           HasMob: {visible: true, state: morgue_nosoul_light}
           HasSoul: {visible: true, state: morgue_soul_light}
   - type: Transform
+    noRot: false
     anchored: true
   - type: AntiRottingContainer
     requiresPower: true
+  - type: PowerState
+    isWorking: false
+    idlePowerDraw: 0
+    workingPowerDraw: 1500
   - type: StaticPrice
     price: 200
 

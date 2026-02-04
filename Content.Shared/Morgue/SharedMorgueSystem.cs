@@ -2,6 +2,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Storage.Components;
 using Content.Shared.Examine;
 using Content.Shared.Morgue.Components;
+using Content.Shared.Power.EntitySystems;
 using Robust.Shared.Player;
 
 namespace Content.Shared.Morgue;
@@ -9,6 +10,7 @@ namespace Content.Shared.Morgue;
 public abstract class SharedMorgueSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedPowerStateSystem _powerStateSystem = default!;
 
     public override void Initialize()
     {
@@ -61,23 +63,29 @@ public abstract class SharedMorgueSystem : EntitySystem
         if (storage.Contents.ContainedEntities.Count == 0)
         {
             _appearance.SetData(uid, MorgueVisuals.Contents, MorgueContents.Empty, app);
+            _powerStateSystem.SetWorkingState(uid, false);
             return;
         }
 
         var hasMob = false;
+        var hasSoul = false;
 
         foreach (var ent in storage.Contents.ContainedEntities)
         {
             if (!hasMob && HasComp<MobStateComponent>(ent))
                 hasMob = true;
 
-            if (HasComp<ActorComponent>(ent))
-            {
-                _appearance.SetData(uid, MorgueVisuals.Contents, MorgueContents.HasSoul, app);
-                return;
-            }
+            if (hasSoul || !HasComp<ActorComponent>(ent))
+                continue;
+
+            hasSoul = true;
         }
 
-        _appearance.SetData(uid, MorgueVisuals.Contents, hasMob ? MorgueContents.HasMob : MorgueContents.HasContents, app);
+        if (hasSoul)
+            _appearance.SetData(uid, MorgueVisuals.Contents, MorgueContents.HasSoul, app);
+        else
+            _appearance.SetData(uid, MorgueVisuals.Contents, hasMob ? MorgueContents.HasMob : MorgueContents.HasContents, app);
+
+        _powerStateSystem.SetWorkingState(uid, hasMob);
     }
 }

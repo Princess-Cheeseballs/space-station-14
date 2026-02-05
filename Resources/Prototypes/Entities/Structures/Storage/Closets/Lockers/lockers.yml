@@ -186,7 +186,9 @@
     stateDoorClosed: freezer_door
   - type: ExplosionResistance
     damageCoefficient: 0.50
-  - type: AntiRottingContainer
+  - type: TemperatureRegulatedContainer
+    containerId: entity_storage
+    targetTemperature: 250 # Typical freezer temperature.
   - type: Construction
     graph: ClosetFreezer
     node: done

@@ -160,4 +160,6 @@
     - type: ContainerContainer
       containers:
         storagebase: !type:Container
-    - type: AntiRottingContainer
+    - type: TemperatureRegulatedContainer
+      containerId: storagebase
+      targetTemperature: 250 # Typical freezer temperature.

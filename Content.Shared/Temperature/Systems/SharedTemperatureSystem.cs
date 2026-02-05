@@ -84,6 +84,11 @@ public abstract class SharedTemperatureSystem : EntitySystem
         }
     }
 
+    public float ConductHeat(Entity<TemperatureComponent?> entity, float temperature, float deltaT, float conductanceMod = 1f, bool ignoreHeatResistance = false)
+    {
+        return 0f;
+    }
+
     public virtual void ChangeHeat(EntityUid uid, float heatAmount, bool ignoreHeatResistance = false, TemperatureComponent? temperature = null)
     {
 

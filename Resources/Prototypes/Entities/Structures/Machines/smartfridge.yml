@@ -70,7 +70,8 @@
   - type: AccessReader
   - type: UseDelay
     delay: 1
-  - type: AntiRottingContainer
+  - type: TemperatureRegulatedContainer
+    containerId: smart_fridge_inventory # Will exchange heat with solutions some day...
   - type: ResistLocker
   - type: Physics
     bodyType: Static

@@ -45,7 +45,9 @@
     sprite: Structures/Storage/Crates/freezer.rsi
   - type: Sprite
     sprite: Structures/Storage/Crates/freezer.rsi
-  - type: AntiRottingContainer
+  - type: TemperatureRegulatedContainer
+    containerId: entity_storage
+    targetTemperature: 250 # Typical freezer temperature.
   - type: ExplosionResistance
     damageCoefficient: 0.50
   - type: Construction

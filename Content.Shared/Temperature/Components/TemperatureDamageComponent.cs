@@ -1,4 +1,5 @@
 using Content.Shared.Alert;
+using Content.Shared.Atmos;
 using Content.Shared.Damage;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
@@ -23,7 +24,7 @@ public sealed partial class TemperatureDamageComponent : Component
     /// The temperature below which the entity will start taking damage from being too cold.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float ColdDamageThreshold = 260f;
+    public float ColdDamageThreshold = Atmospherics.T0C;
 
     /// <summary>
     /// Overrides HeatDamageThreshold if the entity's within a parent with the ContainerTemperatureDamageThresholdsComponent component.

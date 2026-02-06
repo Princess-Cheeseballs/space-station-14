@@ -45,7 +45,6 @@
     heatContainer:
       temperature: 293.15
       heatCapacity: 750
-  - type: TemperatureDamage
   # required for cooking to work
   - type: InternalTemperature
   - type: Material

@@ -19,7 +19,7 @@ public sealed partial class TemperatureRegulatedContainerComponent : Component
     /// Conductivity modifiers for heat exchanges.
     /// </summary>
     [DataField]
-    public float Conductance = 1f;
+    public float Conductance = 5f;
 
     /// <summary>
     /// Name of the container we're cooling.

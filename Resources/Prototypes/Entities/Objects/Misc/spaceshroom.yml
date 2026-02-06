@@ -92,7 +92,6 @@
     heatContainer:
       temperature: 293.15
       heatCapacity: 750
-  - type: TemperatureDamage
   - type: InternalTemperature
   - type: Tag
     tags:

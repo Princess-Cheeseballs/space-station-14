@@ -38,6 +38,7 @@ public sealed partial class TemperatureComponent : Component
     /// Human skin is about 0.3 W/(m*K) and the body has about 2m^2 of surface area.
     /// Divide that by the thickness of skin of about 2mm giving us a final value of 300
     /// Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC8953946/
+    /// TODO: Once we have internal temperature, given static conditions the convective heat transfer coefficient is about 3.1–5.1 W/(m2K) https://www.sciencedirect.com/science/article/pii/S0360132320307940
     /// </summary>
     [DataField]
     public float ThermalConductance = 300f;

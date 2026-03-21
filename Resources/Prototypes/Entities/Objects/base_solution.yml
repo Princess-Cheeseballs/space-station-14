@@ -328,6 +328,10 @@
   id: SolutionBeakerNormal
 
 - type: entity
+  parent: [SolutionFood, SolutionNormal]
+  id: SolutionFoodNormal
+
+- type: entity
   parent: [SolutionSpray, SolutionNormal]
   id: SolutionSprayNormal
 

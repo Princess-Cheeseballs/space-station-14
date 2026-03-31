@@ -311,6 +311,8 @@ public sealed partial class EmergencyShuttleSystem : SharedEmergencyShuttleSyste
             resultType = ShuttleDockResultType.NoDock;
         }
 
+        _shuttle.Smimsh(stationShuttle.EmergencyShuttle.Value, xform: xform);
+
         return new ShuttleDockResult
         {
             Station = (stationUid, stationShuttle),

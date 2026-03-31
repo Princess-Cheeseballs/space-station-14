@@ -78,6 +78,7 @@ public sealed partial class ShuttleSystem
     private void InitializeFTL()
     {
         SubscribeLocalEvent<StationPostInitEvent>(OnStationPostInit);
+        SubscribeLocalEvent<ShuttleFlattenEvent>(OnShuttleFlatten);
         SubscribeLocalEvent<FTLComponent, ComponentShutdown>(OnFtlShutdown);
 
         _bodyQuery = GetEntityQuery<BodyComponent>();
@@ -91,6 +92,43 @@ public sealed partial class ShuttleSystem
         _cfg.OnValueChanged(CCVars.ArrivalsFTLCooldown, time => ArrivalsFTLCooldown = TimeSpan.FromSeconds(time), true);
         _cfg.OnValueChanged(CCVars.FTLMassLimit, time => FTLMassLimit = time, true);
         _cfg.OnValueChanged(CCVars.HyperspaceKnockdownTime, time => _hyperspaceKnockdownTime = TimeSpan.FromSeconds(time), true);
+    }
+
+    private void OnShuttleFlatten(ref ShuttleFlattenEvent ev)
+    {
+        //var tiles = new List<(Vector2i Index, Tile Tile)>();
+        var grids = new List<Entity<MapGridComponent>>();
+        var gridTiles = new Dictionary<Entity<MapGridComponent>, HashSet<(Vector2i Index, Tile Tile)>>();
+
+        // We do two loops here since it's more efficient to
+        foreach (var aabb in ev.AABBs)
+        {
+            // We have includeMap false to avoid bulldozing mapGrids we're intentionally landing on.
+            // We don't need to compute the collision exactly since we have a list of tiles we wish to destroy anyways.
+            _mapManager.FindGridsIntersecting(ev.MapUid, aabb, ref grids, approx: true, includeMap: false);
+            foreach (var grid in grids)
+            {
+                if (grid.Owner == ev.ShuttleUid)
+                    continue;
+
+                if (!gridTiles.TryGetValue(grid, out var tiles))
+                {
+                    tiles = new HashSet<(Vector2i Index, Tile Tile)>();
+                    gridTiles.Add(grid, tiles);
+                }
+
+                foreach (var tile in _mapSystem.GetTilesIntersecting(grid, grid.Comp, aabb))
+                {
+                    tiles.Add((tile.GridIndices, Tile.Empty));
+                    _lookupEnts.Clear();
+                }
+            }
+        }
+
+        foreach (var (grid, tiles) in gridTiles)
+        {
+            _mapSystem.SetTiles(grid, tiles.ToList());
+        }
     }
 
     private void OnFtlShutdown(Entity<FTLComponent> ent, ref ComponentShutdown args)
@@ -945,7 +983,7 @@ public sealed partial class ShuttleSystem
     /// <summary>
     /// Flattens / deletes everything under the grid upon FTL.
     /// </summary>
-    private void Smimsh(EntityUid uid, FixturesComponent? manager = null, MapGridComponent? grid = null, TransformComponent? xform = null)
+    public void Smimsh(EntityUid uid, FixturesComponent? manager = null, MapGridComponent? grid = null, TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref manager, ref grid, ref xform) || xform.MapUid == null)
             return;
@@ -1010,7 +1048,7 @@ public sealed partial class ShuttleSystem
             }
         }
 
-        var ev = new ShuttleFlattenEvent(xform.MapUid.Value, aabbs);
+        var ev = new ShuttleFlattenEvent(xform.MapUid.Value, uid, aabbs);
         RaiseLocalEvent(ref ev);
     }
 }

@@ -75,8 +75,8 @@ public sealed partial class DockingSystem
         var gridXformMatrix = Matrix3Helpers.CreateTransform(gridDockXform.LocalPosition, gridDockAngle);
         matty = Matrix3x2.Multiply(stationDockMatrix, gridXformMatrix);
 
-        if (!ValidSpawn(gridEntity, matty, offsetAngle, shuttleFixtures, isMap))
-            return false;
+        //if (!ValidSpawn(gridEntity, matty, offsetAngle, shuttleFixtures, isMap))
+            //return false;
 
         shuttleDockedAABB = matty.TransformBox(shuttleAABB);
         gridRotation = offsetAngle.Reduced();

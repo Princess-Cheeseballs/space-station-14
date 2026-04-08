@@ -9,7 +9,7 @@ namespace Content.Shared.Damage.Systems;
 public sealed partial class DamageableSystem
 {
     /// <returns>If the damage container can take the given damage type</returns>
-    private bool SupportsType(ProtoId<DamageContainerPrototype>? container, ProtoId<DamageTypePrototype> type)
+    public bool SupportsType(ProtoId<DamageContainerPrototype>? container, ProtoId<DamageTypePrototype> type)
     {
         if (container is null)
             return true;
@@ -116,13 +116,9 @@ public sealed partial class DamageableSystem
         bool ignoreResistances = false,
         bool interruptsDoAfters = true,
         EntityUid? origin = null,
-        bool ignoreGlobalModifiers = false
-    )
+        bool ignoreGlobalModifiers = false)
     {
         var damageDone = new DamageSpecifier();
-
-        if (!_damageableQuery.Resolve(ent, ref ent.Comp, false))
-            return damageDone;
 
         if (damage.Empty)
             return damageDone;
@@ -136,11 +132,16 @@ public sealed partial class DamageableSystem
         // Apply resistances
         if (!ignoreResistances)
         {
+            /* Ideally this happens during the DamageModifyEvent when is raised anyways :^)
+             // Theoretically this should be subscribed to in an abstract system inhereited by other damagable systems
+             // Although this should genuinely just be its own component ngl.
+             // For now one could just subscribe with damageable and call it a day:tm:
             if (
                 ent.Comp.DamageModifierSetId != null &&
                 _prototypeManager.Resolve(ent.Comp.DamageModifierSetId, out var modifierSet)
             )
                 damage = DamageSpecifier.ApplyModifierSet(damage, modifierSet);
+                */
 
             // TODO DAMAGE
             // byref struct event.
@@ -156,27 +157,13 @@ public sealed partial class DamageableSystem
             damage = ApplyUniversalAllModifiers(damage);
 
 
-        damageDone.DamageDict.EnsureCapacity(damage.DamageDict.Count);
+        var evt = new DamageDealtEvent(damage, origin, interruptsDoAfters);
+        RaiseLocalEvent(ent, ref evt);
 
-        var dict = ent.Comp.Damage.DamageDict;
-        foreach (var (type, value) in damage.DamageDict)
-        {
-            if (!SupportsType(ent.Comp.DamageContainerID, type))
-                continue;
+        if (evt.Handled && _damageableQuery.Resolve(ent, ref ent.Comp))
+            OnEntityDamageChanged((ent, ent.Comp), damage, interruptsDoAfters, origin);
 
-            var oldValue = dict.GetValueOrDefault(type);
-            var newValue = FixedPoint2.Max(FixedPoint2.Zero, oldValue + value);
-            if (newValue == oldValue)
-                continue;
-
-            dict[type] = newValue;
-            damageDone.DamageDict[type] = newValue - oldValue;
-        }
-
-        if (!damageDone.Empty)
-            OnEntityDamageChanged((ent, ent.Comp), damageDone, interruptsDoAfters, origin);
-
-        return damageDone;
+        return damage;
     }
 
     /// <summary>

@@ -19,7 +19,7 @@ namespace Content.Shared.Damage.Components;
 [RegisterComponent]
 [NetworkedComponent]
 [Access(typeof(DamageableSystem), Other = AccessPermissions.ReadExecute)]
-public sealed partial class DamageableComponent : Component
+public sealed partial class DamageableComponent : DamageTakerComponent
 {
     /// <summary>
     ///     This <see cref="DamageContainerPrototype"/> specifies what damage types are supported by this component.
@@ -28,49 +28,6 @@ public sealed partial class DamageableComponent : Component
     [DataField("damageContainer")]
     // ReSharper disable once InconsistentNaming - This is wrong but fixing it is potentially annoying for downstreams.
     public ProtoId<DamageContainerPrototype>? DamageContainerID;
-
-    /// <summary>
-    ///     This <see cref="DamageModifierSetPrototype"/> will be applied to any damage that is dealt to this container,
-    ///     unless the damage explicitly ignores resistances.
-    /// </summary>
-    /// <remarks>
-    ///     Though DamageModifierSets can be deserialized directly, we only want to use the prototype version here
-    ///     to reduce duplication.
-    /// </remarks>
-    [DataField("damageModifierSet")]
-    public ProtoId<DamageModifierSetPrototype>? DamageModifierSetId;
-
-    /// <summary>
-    ///     All the damage information is stored in this <see cref="DamageSpecifier"/>.
-    /// </summary>
-    /// <remarks>
-    ///     If this data-field is specified, this allows damageable components to be initialized with non-zero damage.
-    /// </remarks>
-    [DataField]
-    [Access(typeof(DamageableSystem), Other = AccessPermissions.None)]
-    public DamageSpecifier Damage = new();
-
-    /// <summary>
-    ///     Damage, indexed by <see cref="DamageGroupPrototype"/> ID keys.
-    /// </summary>
-    /// <remarks>
-    ///     Groups which have no members that are supported by this component will not be present in this
-    ///     dictionary.
-    /// </remarks>
-    [ViewVariables]
-    [Access(typeof(DamageableSystem), Other = AccessPermissions.None)]
-    public Dictionary<ProtoId<DamageGroupPrototype>, FixedPoint2> DamagePerGroup = new();
-
-    /// <summary>
-    ///     The sum of all damages in the DamageableComponent.
-    /// </summary>
-    [ViewVariables]
-    [Access(typeof(DamageableSystem), Other = AccessPermissions.None)]
-    public FixedPoint2 TotalDamage;
-
-    [DataField("radiationDamageTypes")]
-    // ReSharper disable once UseCollectionExpression - Cannot refactor this as it's a potential sandbox violation.
-    public List<ProtoId<DamageTypePrototype>> RadiationDamageTypeIDs = new() { "Radiation" };
 
     /// <summary>
     ///     Group types that affect the pain overlay.
@@ -93,6 +50,49 @@ public sealed partial class DamageableComponent : Component
 
     [DataField]
     public FixedPoint2? HealthBarThreshold;
+}
+
+public abstract partial class DamageTakerComponent : Component
+{
+    /// <summary>
+    ///     This <see cref="DamageModifierSetPrototype"/> will be applied to any damage that is dealt to this container,
+    ///     unless the damage explicitly ignores resistances.
+    /// </summary>
+    /// <remarks>
+    ///     Though DamageModifierSets can be deserialized directly, we only want to use the prototype version here
+    ///     to reduce duplication.
+    /// </remarks>
+    [DataField("damageModifierSet")]
+    public ProtoId<DamageModifierSetPrototype>? DamageModifierSetId;
+
+    /// <summary>
+    ///     All the damage information is stored in this <see cref="DamageSpecifier"/>.
+    /// </summary>
+    /// <remarks>
+    ///     If this data-field is specified, this allows damageable components to be initialized with non-zero damage.
+    /// </remarks>
+    [DataField]
+    public DamageSpecifier Damage = new();
+
+    /// <summary>
+    ///     Damage, indexed by <see cref="DamageGroupPrototype"/> ID keys.
+    /// </summary>
+    /// <remarks>
+    ///     Groups which have no members that are supported by this component will not be present in this
+    ///     dictionary.
+    /// </remarks>
+    [ViewVariables]
+    public Dictionary<ProtoId<DamageGroupPrototype>, FixedPoint2> DamagePerGroup = new();
+
+    /// <summary>
+    ///     The sum of all damages in the DamageableComponent.
+    /// </summary>
+    [ViewVariables]
+    public FixedPoint2 TotalDamage;
+
+    [DataField("radiationDamageTypes")]
+    // ReSharper disable once UseCollectionExpression - Cannot refactor this as it's a potential sandbox violation.
+    public List<ProtoId<DamageTypePrototype>> RadiationDamageTypeIDs = new() { "Radiation" };
 }
 
 [Serializable, NetSerializable]

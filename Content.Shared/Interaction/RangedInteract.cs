@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 
@@ -7,7 +8,7 @@ namespace Content.Shared.Interaction
     ///     Raised when an entity is interacted with that is out of the user entity's range of direct use.
     /// </summary>
     [PublicAPI]
-    public sealed class RangedInteractEvent : HandledEntityEventArgs
+    public sealed class RangedInteractEvent : IHandleableEvent
     {
         /// <summary>
         ///     Entity that triggered the interaction.
@@ -36,5 +37,7 @@ namespace Content.Shared.Interaction
             TargetUid = target;
             ClickLocation = clickLocation;
         }
+
+        public bool Handled { get; set; }
     }
 }

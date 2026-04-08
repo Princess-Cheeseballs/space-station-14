@@ -1,4 +1,5 @@
 using Content.Shared.Bed.Sleep;
+using Content.Shared.Helpers;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Interaction.Events;
@@ -50,7 +51,7 @@ public sealed class InteractionPopupSystem : EntitySystem
     private void SharedInteract(
         EntityUid uid,
         InteractionPopupComponent component,
-        HandledEntityEventArgs args,
+        IHandleableEvent args,
         EntityUid target,
         EntityUid user)
     {
@@ -69,7 +70,7 @@ public sealed class InteractionPopupSystem : EntitySystem
             return;
         }
 
-        args.Handled = true;
+        args.Handle();
 
         var curTime = _gameTiming.CurTime;
 

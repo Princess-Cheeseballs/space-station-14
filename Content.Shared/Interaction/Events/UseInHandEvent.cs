@@ -1,4 +1,5 @@
 using Content.Shared.Clothing.EntitySystems;
+using Content.Shared.Helpers;
 using Content.Shared.Timing;
 using JetBrains.Annotations;
 
@@ -8,7 +9,7 @@ namespace Content.Shared.Interaction.Events;
 ///     Raised when using the entity in your hands.
 /// </summary>
 [PublicAPI]
-public sealed class UseInHandEvent : HandledEntityEventArgs
+public sealed class UseInHandEvent : IHandleableEvent
 {
     /// <summary>
     ///     Entity holding the item in their hand.
@@ -25,4 +26,6 @@ public sealed class UseInHandEvent : HandledEntityEventArgs
     {
         User = user;
     }
+
+    public bool Handled { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Content.Shared.Helpers;
+using JetBrains.Annotations;
 using Robust.Shared.Map;
 
 namespace Content.Shared.Interaction
@@ -7,7 +8,7 @@ namespace Content.Shared.Interaction
     ///     Raised directed on the used object when clicking on another object before an interaction is handled.
     /// </summary>
     [PublicAPI]
-    public sealed class BeforeRangedInteractEvent : HandledEntityEventArgs
+    public sealed class BeforeRangedInteractEvent : IHandleableEvent
     {
         /// <summary>
         ///     Entity that triggered the interaction.
@@ -47,5 +48,7 @@ namespace Content.Shared.Interaction
             ClickLocation = clickLocation;
             CanReach = canReach;
         }
+
+        public bool Handled { get; set; }
     }
 }

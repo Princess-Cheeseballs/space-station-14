@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 using Robust.Shared.Utility;
@@ -8,7 +9,7 @@ namespace Content.Shared.Interaction;
 ///     Raised when a target entity is interacted with by a user while holding an object in their hand.
 /// </summary>
 [PublicAPI]
-public sealed class InteractUsingEvent : HandledEntityEventArgs
+public sealed class InteractUsingEvent : IHandleableEvent
 {
     /// <summary>
     ///     Entity that triggered the interaction.
@@ -42,13 +43,15 @@ public sealed class InteractUsingEvent : HandledEntityEventArgs
         Target = target;
         ClickLocation = clickLocation;
     }
+
+    public bool Handled { get; set; }
 }
 
 /// <summary>
 /// Raised when a user entity interacts with a target while holding an object in their hand.
 /// </summary>
 [PublicAPI]
-public sealed class UserInteractUsingEvent : HandledEntityEventArgs
+public sealed class UserInteractUsingEvent : IHandleableEvent
 {
     /// <summary>
     ///     Entity that triggered the interaction.
@@ -82,5 +85,7 @@ public sealed class UserInteractUsingEvent : HandledEntityEventArgs
         Target = target;
         ClickLocation = clickLocation;
     }
+
+    public bool Handled { get; set; }
 }
 

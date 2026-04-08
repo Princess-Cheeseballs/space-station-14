@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using JetBrains.Annotations;
 
 namespace Content.Shared.Interaction;
@@ -18,7 +19,7 @@ public sealed class InteractHandEventArgs : EventArgs, ITargetedInteractEventArg
 ///     Raised directed on a target entity when it is interacted with by a user with an empty hand.
 /// </summary>
 [PublicAPI]
-public sealed class InteractHandEvent : HandledEntityEventArgs, ITargetedInteractEventArgs
+public sealed class InteractHandEvent : IHandleableEvent, ITargetedInteractEventArgs
 {
     /// <summary>
     ///     Entity that triggered the interaction.
@@ -35,6 +36,8 @@ public sealed class InteractHandEvent : HandledEntityEventArgs, ITargetedInterac
         User = user;
         Target = target;
     }
+
+    public bool Handled { get; set; }
 }
 
 /// <summary>

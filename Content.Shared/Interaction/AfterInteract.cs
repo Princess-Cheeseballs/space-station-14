@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Content.Shared.Helpers;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 
@@ -6,7 +7,7 @@ using Robust.Shared.Map;
 namespace Content.Shared.Interaction
 {
     [PublicAPI]
-    public abstract class InteractEvent : HandledEntityEventArgs
+    public abstract class InteractEvent : IHandleableEvent
     {
         /// <summary>
         ///     Entity that triggered the interaction.
@@ -42,6 +43,8 @@ namespace Content.Shared.Interaction
             ClickLocation = clickLocation;
             CanReach = canReach;
         }
+
+        public bool Handled { get; set; }
     }
 
     /// <summary>

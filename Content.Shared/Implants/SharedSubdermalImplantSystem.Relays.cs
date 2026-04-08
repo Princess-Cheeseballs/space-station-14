@@ -1,4 +1,5 @@
 using Content.Shared.Chat;
+using Content.Shared.Helpers;
 using Content.Shared.IdentityManagement.Components;
 using Content.Shared.Implants.Components;
 using Content.Shared.Interaction;
@@ -30,7 +31,7 @@ public abstract partial class SharedSubdermalImplantSystem
         var relayEv = new ImplantRelayEvent<T>(args, uid);
         foreach (var implant in implantContainer.ContainedEntities)
         {
-            if (args is HandledEntityEventArgs { Handled: true })
+            if (args is IHandleableEvent { Handled: true } || args is ICancellableEvent { Cancelled: true })
                 return;
 
             RaiseLocalEvent(implant, relayEv);

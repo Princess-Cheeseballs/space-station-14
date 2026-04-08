@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using Content.Shared.Inventory;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
@@ -30,7 +31,7 @@ public enum IdentityBlockerCoverage
 /// <summary>
 ///     Raised on an entity and relayed to inventory to determine if its identity should be knowable.
 /// </summary>
-public sealed class SeeIdentityAttemptEvent : CancellableEntityEventArgs, IInventoryRelayEvent
+public sealed class SeeIdentityAttemptEvent : ICancellableEvent, IInventoryRelayEvent
 {
     // i.e. masks, helmets, or glasses.
     public SlotFlags TargetSlots => SlotFlags.MASK | SlotFlags.HEAD | SlotFlags.EYES | SlotFlags.OUTERCLOTHING;
@@ -42,4 +43,6 @@ public sealed class SeeIdentityAttemptEvent : CancellableEntityEventArgs, IInven
     /// A specific name to override your identiy with.
     /// </summary>
     public string? NameOverride = null;
+
+    public bool Cancelled { get; set; }
 }

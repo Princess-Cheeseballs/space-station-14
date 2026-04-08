@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using JetBrains.Annotations;
 
 namespace Content.Shared.Interaction;
@@ -6,7 +7,7 @@ namespace Content.Shared.Interaction;
 ///     Raised when an entity is activated in the world.
 /// </summary>
 [PublicAPI]
-public sealed class ActivateInWorldEvent : HandledEntityEventArgs, ITargetedInteractEventArgs
+public sealed class ActivateInWorldEvent : IHandleableEvent, ITargetedInteractEventArgs
 {
     /// <summary>
     ///     Entity that activated the target world entity.
@@ -34,6 +35,8 @@ public sealed class ActivateInWorldEvent : HandledEntityEventArgs, ITargetedInte
         Target = target;
         Complex = complex;
     }
+
+    public bool Handled { get; set; }
 }
 
 /// <summary>

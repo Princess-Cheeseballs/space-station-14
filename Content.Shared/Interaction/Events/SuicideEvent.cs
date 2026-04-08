@@ -1,5 +1,6 @@
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
+using Content.Shared.Helpers;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Interaction.Events;
@@ -7,7 +8,7 @@ namespace Content.Shared.Interaction.Events;
 /// <summary>
 ///     Raised Directed at an entity to check whether they will handle the suicide.
 /// </summary>
-public sealed class SuicideEvent : HandledEntityEventArgs
+public sealed class SuicideEvent : IHandleableEvent
 {
     public SuicideEvent(EntityUid victim)
     {
@@ -17,6 +18,7 @@ public sealed class SuicideEvent : HandledEntityEventArgs
     public DamageSpecifier? DamageSpecifier;
     public ProtoId<DamageTypePrototype>? DamageType;
     public EntityUid Victim { get; private set; }
+    public bool Handled { get; set; }
 }
 
 public sealed class SuicideByEnvironmentEvent : HandledEntityEventArgs

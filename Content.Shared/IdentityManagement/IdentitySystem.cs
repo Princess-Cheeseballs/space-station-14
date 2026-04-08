@@ -4,6 +4,7 @@ using Content.Shared.Clothing;
 using Content.Shared.CriminalRecords.Systems;
 using Content.Shared.Database;
 using Content.Shared.Hands;
+using Content.Shared.Helpers;
 using Content.Shared.Humanoid;
 using Content.Shared.IdentityManagement.Components;
 using Content.Shared.Inventory;

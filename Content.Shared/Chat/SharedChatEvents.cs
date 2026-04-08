@@ -1,3 +1,4 @@
+using Content.Shared.Helpers;
 using Content.Shared.Inventory;
 using Content.Shared.Radio;
 using Content.Shared.Speech;
@@ -27,7 +28,7 @@ public sealed class TransformSpeakerNameEvent : EntityEventArgs, IInventoryRelay
 /// <summary>
 /// Raised broadcast in order to transform speech.transmit
 /// </summary>
-public sealed class TransformSpeechEvent : CancellableEntityEventArgs, IInventoryRelayEvent
+public sealed class TransformSpeechEvent : ICancellableEvent, IInventoryRelayEvent
 {
     public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
     public EntityUid Sender;
@@ -38,6 +39,8 @@ public sealed class TransformSpeechEvent : CancellableEntityEventArgs, IInventor
         Sender = sender;
         Message = message;
     }
+
+    public bool Cancelled { get; set; }
 }
 
 public sealed class CheckIgnoreSpeechBlockerEvent : EntityEventArgs

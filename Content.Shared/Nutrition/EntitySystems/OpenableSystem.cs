@@ -1,5 +1,6 @@
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Examine;
+using Content.Shared.Helpers;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Lock;
@@ -82,10 +83,11 @@ public sealed partial class OpenableSystem : EntitySystem
         args.PushMarkup(text);
     }
 
-    private void HandleIfClosed(EntityUid uid, OpenableComponent comp, HandledEntityEventArgs args)
+    private void HandleIfClosed(EntityUid uid, OpenableComponent comp, IHandleableEvent args)
     {
         // prevent spilling/pouring/whatever drinks when closed
-        args.Handled = !comp.Opened;
+        if (!comp.Opened)
+            args.Handle();
     }
 
     private void OnGetVerbs(EntityUid uid, OpenableComponent comp, GetVerbsEvent<AlternativeVerb> args)

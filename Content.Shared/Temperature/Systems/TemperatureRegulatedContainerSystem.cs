@@ -14,6 +14,8 @@ public sealed class TemperatureRegulatedContainerSystem : EntitySystem
     public override void Update(float frameTime)
     {
         // TODO: OPTIMIZE THIS CODE
+        // TODO: Active Component + Check on insertion/removal for entities that can recieve temperature changes using temperature API
+        // TODO: Respond to container being opened events for entity containers and remove active component
 
         var query = EntityQueryEnumerator<TemperatureRegulatedContainerComponent>();
         while (query.MoveNext(out var uid, out var comp))

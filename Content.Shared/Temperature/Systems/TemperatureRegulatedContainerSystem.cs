@@ -13,8 +13,7 @@ public sealed class TemperatureRegulatedContainerSystem : EntitySystem
 
     public override void Update(float frameTime)
     {
-        // TODO: Maybe have a global update time limit to avoid lag? I doubt it'll be an issue tbqh.
-        // TODO: Raise the cold damage thresholds of all species, they currently have to be beyond ice cubes before they start taking damage.
+        // TODO: OPTIMIZE THIS CODE
 
         var query = EntityQueryEnumerator<TemperatureRegulatedContainerComponent>();
         while (query.MoveNext(out var uid, out var comp))

@@ -91,6 +91,8 @@ public sealed class RottingSystem : SharedRottingSystem
             if (perishable.RotAccumulator >= perishable.RotAfter)
             {
                 var rot = AddComp<RottingComponent>(uid);
+                var ev = new BeginRottingEvent();
+                RaiseLocalEvent(uid, ref ev);
                 rot.NextRotUpdate = _timing.CurTime + rot.RotUpdateRate;
             }
         }
@@ -125,6 +127,7 @@ public sealed class RottingSystem : SharedRottingSystem
 
             if (!TryComp<PhysicsComponent>(uid, out var physics))
                 continue;
+
             // We need a way to get the mass of the mob alone without armor etc in the future
             // or just remove the mass mechanics altogether because they aren't good.
             var molRate = perishable.MolsPerSecondPerUnitMass * (float)rotting.RotUpdateRate.TotalSeconds;

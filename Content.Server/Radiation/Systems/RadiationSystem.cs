@@ -119,7 +119,7 @@ public sealed partial class RadiationSystem : SharedRadiationSystem
         var maxRange = component.Slope >= float.Epsilon ? intensity / component.Slope : GridcastMaxDistance;
         maxRange = Math.Min(maxRange, GridcastMaxDistance);
 
-        _sourceDataMap[uid] = new SourceData(intensity, component.Slope, maxRange, (uid, component, xform), worldPos);
+        _sourceDataMap[uid] = new SourceData(intensity, component.Slope, maxRange, (uid, component, xform));
         var aabb = Box2.CenteredAround(worldPos, new Vector2(maxRange * 2, maxRange * 2));
 
         if (component.Proxy != DynamicTree.Proxy.Free)

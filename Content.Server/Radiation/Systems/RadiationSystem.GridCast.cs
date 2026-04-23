@@ -21,8 +21,7 @@ public partial class RadiationSystem
         float Intensity,
         float Slope,
         float MaxRange,
-        Entity<RadiationSourceComponent, TransformComponent> Entity,
-        Vector2 WorldPosition)
+        Entity<RadiationSourceComponent, TransformComponent> Entity)
     {
         public EntityUid Uid => Entity.Owner;
         public TransformComponent Transform => Entity.Comp2;
@@ -79,19 +78,16 @@ public partial class RadiationSystem
     private RadiationRay? Irradiate(SourceData source,
         EntityUid destUid,
         TransformComponent destTrs,
+        Vector2 sourceWorld,
         Vector2 destWorld,
+        float rads,
         bool saveVisitedTiles,
         List<Entity<MapGridComponent>> gridList)
     {
         var mapId = destTrs.MapID;
-        var dist = (destWorld - source.WorldPosition).Length();
-        var rads = source.Intensity - source.Slope * dist;
-        if (rads < MinIntensity)
-            return null;
+        var ray = new RadiationRay(mapId, source.Entity, sourceWorld, destUid, destWorld, rads);
 
-        var ray = new RadiationRay(mapId, source.Entity, source.WorldPosition, destUid, destWorld, rads);
-
-        var box = Box2.FromTwoPoints(source.WorldPosition, destWorld);
+        var box = Box2.FromTwoPoints(sourceWorld, destWorld);
         gridList.Clear();
         _mapManager.FindGridsIntersecting(mapId, box, ref gridList, true);
 
@@ -242,14 +238,19 @@ public partial class RadiationSystem
                     if (!SourceDataMap.TryGetValue(sourceUid, out var source)
                         || source.Transform.MapID != destMapId)
                         continue;
-                    var delta = source.WorldPosition - destWorld;
-                    if (delta.LengthSquared() > source.MaxRange * source.MaxRange)
+
+                    // TODO: Should be cached to avoid excessive recursive parent coordinate checking, we should only calculate this once per source per tick
+                    var sourceWorld = System._transform.GetWorldPosition(source.Transform);
+                    var distFast = ( sourceWorld - destWorld).LengthSquared();
+                    if (distFast > source.MaxRange * source.MaxRange)
                         continue;
-                    var dist = delta.Length();
+
+                    var dist = float.Sqrt(distFast);
                     var radsAfterDist = source.Intensity - source.Slope * dist;
                     if (radsAfterDist < System.MinIntensity)
                         continue;
-                    if (System.Irradiate(source, destUid, destTrs, destWorld, Debug, gridList) is not { } ray)
+
+                    if (System.Irradiate(source, destUid, destTrs, sourceWorld, destWorld, radsAfterDist, Debug, gridList) is not { } ray)
                         continue;
 
                     if (ray.ReachedDestination)

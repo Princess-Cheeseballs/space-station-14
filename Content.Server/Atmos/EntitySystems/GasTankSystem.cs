@@ -105,6 +105,8 @@ public sealed class GasTankSystem : SharedGasTankSystem
         if (environment != null)
             _atmosphereSystem.Merge(environment, removed);
 
+        Dirty(entity);
+
         // If we wouldn't produce a sound, don't throw or play a sound.
         if (removed.Pressure < MinimumSoundValvePressure)
             return;

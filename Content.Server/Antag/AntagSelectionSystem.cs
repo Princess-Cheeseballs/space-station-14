@@ -18,18 +18,19 @@ using Content.Server.Roles.Jobs;
 using Content.Server.Shuttles.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Antag;
+using Content.Shared.CCVar;
 using Content.Shared.Clothing;
 using Content.Shared.Database;
 using Content.Shared.Follower;
 using Content.Shared.GameTicking;
 using Content.Shared.GameTicking.Components;
-using Content.Shared.Players;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Roles;
 using Content.Shared.Whitelist;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
 using Robust.Server.Player;
+using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -58,6 +59,7 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
 {
     [Dependency] private IBanManager _ban = default!;
     [Dependency] private IChatManager _chat = default!;
+    [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
     [Dependency] private IServerPreferencesManager _pref = default!;
     [Dependency] private ISharedAdminLogManager _adminLogger = default!;
@@ -74,7 +76,7 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
     [Dependency] private TransformSystem _transform = default!;
 
     // arbitrary random number to give late joining some mild interest.
-    public const float LateJoinRandomChance = 0.5f;
+    private float _lateJoinRandomChance;
 
     /// <summary>
     /// List of game rules and antags that are assigned during <see cref="RulePlayerSpawningEvent"/>
@@ -112,6 +114,8 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         SubscribeLocalEvent<NoJobsAvailableSpawningEvent>(OnJobNotAssigned);
         SubscribeLocalEvent<RulePlayerJobsAssignedEvent>(OnJobsAssigned);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnSpawnComplete);
+
+        Subs.CVar(_cfg, CCVars.GameLateJoinOdds, value => _lateJoinRandomChance = value);
     }
 
     protected override void Started(EntityUid uid, AntagSelectionComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)

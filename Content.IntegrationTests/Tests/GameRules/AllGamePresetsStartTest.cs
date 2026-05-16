@@ -9,6 +9,7 @@ using Content.Server.Shuttles.Components;
 using Content.Shared.Antag;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
+using Content.Shared.GameTicking.Components;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
 
@@ -32,6 +33,84 @@ public sealed class AllGamePresetsStartTest : AntagTest
     [Description("Ensures all Game Presets are able to start and assign all antags correctly without spawning anyone in nullspace.")]
     public async Task TestAllGamemodesCanStart(string presetId)
     {
+        List<(AntagSpecifierPrototype, int)> rules = [];
+        var players = new List<ICommonSession>();
+        await SetupRound(presetId, rules, players);
+
+        // Start all game presets so antags spawn!
+        await Server.WaitPost(() =>
+        {
+            STicker.StartGamePresetRules();
+        });
+        await Pair.RunUntilSynced();
+
+        await Server.WaitPost(() =>
+        {
+            var j = 0;
+            foreach (var (antag, amount) in rules)
+            {
+                for (var count = 0; count < amount; count++)
+                {
+                    SAssertAntagInitialized(antag, players[j++]);
+                }
+            }
+        });
+
+        // Maps now exist
+        Assert.That(SEntMan.Count<MapComponent>(), Is.GreaterThan(0));
+        Assert.That(SEntMan.Count<MapGridComponent>(), Is.GreaterThan(0));
+        Assert.That(SEntMan.Count<StationCentcommComponent>(), Is.EqualTo(1));
+
+        // Clear game preset and return to lobby
+        await Pair.WaitCommand("golobby");
+        STicker.SetGamePreset((GamePresetPrototype) null);
+        await Pair.RunUntilSynced();
+    }
+
+    [Test]
+    [TestOf(typeof(GameTicker)), TestOf(typeof(AntagSelectionSystem)), TestOf(typeof(AntagSelectionComponent))]
+    [TestCaseSource(nameof(_gamePresets))]
+    [Description("Ensures all Game Presets are able to spawn the correct amount of late joins, and that they can be assigned!")]
+    public async Task TestAllLateJoins(string presetId)
+    {
+        List<(AntagSpecifierPrototype, int)> rules = [];
+        var players = new List<ICommonSession>();
+        Server.CfgMan.SetCVar(CCVars.GameLateJoinOdds, 1f);
+
+        await SetupRound(presetId, rules, players);
+
+        // TODO: DISCONNECT PLAYERS WHO CAN BE LATE JOIN ANTAGS AND WHO'S PRESETS HAVEN'T STARTED YET!!!
+        var allRules = SEntMan.EntityQueryEnumerator<AntagSelectionComponent, GameRuleComponent>();
+        while (allRules.MoveNext(out var uid, out var antag, out var rule))
+        {
+            // Make sure this game rule can actually accept late joins!
+            if (antag.SelectionTime == AntagSelectionTime.Never || !antag.LateJoinAdditional)
+                continue;
+
+            // If the game rule has already started, then disconnecting assigned players won't do anything
+            if (STicker.IsGameRuleActive(uid, rule))
+                continue;
+
+            foreach (var (_, sessions) in antag.PreSelectedSessions)
+            {
+                foreach (var session in sessions)
+                {
+                    // TODO: Save these players, their antags, and job preferences!!!
+                    STicker.Respawn(session);
+                }
+            }
+        }
+
+        // Start all game presets so antags spawn!
+        await Server.WaitPost(() =>
+        {
+            STicker.StartGamePresetRules();
+        });
+        await Pair.RunUntilSynced();
+    }
+
+    private async Task SetupRound(string presetId, List<(AntagSpecifierPrototype, int)> rules, List<ICommonSession> players)
+    {
         // Initially in the lobby
         Assert.That(STicker.RunLevel, Is.EqualTo(GameRunLevel.PreRoundLobby));
         Assert.That(Client.AttachedEntity, Is.Null);
@@ -43,7 +122,6 @@ public sealed class AllGamePresetsStartTest : AntagTest
         var preset = SProtoMan.Index<GamePresetPrototype>(presetId);
 
         // Spawn the minimum number of players.
-        var players = new List<ICommonSession>();
         players.Add(Client.Session);
         var min = 0;
         await Server.WaitPost(() =>
@@ -52,10 +130,6 @@ public sealed class AllGamePresetsStartTest : AntagTest
         });
 
         // We should already have one client connected, and we need to check the min
-
-        // If we have antags, make sure that those with the correct preferences can spawn with them!
-        List<(AntagSpecifierPrototype, int)> rules = [];
-
         var antags = 0;
         await Server.WaitPost(() =>
         {
@@ -126,34 +200,5 @@ public sealed class AllGamePresetsStartTest : AntagTest
 
         var player = Pair.Player!.AttachedEntity!.Value;
         Assert.That(SEntMan.EntityExists(player));
-
-        // Start all game presets so antags spawn!
-        await Server.WaitPost(() =>
-        {
-            STicker.StartGamePresetRules();
-        });
-        await Pair.RunUntilSynced();
-
-        await Server.WaitPost(() =>
-        {
-            var j = 0;
-            foreach (var (antag, amount) in rules)
-            {
-                for (var count = 0; count < amount; count++)
-                {
-                    SAssertAntagInitialized(antag, players[j++]);
-                }
-            }
-        });
-
-        // Maps now exist
-        Assert.That(SEntMan.Count<MapComponent>(), Is.GreaterThan(0));
-        Assert.That(SEntMan.Count<MapGridComponent>(), Is.GreaterThan(0));
-        Assert.That(SEntMan.Count<StationCentcommComponent>(), Is.EqualTo(1));
-
-        // Clear game preset and return to lobby
-        await Pair.WaitCommand("golobby");
-        STicker.SetGamePreset((GamePresetPrototype) null);
-        await Pair.RunUntilSynced();
     }
 }

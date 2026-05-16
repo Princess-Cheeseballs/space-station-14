@@ -4,6 +4,7 @@ using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Shared.Antag;
+using Content.Shared.CCVar;
 using Content.Shared.Database;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
@@ -288,7 +289,7 @@ public sealed partial class AntagSelectionSystem
     public bool TryMakeLateJoinAntag(ICommonSession session)
     {
         // Sorry buddy, no antag for you!
-        if (!RobustRandom.Prob(LateJoinRandomChance))
+        if (!RobustRandom.Prob(_lateJoinRandomChance))
             return false;
 
         // TODO: We may want to query all rules to add late joins to pre-selections?

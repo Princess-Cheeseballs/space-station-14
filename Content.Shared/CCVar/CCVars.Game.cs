@@ -30,6 +30,12 @@ public sealed partial class CCVars
         GameDisallowLateJoins = CVarDef.Create("game.disallowlatejoins", false, CVar.ARCHIVE | CVar.SERVERONLY);
 
     /// <summary>
+    ///     Controls the odds that a player is assigned antag when late joining the round.
+    /// </summary>
+    public static readonly CVarDef<float>
+        GameLateJoinOdds = CVarDef.Create("game.latejoinodds", 0.5f, CVar.ARCHIVE | CVar.SERVERONLY);
+
+    /// <summary>
     ///     Controls the default game preset.
     /// </summary>
     public static readonly CVarDef<string>

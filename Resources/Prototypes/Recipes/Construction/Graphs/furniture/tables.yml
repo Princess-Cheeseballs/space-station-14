@@ -76,9 +76,9 @@
               amount: 1
               doAfter: 1
 
-        - to: TablePlasmaGlass
+        - to: TablePhoronGlass
           steps:
-            - material: PlasmaGlass
+            - material: PhoronGlass
               amount: 1
               doAfter: 1
 
@@ -192,8 +192,8 @@
             - tool: Anchoring
               doAfter: 1
 
-    - node: TablePlasmaGlass
-      entity: TablePlasmaGlass
+    - node: TablePhoronGlass
+      entity: TablePhoronGlass
       edges:
         - to: TableFrame
           completed:

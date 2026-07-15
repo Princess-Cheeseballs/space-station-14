@@ -33,9 +33,9 @@
   pricePerMole: 0
 
 - type: gas
-  id: Plasma
-  name: gas-plasma
-  abbreviation: gas-plasma-abbreviation
+  id: Phoron
+  name: gas-phoron
+  abbreviation: gas-phoron-abbreviation
   molarHeatCapacity: 200
   heatCapacityRatio: 1.7
   molarMass: 120
@@ -43,7 +43,7 @@
     sprite: /Textures/Effects/atmospherics.rsi
     state: plasma
   color: '#FF3300'
-  reagent: Plasma
+  reagent: Phoron
   pricePerMole: 0
   isFuel: true
 

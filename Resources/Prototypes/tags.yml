@@ -1032,7 +1032,7 @@
   id: OreGold # CargoBounty: BountySalvageOreGold
 
 - type: Tag
-  id: OrePlasma # CargoBounty: BountySalvageOrePlasma
+  id: OrePhoron # CargoBounty: BountySalvageOrePhoron
 
 - type: Tag
   id: OreSilver # CargoBounty: BountySalvageOreSilver
@@ -1113,7 +1113,7 @@
   id: PlantSampleTaker # Used by PlantHolderSystem to make tagged entities a pseudo-tool for trimming seeds. TODO this sucks!
 
 - type: Tag
-  id: PlasmaGlassShard # ConstructionGraph: ImprovisedArrowPlasma, PlasmaShiv, SpearPlasma
+  id: PhoronGlassShard # ConstructionGraph: ImprovisedArrowPhoron, PhoronShiv, SpearPhoron
 
 - type: Tag
   id: Plastic # Used by MicrowaveSystem to turn tagged entities into trash.
@@ -1263,13 +1263,13 @@
   id: SecBeltEquip # Storage whitelist: ClothingBeltSecurity
 
 - type: Tag
-  id: SecurePlasmaWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: SecurePhoronWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
-  id: SecureUraniumWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: SecureUraniumWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
-  id: SecureWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: SecureWindoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
   id: SecurityHelmet # ConstructionGraph: HelmetJustice
@@ -1420,7 +1420,7 @@
 
 - type: Tag
   id: TeleportScrollWarpBlacklist # blacklists a warp point for the wizard's teleport scroll
-  
+
 - type: Tag
   id: TheaterBagel # used for Bagel Station's randomized theater
 

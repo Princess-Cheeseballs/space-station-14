@@ -1,6 +1,6 @@
 - type: gameMap
   id: Plasma
-  mapName: 'Plasma'
+  mapName: 'Phoron'
   mapPath: /Maps/plasma.yml
   minPlayers: 30
   maxPlayers: 80

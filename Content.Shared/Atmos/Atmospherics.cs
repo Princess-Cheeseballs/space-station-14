@@ -382,7 +382,7 @@ namespace Content.Shared.Atmos
         Oxygen = 0,
         Nitrogen = 1,
         CarbonDioxide = 2,
-        Plasma = 3,
+        Phoron = 3,
         Tritium = 4,
         WaterVapor = 5,
         Ammonia = 6,

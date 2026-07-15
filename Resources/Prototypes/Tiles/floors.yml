@@ -1991,9 +1991,9 @@
   itemDrop: FloorTileItemDarkMarble
 
 - type: tile
-  id: FloorPlasmaMarble
+  id: FloorPhoronMarble
   parent: BaseStationTile
-  name: tiles-plasma-marble
+  name: tiles-phoron-marble
   sprite: /Textures/Tiles/plasmarble.png
   variants: 8
   placementVariants:
@@ -2008,7 +2008,7 @@
   footstepSounds:
     collection: FootstepTile
   friction: 0.8
-  itemDrop: FloorTileItemPlasmaMarble
+  itemDrop: FloorTileItemPhoronMarble
 
 - type: tile
   id: FloorUraniumMarble

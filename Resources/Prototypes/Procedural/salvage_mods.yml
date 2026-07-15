@@ -189,7 +189,7 @@
     - Lava
 
 - type: salvageAirMod
-  id: Plasma
+  id: Phoron
   cost: 4
   desc: salvage-air-mod-toxic-atmosphere
   gases:

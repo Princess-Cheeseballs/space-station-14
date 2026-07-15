@@ -107,7 +107,7 @@
   reactants:
     Oxygen:
       amount: 2
-    Plasma:
+    Phoron:
       amount: 1
       catalyst: true
   products:
@@ -188,7 +188,7 @@
       amount: 1
     Fersilicite:
       amount: 1
-    Plasma:
+    Phoron:
       amount: 1
       catalyst: true
   products:
@@ -279,7 +279,7 @@
   reactants:
     HeartbreakerToxin:
       amount: 1
-    Plasma:
+    Phoron:
       amount: 1
     Vestine:
       amount: 1
@@ -340,7 +340,7 @@
   reactants:
     Histamine:
       amount: 2
-    Plasma:
+    Phoron:
       amount: 1
       catalyst: true
   products:
@@ -563,7 +563,7 @@
   reactants:
     Cognizine:
       amount: 1
-    Plasma:
+    Phoron:
       amount: 2
     Doxarubixadone:
       amount: 1
@@ -630,7 +630,7 @@
       amount: 1
     Ethanol:
       amount: 1
-    Plasma:
+    Phoron:
       amount: 5
       catalyst: true
   products:
@@ -681,7 +681,7 @@
       amount: 2
     Razorium:
       amount: 2
-    Plasma:
+    Phoron:
       amount: 1
   products:
     Hemorrhinol: 2

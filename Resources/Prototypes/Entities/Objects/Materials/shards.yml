@@ -152,7 +152,7 @@
 
 - type: entity
   parent: ShardBase
-  id: ShardGlassPlasma
+  id: ShardGlassPhoron
   name: plasma glass shard
   description: A small piece of plasma glass.
   components:
@@ -165,24 +165,24 @@
   - type: ToolRefinable
     refineResult:
     - id: SheetGlass1
-    - id: SheetPlasma1
+    - id: SheetPhoron1
   - type: DamageOnTrigger
     damage:
       types:
         Piercing: 6.5
   - type: Tag
     tags:
-      - PlasmaGlassShard
+      - PhoronGlassShard
       - Trash
   - type: Solution
     solution:
       reagents:
       - ReagentId: Silicon
         Quantity: 5
-      - ReagentId: Plasma
+      - ReagentId: Phoron
         Quantity: 5
   - type: Construction
-    graph: PlasmaShivConstruct
+    graph: PhoronShivConstruct
     node: start
 
 - type: entity

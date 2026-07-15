@@ -26,9 +26,9 @@
 
 - type: stack
   parent: BaseTileStack
-  id: FloorTilePlasmaMarble
-  name: stack-plasma-marble-floor
-  spawn: FloorTileItemPlasmaMarble
+  id: FloorTilePhoronMarble
+  name: stack-phoron-marble-floor
+  spawn: FloorTileItemPhoronMarble
 
 - type: stack
   parent: BaseTileStack

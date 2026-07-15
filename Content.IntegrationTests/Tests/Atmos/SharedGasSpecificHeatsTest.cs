@@ -103,7 +103,7 @@ public sealed class SharedGasSpecificHeatsTest
             mix.AdjustMoles(Gas.Oxygen, o2);
             mix.AdjustMoles(Gas.Nitrogen, n2);
             mix.AdjustMoles(Gas.CarbonDioxide, co2);
-            mix.AdjustMoles(Gas.Plasma, plasma);
+            mix.AdjustMoles(Gas.Phoron, plasma);
 
             serverScaled = _sAtmos.GetHeatCapacity(mix, applyScaling: true);
             serverUnscaled = _sAtmos.GetHeatCapacity(mix, applyScaling: false);
@@ -115,7 +115,7 @@ public sealed class SharedGasSpecificHeatsTest
             mix.AdjustMoles(Gas.Oxygen, o2);
             mix.AdjustMoles(Gas.Nitrogen, n2);
             mix.AdjustMoles(Gas.CarbonDioxide, co2);
-            mix.AdjustMoles(Gas.Plasma, plasma);
+            mix.AdjustMoles(Gas.Phoron, plasma);
 
             clientScaled = _cAtmos.GetHeatCapacity(mix, applyScaling: true);
             clientUnscaled = _cAtmos.GetHeatCapacity(mix, applyScaling: false);

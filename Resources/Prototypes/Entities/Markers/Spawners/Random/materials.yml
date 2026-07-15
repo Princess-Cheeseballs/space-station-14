@@ -169,7 +169,7 @@
   id: RandomCommonHighValueMaterialsTable
   table: !type:GroupSelector
     children:
-    - id: SheetPlasma
+    - id: SheetPhoron
     - id: IngotGold
     - id: IngotSilver
 
@@ -212,7 +212,7 @@
   table: !type:GroupSelector
     children:
     - id: SheetPlasteel10
-    - id: SheetPlasma1
+    - id: SheetPhoron1
     - id: MaterialWoodPlank10
     - id: PartRodMetal10
     - id: SheetSteel10

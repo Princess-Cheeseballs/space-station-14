@@ -392,8 +392,8 @@
 
 - type: entity
   parent: BaseWall
-  id: WallPlasma
-  name: plasma wall
+  id: WallPhoron
+  name: phoron wall
   components:
   - type: Sprite
     sprite: Structures/Walls/plasma.rsi
@@ -401,7 +401,7 @@
     sprite: Structures/Walls/plasma.rsi
   - type: Construction
     graph: Girder
-    node: plasmaWall
+    node: phoronWall
   - type: RCDDeconstructable
     cost: 6
     delay: 8

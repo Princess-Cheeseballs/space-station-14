@@ -83,15 +83,15 @@
         id: SheetPlasteel
 
 - type: entity
-  parent: CratePlasma
-  id: CrateMaterialPlasma
-  name: solid plasma crate
-  description: 30 sheets of plasma.
+  parent: CratePhoron
+  id: CrateMaterialPhoron
+  name: solid phoron crate
+  description: 30 sheets of phoron.
   components:
   - type: EntityTableContainerFill
     containers:
       entity_storage:
-        id: SheetPlasma
+        id: SheetPhoron
 
 - type: entity
   parent: CrateGenericSteel
@@ -165,7 +165,7 @@
     - !type:GroupSelector # tertiary materials, singles
       weight: 5
       children:
-      - id: SheetPlasma1
+      - id: SheetPhoron1
       - id: SheetUranium1
       - id: IngotGold1
       - id: IngotSilver1

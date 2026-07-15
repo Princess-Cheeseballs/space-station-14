@@ -292,7 +292,7 @@
     - SolutionRiggableLarge
   - type: Riggable
     reagent:
-      ReagentId: Plasma
+      ReagentId: Phoron
       Quantity: 15
   - type: Extractable
     juiceSolution:

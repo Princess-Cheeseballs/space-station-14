@@ -397,7 +397,7 @@
       - id: NitrogenCanister
       - id: OxygenCanister
       - id: CarbonDioxideCanister
-      - id: PlasmaCanister
+      - id: PhoronCanister
         weight: 0.25
       - id: NitrousOxideCanister
         weight: 0.25

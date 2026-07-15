@@ -23,10 +23,10 @@
 
 - type: stack
   parent: BaseMediumStack
-  id: PlasmaOre
-  name: stack-plasma-ore
+  id: PhoronOre
+  name: stack-phoron-ore
   icon: { sprite: /Textures/Objects/Materials/ore.rsi, state: plasma }
-  spawn: PlasmaOre1
+  spawn: PhoronOre1
 
 - type: stack
   parent: BaseMediumStack

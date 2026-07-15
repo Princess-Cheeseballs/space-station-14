@@ -1882,9 +1882,9 @@
 
 - type: entity
   name: plasmarble tile
-  description: A chiseled, polished square of the finest Space Marble. Plasma-infused for extra... something.
+  description: A chiseled, polished square of the finest Space Marble. Phoron-infused for extra... something.
   parent: FloorTileItemWhiteMarble
-  id: FloorTileItemPlasmaMarble
+  id: FloorTileItemPhoronMarble
   components:
   - type: Sprite
     state: plasmarble
@@ -1893,9 +1893,9 @@
   - type: FloorTile
     outputs:
       - Plating
-      - FloorPlasmaMarble
+      - FloorPhoronMarble
   - type: Stack
-    stackType: FloorTilePlasmaMarble
+    stackType: FloorTilePhoronMarble
   - type: DamageOtherOnHit
     damage:
       types:

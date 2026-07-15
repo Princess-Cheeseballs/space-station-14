@@ -4,7 +4,7 @@
 ## For reinforced plasma windows
 - type: entity
   abstract: true
-  id: BaseDeltaPressureReinforcedPlasma
+  id: BaseDeltaPressureReinforcedPhoron
   components:
   - type: DeltaPressure
     minPressure: 150000
@@ -15,7 +15,7 @@
 ## For quarter reinforced plasma windows
 - type: entity
   abstract: true
-  id: BaseDeltaPressureReinforcedPlasmaQuarter
+  id: BaseDeltaPressureReinforcedPhoronQuarter
   components:
   - type: DeltaPressure
     minPressure: 37500
@@ -25,7 +25,7 @@
 ## For plasma windows
 - type: entity
   abstract: true
-  id: BaseDeltaPressurePlasma
+  id: BaseDeltaPressurePhoron
   components:
   - type: DeltaPressure
     minPressure: 75000
@@ -36,7 +36,7 @@
 ## For quarter plasma windows
 - type: entity
   abstract: true
-  id: BaseDeltaPressurePlasmaQuarter
+  id: BaseDeltaPressurePhoronQuarter
   components:
   - type: DeltaPressure
     minPressure: 18750

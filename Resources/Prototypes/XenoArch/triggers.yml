@@ -7,7 +7,7 @@
     TriggerNoOxygen: 1
     TriggerWater: 1
     TriggerCO2: 0.5
-    TriggerPlasma: 0.5
+    TriggerPhoron: 0.5
     TriggerN2O: 0.5
     TriggerTritium: 0.1
     TriggerAmmonia: 0.1
@@ -93,14 +93,14 @@
     - CarbonDioxide
 
 - type: xenoArchTrigger
-  id: TriggerPlasma
-  tip: xenoarch-trigger-tip-plasma
+  id: TriggerPhoron
+  tip: xenoarch-trigger-tip-phoron
   components:
   - type: XATGas
-    targetGas: Plasma
+    targetGas: Phoron
   - type: XATReactive
     reagents:
-    - Plasma
+    - Phoron
 
 - type: xenoArchTrigger
   id: TriggerTritium

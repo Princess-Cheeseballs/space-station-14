@@ -130,7 +130,7 @@
     - id: CrateArtifactContainer
     - id: HandheldArtifactContainer
       weight: 0.2
-    - id: CrateMaterialPlasma
+    - id: CrateMaterialPhoron
 
 - type: entityTable
   id: LowValueCrateTable

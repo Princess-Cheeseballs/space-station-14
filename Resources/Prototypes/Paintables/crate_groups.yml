@@ -31,7 +31,7 @@
     engineering: CrateEngineeringSecure
     hydroponics: CrateHydroSecure
     medical: CrateMedicalSecure
-    plasma: CratePlasma
+    plasma: CratePhoron
     private: CratePrivateSecure
     science: CrateScienceSecure
     secgear: CrateSecgear

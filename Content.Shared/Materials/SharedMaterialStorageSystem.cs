@@ -26,6 +26,8 @@ public abstract partial class SharedMaterialStorageSystem : EntitySystem
     /// </summary>
     private const int DefaultSheetVolume = 100;
 
+    public static ProtoId<MaterialPrototype> MaterialPhoron = "Phoron";
+
     /// <inheritdoc/>
     public override void Initialize()
     {

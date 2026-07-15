@@ -25,11 +25,11 @@
           steps:
             - tool: Screwing
               doAfter: 2
-        - to: solarpanelplasma
+        - to: solarpanelphoron
           conditions:
             - !type:EntityAnchored
           steps:
-            - material: PlasmaGlass
+            - material: PhoronGlass
               amount: 2
               doAfter: 0.5
           completed:
@@ -68,8 +68,8 @@
           completed:
             - !type:SnapToGrid
 
-    - node: solarpanelplasma
-      entity: SolarPanelPlasma
+    - node: solarpanelphoron
+      entity: SolarPanelPhoron
       edges:
         - to: solarassembly
           completed:
@@ -136,15 +136,15 @@
             - tool: Prying
               doAfter: 0.5
 
-    - node: solarpanelplasma_broken
-      entity: SolarPanelPlasmaBroken
+    - node: solarpanelphoron_broken
+      entity: SolarPanelPhoronBroken
       edges:
       - to: solarassembly
         completed:
         - !type:SnapToGrid
           southRotation: true
         - !type:SpawnPrototype
-          prototype: ShardGlassPlasma
+          prototype: ShardGlassPhoron
           amount: 2
         conditions:
         - !type:EntityAnchored

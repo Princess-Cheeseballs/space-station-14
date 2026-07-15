@@ -580,12 +580,12 @@
 
 - type: latheRecipe
   parent: BaseMarbleTileRecipe
-  id: FloorTileItemPlasmaMarble
-  result: FloorTileItemPlasmaMarble
+  id: FloorTileItemPhoronMarble
+  result: FloorTileItemPhoronMarble
   materials:
     Steel: 25
     Glass: 25
-    Plasma: 25
+    Phoron: 25
 
 # Shuttle
 - type: latheRecipe

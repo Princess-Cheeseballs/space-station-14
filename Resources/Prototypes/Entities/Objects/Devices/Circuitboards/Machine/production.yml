@@ -190,7 +190,7 @@
   - type: MachineBoard
     prototype: ResearchAndDevelopmentServer
     stackRequirements:
-      Plasma: 5
+      Phoron: 5
 
 - type: entity
   id: BiogeneratorMachineCircuitboard
@@ -298,7 +298,7 @@
       stackRequirements:
         Manipulator: 3
         Cable: 1
-        PlasmaGlass: 10
+        PhoronGlass: 10
 
 - type: entity
   parent: BaseMachineCircuitboard
@@ -313,7 +313,7 @@
     stackRequirements:
       Manipulator: 3
       Cable: 5
-      PlasmaGlass: 15
+      PhoronGlass: 15
       MetalRod: 4
 
 - type: entity
@@ -328,7 +328,7 @@
       prototype: MachineAnomalySynchronizer
       stackRequirements:
         Manipulator: 7
-        PlasmaGlass: 5
+        PhoronGlass: 5
         Cable: 5
 
 - type: entity
@@ -394,7 +394,7 @@
     prototype: GasThermoMachineHellfireFreezer
     stackRequirements:
       Manipulator: 4
-      Plasma: 1
+      Phoron: 1
   - type: Construction
     deconstructionTarget: null
     graph: ThermomachineBoard
@@ -412,7 +412,7 @@
     prototype: GasThermoMachineHellfireHeater
     stackRequirements:
       Manipulator: 4
-      Plasma: 1
+      Phoron: 1
   - type: Construction
     graph: ThermomachineBoard
     deconstructionTarget: null
@@ -1186,7 +1186,7 @@
     stackRequirements:
       Manipulator: 2
       Steel: 10
-      Plasma: 5
+      Phoron: 5
 
 - type: entity
   id: BoozeDispenserMachineCircuitboard

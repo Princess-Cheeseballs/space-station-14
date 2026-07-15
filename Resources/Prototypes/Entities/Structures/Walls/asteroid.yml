@@ -201,13 +201,13 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: AsteroidRockPlasma
+  id: AsteroidRockPhoron
   parent: AsteroidRock
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_asteroid
@@ -571,14 +571,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: IronRockPlasma
+  id: IronRockPhoron
   parent: IronRock
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: ironrock
@@ -928,21 +928,21 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockPlasma
+  id: WallRockPhoron
   parent: WallRock
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: EntityRemap
     mask:
-      AsteroidRock: AsteroidRockPlasma
-      WallRockBasalt: WallRockBasaltPlasma
-      WallRockChromite: WallRockChromitePlasma
-      WallRockSand: WallRockSandPlasma
-      WallRockSnow: WallRockSnowPlasma
+      AsteroidRock: AsteroidRockPhoron
+      WallRockBasalt: WallRockBasaltPhoron
+      WallRockChromite: WallRockChromitePhoron
+      WallRockSand: WallRockSandPhoron
+      WallRockSnow: WallRockSnowPhoron
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock
@@ -1261,14 +1261,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockBasaltPlasma
+  id: WallRockBasaltPhoron
   parent: WallRockBasalt
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_wall
@@ -1537,14 +1537,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockSnowPlasma
+  id: WallRockSnowPhoron
   parent: WallRockSnow
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_snow
@@ -1813,14 +1813,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockSandPlasma
+  id: WallRockSandPhoron
   parent: WallRockSand
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_sand
@@ -2088,14 +2088,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockChromitePlasma
+  id: WallRockChromitePhoron
   parent: WallRockChromite
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_chromite
@@ -2364,14 +2364,14 @@
       map: [ "enum.MiningScannerVisualLayers.Overlay" ]
 
 - type: entity
-  id: WallRockAndesitePlasma
+  id: WallRockAndesitePhoron
   parent: WallRockAndesite
-  description: An ore vein rich with plasma.
-  suffix: Plasma
+  description: An ore vein rich with phoron.
+  suffix: Phoron
   components:
   - type: OreVein
     oreChance: 1.0
-    currentOre: OrePlasma
+    currentOre: OrePhoron
   - type: Sprite
     layers:
     - state: rock_andesite

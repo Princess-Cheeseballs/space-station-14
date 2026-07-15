@@ -63,7 +63,7 @@
   completetime: 0
   materials:
     RawQuartz: 100
-    RawPlasma: 100
+    RawPhoron: 100
 
 - type: latheRecipe
   id: SheetPGlass30
@@ -71,7 +71,7 @@
   completetime: 2
   materials:
     RawQuartz: 3000
-    RawPlasma: 3000
+    RawPhoron: 3000
 
 - type: latheRecipe
   id: SheetRPGlass1
@@ -79,7 +79,7 @@
   completetime: 0
   materials:
     RawQuartz: 100
-    RawPlasma: 100
+    RawPhoron: 100
     RawIron: 50
     Coal: 15
 
@@ -89,30 +89,30 @@
   completetime: 2
   materials:
     RawQuartz: 3000
-    RawPlasma: 3000
+    RawPhoron: 3000
     RawIron: 1500
     Coal: 500
 
 - type: latheRecipe
-  id: SheetPlasma1
-  result: SheetPlasma1
+  id: SheetPhoron1
+  result: SheetPhoron1
   completetime: 0
   materials:
-    RawPlasma: 100
+    RawPhoron: 100
 
 - type: latheRecipe
-  id: SheetPlasma30
-  result: SheetPlasma
+  id: SheetPhoron30
+  result: SheetPhoron
   completetime: 2
   materials:
-    RawPlasma: 3000
+    RawPhoron: 3000
 
 - type: latheRecipe
   id: SheetPlasteel1
   result: SheetPlasteel1
   completetime: 0
   materials:
-    RawPlasma: 100
+    RawPhoron: 100
     RawIron: 200 #Twice as durable as steel, Twice the material cost
     Coal: 30
 
@@ -121,7 +121,7 @@
   result: SheetPlasteel
   completetime: 5
   materials:
-    RawPlasma: 3000
+    RawPhoron: 3000
     RawIron: 6000 #Twice as durable as steel, Twice the material cost
     Coal: 1000
 

@@ -91,7 +91,7 @@ public sealed class GasTileOverlayTemperatureNetworkingTest : AtmosTest
             if (mixture != null)
             {
                 mixture.Clear();
-                mixture.AdjustMoles(Gas.Plasma, 100f); // Inject hot plasma
+                mixture.AdjustMoles(Gas.Phoron, 100f); // Inject hot plasma
                 mixture.Temperature = temperature;
                 SAtmos.InvalidateVisuals(gridEnt, tileIndices);
             }

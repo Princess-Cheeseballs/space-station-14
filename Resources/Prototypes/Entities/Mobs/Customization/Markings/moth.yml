@@ -96,7 +96,7 @@
     state: oakworm
 
 - type: marking
-  id: MothAntennasPlasmafire
+  id: MothAntennasPhoronfire
   bodyPart: HeadTop
   groupWhitelist: [Moth]
   sprites:
@@ -277,7 +277,7 @@
     state: oakworm
 
 - type: marking
-  id: MothWingsPlasmafire
+  id: MothWingsPhoronfire
   bodyPart: Tail
   groupWhitelist: [Moth]
   sprites:

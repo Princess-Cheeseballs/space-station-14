@@ -38,7 +38,7 @@ public sealed partial class AnomalyGeneratorComponent : Component
     /// The material needed to generate an anomaly
     /// </summary>
     [DataField("requiredMaterial", customTypeSerializer: typeof(PrototypeIdSerializer<MaterialPrototype>)), ViewVariables(VVAccess.ReadWrite)]
-    public string RequiredMaterial = "Plasma";
+    public string RequiredMaterial = SharedMaterialStorageSystem.MaterialPhoron;
 
     /// <summary>
     /// The amount of material needed to generate a single anomaly

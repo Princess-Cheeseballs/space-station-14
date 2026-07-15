@@ -55,7 +55,7 @@
       weight: 0.33
     - id: MaterialWoodPlank10
       weight: 0.2
-    - id: SheetPlasma10
+    - id: SheetPhoron10
       weight: 0.2
     - id: ArtifactFragment1
       weight: 0.05
@@ -93,7 +93,7 @@
   id: SalvageTreasureCommon
   table: !type:GroupSelector
     children:
-    - id: SheetPlasma1
+    - id: SheetPhoron1
       amount: !type:RangeNumberSelector
         range: 3, 5
     - id: ResearchDisk
@@ -277,9 +277,9 @@
   id: RandomGeneratorTable
   table: !type:GroupSelector
     children:
-    - id: ScrapGeneratorPlasmaLeaking
+    - id: ScrapGeneratorPhoronLeaking
     - id: ScrapGeneratorUraniumLeaking
-    - id: ScrapGeneratorPlasma
+    - id: ScrapGeneratorPhoron
       weight: 0.5
     - id: ScrapGeneratorUranium
       weight: 0.5

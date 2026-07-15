@@ -1,7 +1,7 @@
 - type: entity
-  id: PlasmaWindow
-  name: plasma window
-  parent: [BaseDeltaPressurePlasma, WindowRCDResistant]
+  id: PhoronWindow
+  name: phoron window
+  parent: [BaseDeltaPressurePhoron, WindowRCDResistant]
   components:
   - type: Sprite
     drawdepth: WallTops
@@ -23,7 +23,7 @@
           collection: WindowShatter
       - !type:SpawnEntitiesBehavior
         spawn:
-          ShardGlassPlasma:
+          ShardGlassPhoron:
             min: 1
             max: 2
       - !type:DoActsBehavior
@@ -32,7 +32,7 @@
     base: pwindow
   - type: Construction
     graph: Window
-    node: plasmaWindow
+    node: phoronWindow
   - type: Appearance
   - type: DamageVisuals
     thresholds: [5, 10, 20]
@@ -46,9 +46,9 @@
     resistance: 2
 
 - type: entity
-  id: PlasmaWindowDirectional
-  parent: [BaseDeltaPressurePlasmaQuarter, WindowDirectionalRCDResistant]
-  name: directional plasma window
+  id: PhoronWindowDirectional
+  parent: [BaseDeltaPressurePhoronQuarter, WindowDirectionalRCDResistant]
+  name: directional phoron window
   description: Don't smudge up the glass down there.
   placement:
     mode: SnapgridCenter
@@ -63,7 +63,7 @@
     state: plasma_window
   - type: Construction
     graph: WindowDirectional
-    node: plasmaWindowDirectional
+    node: phoronWindowDirectional
   - type: Appearance
   - type: DamageVisuals
     thresholds: [5, 10, 20]
@@ -82,7 +82,7 @@
           collection: WindowShatter
       - !type:SpawnEntitiesBehavior
         spawn:
-          ShardGlassPlasma:
+          ShardGlassPhoron:
             min: 1
             max: 1
       - !type:DoActsBehavior
@@ -93,8 +93,8 @@
     resistance: 1
 
 - type: entity
-  parent: PlasmaWindow
-  id: PlasmaWindowDiagonal
+  parent: PhoronWindow
+  id: PhoronWindowDiagonal
   suffix: diagonal
   placement:
     mode: SnapgridCenter
@@ -139,4 +139,4 @@
       sprite: Structures/Windows/cracks_diagonal.rsi
   - type: Construction
     graph: WindowDiagonal
-    node: plasmaWindowDiagonal
+    node: phoronWindowDiagonal

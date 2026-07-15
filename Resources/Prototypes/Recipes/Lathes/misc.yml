@@ -105,7 +105,7 @@
   materials:
     Steel: 500
     Plastic: 500
-    Plasma: 200
+    Phoron: 200
 
 - type: latheRecipe
   parent: BaseToolRecipe
@@ -168,7 +168,7 @@
     Steel: 1400
     Plastic: 600
     Silver: 200
-    Plasma: 200
+    Phoron: 200
 
 - type: latheRecipe
   id: ModularReceiver

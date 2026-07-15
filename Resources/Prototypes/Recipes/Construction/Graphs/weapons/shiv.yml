@@ -85,11 +85,11 @@
     entity: ReinforcedShiv
 
 - type: constructionGraph
-  id: PlasmaShivConstruct
+  id: PhoronShivConstruct
   start: start
   graph:
   - node: start
-    entity: ShardGlassPlasma
+    entity: ShardGlassPhoron
     edges:
     - to: icon
       completed:
@@ -101,10 +101,10 @@
         amount: 1
         doAfter: 1
   - node: icon
-    entity: PlasmaShiv
+    entity: PhoronShiv
 
 - type: constructionGraph
-  id: PlasmaShiv
+  id: PhoronShiv
   start: start
   graph:
   - node: start
@@ -115,8 +115,8 @@
         message: "Construction"
         impact: High
       steps:
-      - tag: PlasmaGlassShard
-        name: construction-graph-tag-plasma-glass-shard
+      - tag: PhoronGlassShard
+        name: construction-graph-tag-phoron-glass-shard
         icon:
           sprite: Objects/Materials/Shards/shard.rsi
           state: shard1
@@ -125,7 +125,7 @@
         amount: 1
         doAfter: 1
   - node: icon
-    entity: PlasmaShiv
+    entity: PhoronShiv
 
 - type: constructionGraph
   id: UraniumShivConstruct

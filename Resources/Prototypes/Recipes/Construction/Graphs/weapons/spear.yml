@@ -53,7 +53,7 @@
       entity: SpearReinforced
 
 - type: constructionGraph
-  id: SpearPlasma
+  id: SpearPhoron
   start: start
   graph:
     - node: start
@@ -70,14 +70,14 @@
             - material: Cable
               amount: 3
               doAfter: 1
-            - tag: PlasmaGlassShard
-              name: construction-graph-tag-plasma-glass-shard
+            - tag: PhoronGlassShard
+              name: construction-graph-tag-phoron-glass-shard
               icon:
                 sprite: Objects/Materials/Shards/shard.rsi
                 state: shard1
               doAfter: 1
     - node: spear
-      entity: SpearPlasma
+      entity: SpearPhoron
 
 - type: constructionGraph
   id: SpearUranium

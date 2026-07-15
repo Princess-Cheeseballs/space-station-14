@@ -105,10 +105,10 @@
     graph: Windoor
     node: assemblyClockwork
 
-#plasma windoor assemblies
+#phoron windoor assemblies
 - type: entity
-  id: WindoorAssemblyPlasma
-  name: plasma windoor assembly
+  id: WindoorAssemblyPhoron
+  name: phoron windoor assembly
   description: It opens, it closes, and you can see through it! This one looks purp-, no, pink. Wait...
   parent: WindoorAssembly
   components:
@@ -137,8 +137,8 @@
     node: pglass
 
 - type: entity
-  id: WindoorAssemblySecurePlasma
-  name: secure plasma windoor assembly
+  id: WindoorAssemblySecurePhoron
+  name: secure phoron windoor assembly
   description: It opens, it closes, and you can see through it! This one looks strong and pin-, no, purple. Hold on...
   parent: WindoorAssembly
   components:

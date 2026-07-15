@@ -27,7 +27,7 @@
       amount: 25
     TableSalt:
       amount: 10
-    Plasma:
+    Phoron:
       amount: 5
   effects:
     - !type:SpawnEntity

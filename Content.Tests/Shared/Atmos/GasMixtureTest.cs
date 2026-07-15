@@ -13,7 +13,7 @@ public sealed class GasMixtureTest
         var mixture = new GasMixture();
         mixture.SetMoles(Gas.Oxygen, 20);
         mixture.SetMoles(Gas.Nitrogen, 10);
-        mixture.SetMoles(Gas.Plasma, 80);
+        mixture.SetMoles(Gas.Phoron, 80);
 
         var expectedList = new (Gas, float)[Atmospherics.TotalNumberOfGases];
         for (var i = 0; i < Atmospherics.TotalNumberOfGases; i++)
@@ -23,7 +23,7 @@ public sealed class GasMixtureTest
 
         expectedList[(int)Gas.Oxygen].Item2 = 20f;
         expectedList[(int)Gas.Nitrogen].Item2 = 10f;
-        expectedList[(int)Gas.Plasma].Item2 = 80f;
+        expectedList[(int)Gas.Phoron].Item2 = 80f;
 
         Assert.That(mixture, Is.EquivalentTo(expectedList));
     }

@@ -169,7 +169,7 @@
     radius: 1.5
     color: lightblue
   - type: Welder
-    fuelReagent: Plasma
+    fuelReagent: Phoron
   - type: RequiresEyeProtection
     statusEffectTime: 5 # less harmful; sunglasses can block it
 
@@ -181,12 +181,12 @@
   - type: Solution
     solution:
       reagents:
-      - ReagentId: Plasma
+      - ReagentId: Phoron
         Quantity: 480 # Literally infinite so this number basically doesn't matter, also this should be a battery tbqh.
   - type: SolutionRegeneration
     generated:
       reagents:
-      - ReagentId: Plasma
+      - ReagentId: Phoron
         Quantity: 1
 
 - type: entity

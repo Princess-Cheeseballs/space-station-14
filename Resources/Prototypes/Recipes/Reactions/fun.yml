@@ -101,7 +101,7 @@
   reactants:
     Frezon:
       amount: 3
-    Plasma:
+    Phoron:
       amount: 1
       catalyst: true
     Nitrogen:

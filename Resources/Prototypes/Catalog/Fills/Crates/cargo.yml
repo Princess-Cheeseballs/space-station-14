@@ -97,7 +97,7 @@
     - id: NitrogenCanister
     - id: NitrousOxideCanister
     - id: OxygenCanister
-    - id: PlasmaCanister
+    - id: PhoronCanister
     - id: TritiumCanister
     - id: WaterVaporCanister
 

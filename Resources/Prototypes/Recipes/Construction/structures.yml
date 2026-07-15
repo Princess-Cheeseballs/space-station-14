@@ -102,8 +102,8 @@
 
 - type: construction
   parent: Girder
-  id: PlasmaWall
-  targetNode: plasmaWall
+  id: PhoronWall
+  targetNode: phoronWall
 
 - type: construction
   parent: Girder
@@ -212,13 +212,13 @@
 
 - type: construction
   parent: BaseWindow
-  id: PlasmaWindow
-  targetNode: plasmaWindow
+  id: PhoronWindow
+  targetNode: phoronWindow
 
 - type: construction
   parent: BaseWindow
-  id: ReinforcedPlasmaWindow
-  targetNode: reinforcedPlasmaWindow
+  id: ReinforcedPhoronWindow
+  targetNode: reinforcedPhoronWindow
 
 - type: construction
   parent: BaseWindow
@@ -227,15 +227,15 @@
 
 - type: construction
   parent: BaseWindowDiagonal
-  id: PlasmaWindowDiagonal
-  name: construction-recipe-plasma-window-diagonal
-  targetNode: plasmaWindowDiagonal
+  id: PhoronWindowDiagonal
+  name: construction-recipe-phoron-window-diagonal
+  targetNode: phoronWindowDiagonal
 
 - type: construction
   parent: BaseWindowDiagonal
-  id: ReinforcedPlasmaWindowDiagonal
-  name: construction-recipe-reinforced-plasma-window-diagonal
-  targetNode: reinforcedPlasmaWindowDiagonal
+  id: ReinforcedPhoronWindowDiagonal
+  name: construction-recipe-reinforced-phoron-window-diagonal
+  targetNode: reinforcedPhoronWindowDiagonal
 
 - type: construction
   parent: BaseWindow
@@ -277,13 +277,13 @@
 
 - type: construction
   parent: WindowDirectional
-  id: PlasmaWindowDirectional
-  targetNode: plasmaWindowDirectional
+  id: PhoronWindowDirectional
+  targetNode: phoronWindowDirectional
 
 - type: construction
   parent: WindowDirectional
-  id: PlasmaReinforcedWindowDirectional
-  targetNode: plasmaReinforcedWindowDirectional
+  id: PhoronReinforcedWindowDirectional
+  targetNode: phoronReinforcedWindowDirectional
 # endregion Windows
 
 # region Firelocks
@@ -586,8 +586,8 @@
 
 - type: construction
   parent: MetalDoor
-  id: PlasmaDoor
-  targetNode: plasmaDoor
+  id: PhoronDoor
+  targetNode: phoronDoor
 
 - type: construction
   parent: MetalDoor

@@ -87,14 +87,14 @@
         - state: rock_diamond
 
 - type: entity
-  id: MeteorRockPlasma
+  id: MeteorRockPhoron
   parent: MeteorRock
   description: An ore vein rich with plasma.
-  suffix: Plasma
+  suffix: Phoron
   components:
     - type: OreVein
       oreChance: 1.0
-      currentOre: OrePlasma
+      currentOre: OrePhoron
     - type: Sprite
       layers:
         - state: rock_asteroid

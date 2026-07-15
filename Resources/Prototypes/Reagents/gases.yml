@@ -75,9 +75,9 @@
         time: 5
 
 - type: reagent
-  id: Plasma
-  name: reagent-name-plasma
-  desc: reagent-desc-plasma
+  id: Phoron
+  name: reagent-name-phoron
+  desc: reagent-desc-phoron
   physicalDesc: reagent-physical-desc-gaseous
   flavor: bitter
   color: "#7e009e"

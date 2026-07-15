@@ -48,7 +48,7 @@ public class HeatCapacityBenchmark
         _mix.AdjustMoles(Gas.Oxygen, o2);
         _mix.AdjustMoles(Gas.Nitrogen, n2);
         _mix.AdjustMoles(Gas.CarbonDioxide, co2);
-        _mix.AdjustMoles(Gas.Plasma, plasma);
+        _mix.AdjustMoles(Gas.Phoron, plasma);
     }
 
     [Benchmark]

@@ -90,12 +90,12 @@
 - type: biomeMarkerLayer
   id: OrePlasmaLow
   entityMask:
-    AsteroidRock: AsteroidRockPlasma
-    WallRock: WallRockPlasma
-    WallRockBasalt: WallRockBasaltPlasma
-    WallRockChromite: WallRockChromitePlasma
-    WallRockSand: WallRockSandPlasma
-    WallRockSnow: WallRockSnowPlasma
+    AsteroidRock: AsteroidRockPhoron
+    WallRock: WallRockPhoron
+    WallRockBasalt: WallRockBasaltPhoron
+    WallRockChromite: WallRockChromitePhoron
+    WallRockSand: WallRockSandPhoron
+    WallRockSnow: WallRockSnowPhoron
   maxCount: 6
   minGroupSize: 2
   maxGroupSize: 4

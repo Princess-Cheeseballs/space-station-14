@@ -67,7 +67,7 @@
       maxGroupSize: 12
     - !type:OreDunGen
       replacement: IronRock
-      entity: IronRockPlasma
+      entity: IronRockPhoron
       count: 35
       minGroupSize: 4
       maxGroupSize: 8

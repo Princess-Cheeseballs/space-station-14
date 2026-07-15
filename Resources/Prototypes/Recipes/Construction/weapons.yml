@@ -31,8 +31,8 @@
 
 - type: construction
   parent: Shiv
-  id: PlasmaShiv
-  graph: PlasmaShiv
+  id: PhoronShiv
+  graph: PhoronShiv
 
 - type: construction
   parent: Shiv
@@ -52,8 +52,8 @@
 
 - type: construction
   parent: Spear
-  id: SpearPlasma
-  graph: SpearPlasma
+  id: SpearPhoron
+  graph: SpearPhoron
 
 - type: construction
   parent: Spear
@@ -108,9 +108,9 @@
 
 - type: construction
   parent: BaseWeapon
-  id: ImprovisedArrowPlasma
-  graph: ImprovisedArrowPlasma
-  targetNode: ImprovisedArrowPlasma
+  id: ImprovisedArrowPhoron
+  graph: ImprovisedArrowPhoron
+  targetNode: ImprovisedArrowPhoron
 
 - type: construction
   parent: BaseWeapon

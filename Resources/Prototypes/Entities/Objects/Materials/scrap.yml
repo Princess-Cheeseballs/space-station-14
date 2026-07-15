@@ -457,9 +457,9 @@
 
 - type: entity
   parent: BaseScrapLarge
-  id: ScrapGeneratorPlasmaLeaking
+  id: ScrapGeneratorPhoronLeaking
   name: leaking P.A.C.M.A.N. generator
-  description: An old looking P.A.C.M.A.N. generator whos plasma tanks started leaking.
+  description: An old looking P.A.C.M.A.N. generator whos phoron tanks started leaking.
   components:
   - type: Sprite
     sprite: Objects/Materials/Scrap/generator.rsi
@@ -470,12 +470,12 @@
   - type: PhysicalComposition
     materialComposition:
       Steel: 4000 # 40 sheets
-      Plasma: 2500 # 25 sheets
+      Phoron: 2500 # 25 sheets
       Plastic: 500 # 5 sheets
 
 - type: entity
   parent: BaseScrapLarge
-  id: ScrapGeneratorPlasma
+  id: ScrapGeneratorPhoron
   name: old P.A.C.M.A.N. generator
   description: An old looking P.A.C.M.A.N. generator. It's in very poor condition and non functional.
   components:
@@ -486,7 +486,7 @@
   - type: PhysicalComposition
     materialComposition:
       Steel: 4000 # 40 sheets
-      Plasma: 1000 # 10 sheets
+      Phoron: 1000 # 10 sheets
       Plastic: 500 # 5 sheets
 
 - type: entity

@@ -85,7 +85,7 @@ public class GasReactionBenchmark
         {
             Temperature = Atmospherics.PlasmaMinimumBurnTemperature + 100f // ~673K
         };
-        _plasmaFireMixture.AdjustMoles(Gas.Plasma, 20f);
+        _plasmaFireMixture.AdjustMoles(Gas.Phoron, 20f);
         _plasmaFireMixture.AdjustMoles(Gas.Oxygen, 100f);
 
         // Tritium Fire: Tritium + Oxygen at high temperature

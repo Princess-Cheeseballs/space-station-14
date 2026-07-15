@@ -34,7 +34,7 @@ namespace Content.Server.Atmos.Reactions
                 var plasmaBurnRate = 0f;
 
                 var initialOxygenMoles = mixture.GetMoles(Gas.Oxygen);
-                var initialPlasmaMoles = mixture.GetMoles(Gas.Plasma);
+                var initialPlasmaMoles = mixture.GetMoles(Gas.Phoron);
 
                 // Supersaturation makes tritium.
                 var oxyRatio = initialOxygenMoles / initialPlasmaMoles;
@@ -51,7 +51,7 @@ namespace Content.Server.Atmos.Reactions
                 if (plasmaBurnRate > Atmospherics.MinimumHeatCapacity)
                 {
                     plasmaBurnRate = MathF.Min(plasmaBurnRate, MathF.Min(initialPlasmaMoles, initialOxygenMoles / oxygenBurnRate));
-                    mixture.SetMoles(Gas.Plasma, initialPlasmaMoles - plasmaBurnRate);
+                    mixture.SetMoles(Gas.Phoron, initialPlasmaMoles - plasmaBurnRate);
                     mixture.SetMoles(Gas.Oxygen, initialOxygenMoles - plasmaBurnRate * oxygenBurnRate);
 
                     // supersaturation adjusts the ratio of produced tritium to unwanted CO2

@@ -83,7 +83,7 @@
   reactants:
     SulfuricAcid:
       amount: 1
-    Plasma:
+    Phoron:
       amount: 1
     Potassium:
       amount: 1

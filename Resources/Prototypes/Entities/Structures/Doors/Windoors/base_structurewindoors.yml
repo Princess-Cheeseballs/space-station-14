@@ -246,11 +246,11 @@
       # This tag is used by door remotes to allow or not a door remote to normally be able to interact with a door
 
 
-#Plasma Windoors
+# phoron Windoors
 - type: entity
-  id: BasePlasmaWindoor
-  parent: [BaseDeltaPressurePlasmaQuarter, BaseWindoor]
   abstract: true
+  parent: [BaseDeltaPressurePhoronQuarter, BaseWindoor]
+  id: BasePhoronWindoor
   components:
   - type: Sprite
     sprite: Structures/Doors/Windoors/plasma.rsi
@@ -294,7 +294,7 @@
       behaviors:
       - !type:SpawnEntitiesBehavior
         spawn:
-          ShardGlassPlasma:
+          ShardGlassPhoron:
             min: 1
             max: 2
           SheetSteel1:
@@ -311,8 +311,8 @@
     resistance: 2
 
 - type: entity
-  id: BaseSecurePlasmaWindoor
-  parent: [BaseDeltaPressureReinforcedPlasmaQuarter, BaseSecureWindoor]
+  id: BaseSecurePhoronWindoor
+  parent: [BaseDeltaPressureReinforcedPhoronQuarter, BaseSecureWindoor]
   abstract: true
   components:
   - type: Sprite
@@ -358,7 +358,7 @@
       behaviors:
       - !type:SpawnEntitiesBehavior
         spawn:
-          ShardGlassPlasma:
+          ShardGlassPhoron:
             min: 1
             max: 2
           SheetPlasteel1:
@@ -375,7 +375,7 @@
     resistance: 4
   - type: Tag
     tags:
-      - SecurePlasmaWindoor
+      - SecurePhoronWindoor
       # This tag is used to nagivate the Airlock construction graph. It's needed because the construction graph is shared between Airlock, AirlockGlass, and HighSecDoor
       - DoorRemoteWhitelist
       # This tag is used by door remotes to allow or not a door remote to normally be able to interact with a door
@@ -384,7 +384,7 @@
 #Uranium Windoors
 - type: entity
   id: BaseUraniumWindoor
-  parent: [BaseDeltaPressurePlasmaQuarter, BaseWindoor]
+  parent: [BaseDeltaPressurePhoronQuarter, BaseWindoor]
   abstract: true
   components:
   - type: Sprite
@@ -447,7 +447,7 @@
 
 - type: entity
   id: BaseSecureUraniumWindoor
-  parent: [BaseDeltaPressureReinforcedPlasmaQuarter, BaseSecureWindoor]
+  parent: [BaseDeltaPressureReinforcedPhoronQuarter, BaseSecureWindoor]
   abstract: true
   components:
   - type: Sprite

@@ -19,7 +19,7 @@
       Oxygen: stationOxygen
       Nitrogen: stationNitrogen
       CarbonDioxide: stationCO2
-      Plasma: stationPlasma
+      Phoron: stationPhoron
       Tritium: stationTritium
       WaterVapor: stationWaterVapor
       Ammonia: stationAmmonia

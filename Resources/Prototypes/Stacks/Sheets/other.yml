@@ -1,9 +1,9 @@
 - type: stack
   parent: BaseSheetStack
-  id: Plasma
-  name: stack-plasma
+  id: Phoron
+  name: stack-phoron
   icon: { sprite: /Textures/Objects/Materials/Sheets/other.rsi, state: plasma }
-  spawn: SheetPlasma1
+  spawn: SheetPhoron1
 
 - type: stack
   parent: BaseSheetStack

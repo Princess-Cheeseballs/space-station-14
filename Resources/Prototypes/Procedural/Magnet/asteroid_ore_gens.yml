@@ -7,7 +7,7 @@
     OreSalt: 0.20
     OreGold: 0.25
     OreSilver: 0.25
-    OrePlasma: 0.20
+    OrePhoron: 0.20
     OreUranium: 0.20
     OreArtifactFragment: 0.10
     OreBananium: 0.10
@@ -61,9 +61,9 @@
   maxGroupSize: 7
 
 - type: oreDunGen
-  id: OrePlasma
+  id: OrePhoron
   replacement: AsteroidRock
-  entity: AsteroidRockPlasma
+  entity: AsteroidRockPhoron
   count: 4
   minGroupSize: 5
   maxGroupSize: 7

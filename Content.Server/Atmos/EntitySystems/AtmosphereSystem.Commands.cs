@@ -88,11 +88,11 @@ public sealed partial class AtmosphereSystem
         mixtures[3].AdjustMoles(Gas.Nitrogen, Atmospherics.MolesCellGasMiner);
 
         // 4: Plasma (GM)
-        mixtures[4].AdjustMoles(Gas.Plasma, Atmospherics.MolesCellGasMiner);
+        mixtures[4].AdjustMoles(Gas.Phoron, Atmospherics.MolesCellGasMiner);
 
         // 5: Instant Plasmafire (r)
         mixtures[5].AdjustMoles(Gas.Oxygen, Atmospherics.MolesCellGasMiner);
-        mixtures[5].AdjustMoles(Gas.Plasma, Atmospherics.MolesCellGasMiner);
+        mixtures[5].AdjustMoles(Gas.Phoron, Atmospherics.MolesCellGasMiner);
         mixtures[5].Temperature = 5000f;
 
         // 6: (Walk-In) Freezer

@@ -14,15 +14,15 @@
 
 - type: stack
   parent: BaseSheetStack
-  id: PlasmaGlass
-  name: stack-plasma-glass
+  id: PhoronGlass
+  name: stack-phoron-glass
   icon: { sprite: /Textures/Objects/Materials/Sheets/glass.rsi, state: pglass }
   spawn: SheetPGlass1
 
 - type: stack
   parent: BaseSheetStack
-  id: ReinforcedPlasmaGlass
-  name: stack-reinforced-plasma-glass
+  id: ReinforcedPhoronGlass
+  name: stack-reinforced-phoron-glass
   icon: { sprite: /Textures/Objects/Materials/Sheets/glass.rsi, state: rpglass }
   spawn: SheetRPGlass1
 

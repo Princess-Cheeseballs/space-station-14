@@ -159,8 +159,8 @@
 
 - type: construction
   parent: BaseTable
-  id: TablePlasmaGlass
-  targetNode: TablePlasmaGlass
+  id: TablePhoronGlass
+  targetNode: TablePhoronGlass
 
 - type: construction
   parent: BaseTable

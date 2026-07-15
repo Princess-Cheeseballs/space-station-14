@@ -23,12 +23,12 @@
     entity: ArrowImprovised
 
 - type: constructionGraph
-  id: ImprovisedArrowPlasma
+  id: ImprovisedArrowPhoron
   start: start
   graph:
   - node: start
     edges:
-    - to: ImprovisedArrowPlasma
+    - to: ImprovisedArrowPhoron
       steps:
       - material: MetalRod
         amount: 1
@@ -36,15 +36,15 @@
       - material: Cloth
         amount: 1
         doAfter: 0.5
-      - tag: PlasmaGlassShard
-        name: construction-graph-tag-plasma-glass-shard
+      - tag: PhoronGlassShard
+        name: construction-graph-tag-phoron-glass-shard
         icon:
           sprite: Objects/Materials/Shards/shard.rsi
           state: shard1
         doAfter: 0.5
 
-  - node: ImprovisedArrowPlasma
-    entity: ArrowImprovisedPlasma
+  - node: ImprovisedArrowPhoron
+    entity: ArrowImprovisedPhoron
 
 - type: constructionGraph
   id: ImprovisedArrowUranium

@@ -107,7 +107,7 @@
   - FloorTileItemWhiteMarble
   - FloorTileItemDarkMarble
   - FloorTileItemUraniumMarble
-  - FloorTileItemPlasmaMarble
+  - FloorTileItemPhoronMarble
 
 - type: latheRecipePack
   id: FloorShuttleTilesStatic

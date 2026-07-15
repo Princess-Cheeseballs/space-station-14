@@ -411,10 +411,10 @@
       - id: IngotSilver
     - !type:GroupSelector
       children:
-      - id: SheetPlasma1
+      - id: SheetPhoron1
         weight: 2
-      - id: SheetPlasma10
-      - id: SheetPlasma
+      - id: SheetPhoron10
+      - id: SheetPhoron
         weight: 0.50
     - !type:GroupSelector
       children:

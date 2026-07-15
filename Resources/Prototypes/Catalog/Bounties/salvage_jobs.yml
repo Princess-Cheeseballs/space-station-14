@@ -81,19 +81,19 @@
       - ToothSharkminnow
 
 - type: cargoBounty
-  id: BountySalvageOrePlasma
+  id: BountySalvageOrePhoron
   reward: 12500
-  description: bounty-description-salvage-ore-plasma
+  description: bounty-description-salvage-ore-phoron
   group: SalvageJobTier2
   sprite:
     sprite: Objects/Materials/ore.rsi
     state: plasma
   entries:
-  - name: bounty-item-ore-plasma
+  - name: bounty-item-ore-phoron
     amount: 45
     whitelist:
       tags:
-      - OrePlasma
+      - OrePhoron
 
 - type: cargoBounty
   id: BountySalvageOreUranium

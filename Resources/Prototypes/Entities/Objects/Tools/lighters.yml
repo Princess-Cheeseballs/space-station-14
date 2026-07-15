@@ -323,7 +323,7 @@
   parent: [BaseBrandedLighter]
   id: NanotrasenFlippo
   name: Nanotrasen Flippo
-  description: A navy blue luxury flippo, generally handed out to loyal heads of staff instead of a pay raise. Fueled with liquid plasma.
+  description: A navy blue luxury flippo, generally handed out to loyal heads of staff instead of a pay raise. Fueled with liquid phoron.
   components:
   - type: Sprite
     sprite: Objects/Tools/Lighters/nanotrasen.rsi
@@ -332,13 +332,13 @@
   - type: Welder
     fuelConsumption: 0.005
     fuelLitCost: 1
-    fuelReagent: Plasma
+    fuelReagent: Phoron
   - type: PointLight
     color: blue
   - type: Solution
     solution:
       reagents:
-      - ReagentId: Plasma
+      - ReagentId: Phoron
         Quantity: 15
 
 - type: entity
@@ -357,7 +357,7 @@
   - type: Welder
     fuelConsumption: 0.0
     fuelLitCost: 10
-    fuelReagent: Plasma
+    fuelReagent: Phoron
   - type: PointLight
     radius: 4 #Excessively powerful
     color: Gold

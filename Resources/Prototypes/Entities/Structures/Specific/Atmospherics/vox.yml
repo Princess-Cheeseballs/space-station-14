@@ -9,7 +9,7 @@
       Oxygen: voxOxygen
       Nitrogen: voxNitrogen
       CarbonDioxide: stationCO2
-      Plasma: stationPlasma
+      Phoron: stationPhoron
       Tritium: stationTritium
       WaterVapor: stationWaterVapor
       Ammonia: stationAmmonia
@@ -33,7 +33,7 @@
     filterGases:
     - Oxygen # filter out oxygen as well as regular harmful gases
     - CarbonDioxide
-    - Plasma
+    - Phoron
     - Tritium
     - WaterVapor
     - Ammonia

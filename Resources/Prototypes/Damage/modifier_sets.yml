@@ -4,8 +4,7 @@
     Blunt: 0.7
     Slash: 0.5
     Piercing: 0.7
-    Shock: 1.2
-    Structural: 0.5
+    Heat: 1.2
   flatReductions:
     Blunt: 5
     Heat: 5
@@ -17,7 +16,6 @@
     Slash: 0.5
     Piercing: 0.5
     Shock: 1.2
-    Structural: 0.25
   flatReductions:
     Blunt: 10
     Slash: 10
@@ -28,15 +26,16 @@
 - type: damageModifierSet
   id: StructuralMetallic
   coefficients:
-    Shock: 1.2
+    Blunt: 0.7
+    Slash: 0.5
+    Piercing: 0.7
     Heat: 1.2
-    Structural: 0.5
   flatReductions:
     Blunt: 10
     Slash: 10
     Piercing: 10
     Heat: 10
-    Structural: 10
+    Structural: 5
 
 - type: damageModifierSet
   id: Rock
@@ -56,7 +55,8 @@
     Piercing: 0.2
     Shock: 0.6
   flatReductions:
-    Piercing: 10
+    Blunt: 5
+    Heat: 5
 
 # for fragile electronics like consoles or shuttle engines.
 - type: damageModifierSet
@@ -67,7 +67,6 @@
     Piercing: 0.7
     Shock: 2
     Heat: 3
-    Structural: 0.5
 
 # Like metallic, but without flat reduction so it can be damaged with fists.
 - type: damageModifierSet
@@ -98,6 +97,7 @@
   coefficients:
     Blunt: 0.5
     Piercing: 2.0
+    Slash: 2.0
     Heat: 0.5
     Shock: 0
     Structural: 0.25
@@ -116,7 +116,6 @@
     Slash: 5
     Piercing: 5
     Heat: 5
-    Structural: 5
 
 # Glass without the flat reductions
 - type: damageModifierSet
@@ -136,7 +135,6 @@
     Piercing: 0.6
     Heat: 0.5
     Shock: 0
-    Structural: 0.5
   flatReductions:
     Blunt: 5
     Slash: 5
@@ -151,7 +149,6 @@
     Slash: 2.0
     Piercing: 1.0
     Heat: 2.0
-    Structural: 0.5
   flatReductions:
     Blunt: 5
 

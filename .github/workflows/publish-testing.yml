@@ -10,8 +10,41 @@ on:
   - cron: '0 10 * * *'
 
 jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: 'recursive'
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Update changelog YML
+      run: dotnet run --project Changelog update -d Resources/Changelog
+      env:
+        REPO: space-wizards/space-station-14
+        BRANCH: master
+        EXTRA_CATEGORIES: Admin,Maps,Rules
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit changelog update
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        file_pattern: 'Resources/Changelog/*.yml'
+        commit_author: 'CentComm <CentComm@users.noreply.github.com>'
+        commit_user_name: 'CentComm'
+        commit_message: Automated changelog update [skip ci]
+
   build:
     runs-on: ubuntu-latest
+
+    needs: update-changelog
 
     steps:
     - uses: actions/checkout@v7

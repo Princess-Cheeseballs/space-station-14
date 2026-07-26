@@ -4050,13 +4050,6 @@
   id: 9734
   time: '2026-06-02T01:31:37.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/44210
-- author: Princess-Cheeseballs
-  changes:
-  - message: Explosive resistance now stacks with other damage resistances.
-    type: Tweak
-  id: 9735
-  time: '2026-06-02T03:02:54.0000000+00:00'
-  url: https://github.com/space-wizards/space-station-14/pull/40090
 - author: YoungThugSS14
   changes:
   - message: Organs are edible again
@@ -4449,15 +4442,6 @@
   id: 9789
   time: '2026-07-02T04:53:31.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/44464
-- author: insoPL
-  changes:
-  - message: Borgs drop some steel and scrap electronics when gibbed
-    type: Tweak
-  - message: Borgs now drop their hats when gibbed
-    type: Fix
-  id: 9790
-  time: '2026-07-02T09:20:35.0000000+00:00'
-  url: https://github.com/space-wizards/space-station-14/pull/42439
 - author: ProPeperos
   changes:
   - message: You can no longer rotate stairs
@@ -4777,13 +4761,6 @@
   id: 9833
   time: '2026-07-13T22:22:01.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/41842
-- author: B_Kirill
-  changes:
-  - message: 'Added new not fun meteors variations: flesh and kudzu meteors.'
-    type: Add
-  id: 9834
-  time: '2026-07-14T03:55:09.0000000+00:00'
-  url: https://github.com/space-wizards/space-station-14/pull/37716
 - author: AsnDen
   changes:
   - message: Faxes now are visually turned off when there is no power

@@ -80,9 +80,9 @@
   radius: 4
 
 # High value
-# Plasma
+# Phoron
 - type: biomeMarkerLayer
-  id: OrePlasmaLow
+  id: OrePhoronLow
   entityMask:
     AsteroidRock: AsteroidRockPhoron
     WallRock: WallRockPhoron

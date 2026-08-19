@@ -142,7 +142,7 @@ entities:
     - type: MapLight
       ambientLightColor: '#543034FF'
     - type: Parallax
-      parallax: PlasmaStation
+      parallax: PhoronStation
     - type: ChunkContainer
       chunkEntities: []
   - uid: 2

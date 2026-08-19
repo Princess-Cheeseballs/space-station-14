@@ -7,7 +7,7 @@
 - type: entity
   id: WindoorPhoron
   parent: BasePhoronWindoor
-  name: plasma windoor
+  name: phoron windoor
   description: It's a pink window *and* a sliding door. Amazing!
 
 - type: entity
@@ -293,12 +293,12 @@
       board: [ DoorElectronicsTheatre ]
 
 #endregion
-#region Windoor (Plasma)
+#region Windoor (Phoron)
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorArmoryLocked
-  suffix: Armory, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorArmoryLocked
+  suffix: Armory, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
@@ -307,27 +307,27 @@
     layoutId: AirlockArmory
 
 - type: entity
-  parent: PlasmaWindoorEngineeringLocked
-  id: PlasmaWindoorAtmosphericsLocked
-  suffix: Atmospherics, Locked, Plasma
+  parent: PhoronWindoorEngineeringLocked
+  id: PhoronWindoorAtmosphericsLocked
+  suffix: Atmospherics, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
       board: [ DoorElectronicsAtmospherics ]
 
 - type: entity
-  parent: PlasmaWindoorCommandLocked
-  id: PlasmaWindoorCentralCommandLocked
-  suffix: Central Command, Locked, Plasma
+  parent: PhoronWindoorCommandLocked
+  id: PhoronWindoorCentralCommandLocked
+  suffix: Central Command, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
       board: [ DoorElectronicsCentralCommand ]
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorChemistryLocked
-  suffix: Chemistry, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorChemistryLocked
+  suffix: Chemistry, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
@@ -360,9 +360,9 @@
     layoutId: AirlockEngineering
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorJanitorLocked
-  suffix: Janitor, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorJanitorLocked
+  suffix: Janitor, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
@@ -371,18 +371,18 @@
     layoutId: AirlockService
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorNukeopLocked
-  suffix: Nukeop, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorNukeopLocked
+  suffix: Nukeop, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
       board: [ DoorElectronicsNukeop ]
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorScienceLocked
-  suffix: Science, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorScienceLocked
+  suffix: Science, Locked, Phoron
   components:
   - type: ContainerFill
     containers:
@@ -391,9 +391,9 @@
     layoutId: AirlockScience
 
 - type: entity
-  parent: WindoorPlasma
-  id: PlasmaWindoorSecurityLocked
-  suffix: Security, Locked, Plasma
+  parent: WindoorPhoron
+  id: PhoronWindoorSecurityLocked
+  suffix: Security, Locked, Phoron
   components:
   - type: ContainerFill
     containers:

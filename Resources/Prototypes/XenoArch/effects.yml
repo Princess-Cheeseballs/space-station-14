@@ -786,7 +786,7 @@
 - type: entity
   parent: BaseXenoArtifactEffect
   id: XenoArtifactRareMaterialSpawnPhoron
-  description: Create plasma
+  description: Create phoron
   components:
   - type: XenoArtifactNode
     maxDurability: 4

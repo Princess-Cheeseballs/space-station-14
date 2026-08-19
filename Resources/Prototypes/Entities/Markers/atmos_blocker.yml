@@ -69,7 +69,7 @@
 - type: entity
   name: Atmos Fix Instant Phoronfire Marker
   id: AtmosFixInstantPhoronFireMarker
-  description: "INSTANT PLASMAFIRE"
+  description: "INSTANT PHORONFIRE"
   parent: MarkerBase
   components:
     - type: Sprite

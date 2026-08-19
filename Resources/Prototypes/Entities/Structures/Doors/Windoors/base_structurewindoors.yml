@@ -194,13 +194,13 @@
 # phoron Windoors
 - type: entity
   abstract: true
-  parent: [BaseDeltaPressurePlasmaQuarter, BaseWindoorGeneric]
+  parent: [BaseDeltaPressurePhoronQuarter, BaseWindoorGeneric]
   id: BasePhoronWindoor
   components:
   - type: Sprite
     sprite: Structures/Doors/Windoors/plasma.rsi
   - type: Damageable
-    damageModifierSet: GlassReinforcedPlasmaMod
+    damageModifierSet: GlassReinforcedPhoronMod
   - type: Destructible
     thresholds:
     - trigger: *DamageDoorWeak

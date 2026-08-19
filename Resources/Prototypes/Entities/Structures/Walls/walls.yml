@@ -275,7 +275,7 @@
     delay: 8
     fx: EffectRCDDeconstruct8
   - type: Damageable
-    damageModifierSet: PlasmaMod
+    damageModifierSet: PhoronMod
   - type: Destructible
     thresholds:
     - trigger: *DamageWallWeak
@@ -284,7 +284,7 @@
       - *SoundMetalSlam
       - !type:SpawnEntitiesBehavior
         spawn:
-          SheetPlasma1: *BaseWallSpawn
+          SheetPhoron1: *BaseWallSpawn
   - type: IconSmooth
     key: walls
     base: plasma

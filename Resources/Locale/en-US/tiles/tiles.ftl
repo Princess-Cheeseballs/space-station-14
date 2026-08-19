@@ -99,7 +99,7 @@ tiles-silver-tile = silver tile
 tiles-glass-floor = glass floor
 tiles-reinforced-glass-floor = reinforced glass floor
 tiles-uranium-glass-floor = uranium glass floor
-tiles-plasma-glass-floor = plasma glass floor
+tiles-phoron-glass-floor = phoron glass floor
 tiles-plastitanium-glass-floor = plastitanium glass floor
 tiles-metal-foam = metal foam floor
 tiles-green-circuit-floor = green circuit floor
@@ -154,8 +154,6 @@ tiles-desert-astro-sand = desert astro-sand
 tiles-wood-large = large wood
 tiles-white-marble = white marble tile
 tiles-dark-marble = dark marble tile
-tiles-phoron-marble = plasmarble tile
-tiles-uranium-marble = uranium marble tile
 
 tiles-exo-viscera = exodermis viscera floor
 tiles-exo-hull = exodermis hull floor

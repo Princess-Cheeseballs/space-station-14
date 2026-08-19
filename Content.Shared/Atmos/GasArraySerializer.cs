@@ -1,3 +1,4 @@
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown;
@@ -8,8 +9,10 @@ using Robust.Shared.Serialization.TypeSerializers.Interfaces;
 
 namespace Content.Shared.Atmos;
 
-public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNode>, ITypeSerializer<float[], MappingDataNode>
+public sealed partial class GasArraySerializer : ITypeSerializer<float[], SequenceDataNode>, ITypeSerializer<float[], MappingDataNode>
 {
+    [Dependency] private IPrototypeManager _proto = default!;
+
     public ValidationNode Validate(ISerializationManager serializationManager,
         SequenceDataNode node,
         IDependencyCollection dependencies,
@@ -51,7 +54,7 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
 
         foreach (var (key, value) in node.Children)
         {
-            ValidationNode keyNode = Enum.TryParse<Gas>(key, out _)
+            ValidationNode keyNode = Enum.TryParse<Gas>(key, out _) || _proto.TryIndex<GasAliasPrototype>(key, out _)
                 ? new ValidatedValueNode(node.GetKeyNode(key))
                 : new ErrorNode(node.GetKeyNode(key), $"Failed to parse Gas: {key}");
 
@@ -76,7 +79,12 @@ public sealed class GasArraySerializer : ITypeSerializer<float[], SequenceDataNo
             // we simply ignore it and continue reading.
             // Errors should already be caught by Validate().
             if (!Enum.TryParse<Gas>(gas, out var gasEnum))
-                continue;
+            {
+                if (!_proto.TryIndex<GasAliasPrototype>(gas, out var proto))
+                    continue;
+
+                gasEnum = proto.Gas;
+            }
 
             list[(int)gasEnum] = serializationManager.Read<float>(value, hookCtx, context);
         }

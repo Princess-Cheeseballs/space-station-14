@@ -23,7 +23,7 @@ public sealed partial class SharedGasTileOverlayTest
         {
             Assert.That(mixture, Is.Not.Null, "The gas mixture was not initialized.");
             mixture.Clear();
-            mixture.AdjustMoles(Gas.Plasma, 100f);
+            mixture.AdjustMoles(Gas.Phoron, 100f);
             mixture.AdjustMoles(Gas.Oxygen, 100f); // Inject flamable gasses
 
             var welder = SEntMan.SpawnEntity("Welder", gridCoords); // spawn welder

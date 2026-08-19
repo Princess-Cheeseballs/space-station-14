@@ -260,10 +260,10 @@
   targetNode: phoronWindowDirectional
 
 - type: construction
-  id: PlasmaWindowDirectionalCorner
+  id: PhoronWindowDirectionalCorner
   graph: WindowDirectionalCorner
   startNode: start
-  targetNode: plasmaWindowDirectionalCorner
+  targetNode: phoronWindowDirectionalCorner
   category: construction-category-structures
   canBuildInImpassable: true
   conditions:
@@ -279,10 +279,10 @@
 # endregion Windows
 
 - type: construction
-  id: PlasmaReinforcedWindowDirectionalCorner
+  id: PhoronReinforcedWindowDirectionalCorner
   graph: WindowDirectionalCorner
   startNode: start
-  targetNode: plasmaReinforcedWindowDirectionalCorner
+  targetNode: phoronReinforcedWindowDirectionalCorner
   category: construction-category-structures
   canBuildInImpassable: true
   conditions:

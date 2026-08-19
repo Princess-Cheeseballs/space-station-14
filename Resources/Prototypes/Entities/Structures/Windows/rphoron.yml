@@ -1,15 +1,74 @@
 - type: entity
-  id: PhoronWindow
-  name: phoron window
-  parent: [BaseDeltaPressurePlasma, BaseWindowStructure, BaseRCDResistant, StructureHealthBarrier]
+  parent: [BaseDeltaPressureReinforcedPhoron, BaseWindowStructure, BaseRCDResistant, StructureHealthBarrierStrong]
+  id: ReinforcedPhoronWindow
+  name: reinforced phoron window
   components:
   - type: Sprite
-    sprite: Structures/Windows/window-plasma.rsi
+    sprite: Structures/Windows/window-plasma-reinf.rsi
   - type: Icon
-    sprite: Structures/Windows/window-plasma.rsi
+    sprite: Structures/Windows/window-plasma-reinf.rsi
     state: full
   - type: Damageable
-    damageModifierSet: GlassPlasmaMod
+    damageModifierSet: GlassReinforcedPhoronMod
+  - type: RadiationBlocker
+    resistance: 4
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 120
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: WindowShatter
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          ShardGlassPhoron:
+            min: 1
+            max: 2
+          PartRodMetal:
+            min: 1
+            max: 2
+  - type: IconSmooth
+    base: rpwindow
+  - type: Construction
+    graph: Window
+    node: reinforcedPhoronWindow
+  - type: Appearance
+  - type: DamageVisuals
+    thresholds: [5, 10, 20]
+    damageDivisor: 6
+    trackAllDamage: true
+    damageOverlay:
+      sprite: Structures/Windows/cracks.rsi
+  - type: StaticPrice
+    price: 132
+
+- type: entity
+  parent: [BaseDeltaPressureReinforcedPhoronQuarter, BaseWindowStructureDirectional, BaseRCDResistant, StructureHealthBarrier]
+  id: PhoronReinforcedWindowDirectional
+  name: directional reinforced phoron window
+  components:
+  - type: Sprite
+    sprite: Structures/Windows/directional.rsi
+    state: plasma_reinforced_window
+  - type: Icon
+    sprite: Structures/Windows/directional.rsi
+    state: plasma_reinforced_window
+  - type: Construction
+    graph: WindowDirectional
+    node: phoronReinforcedWindowDirectional
+  - type: Appearance
+  - type: DamageVisuals
+    thresholds: [5, 10, 20]
+    damageDivisor: 3
+    trackAllDamage: true
+    damageOverlay:
+      sprite: Structures/Windows/cracks_directional.rsi
+  - type: Damageable
+    damageModifierSet: GlassReinforcedPhoronMod
+  - type: RadiationBlocker
+    resistance: 2
   - type: Destructible
     thresholds:
     - trigger:
@@ -23,78 +82,24 @@
         spawn:
           ShardGlassPhoron:
             min: 1
-            max: 2
-  - type: IconSmooth
-    base: pwindow
-  - type: Construction
-    graph: Window
-    node: phoronWindow
-  - type: Appearance
-  - type: DamageVisuals
-    thresholds: [5, 10, 20]
-    damageDivisor: 3
-    trackAllDamage: true
-    damageOverlay:
-      sprite: Structures/Windows/cracks.rsi
-  - type: StaticPrice
-    price: 100
-  - type: RadiationBlocker
-    resistance: 2
-
-- type: entity
-  id: PhoronWindowDirectional
-  parent: [BaseDeltaPressurePlasmaQuarter, BaseWindowStructureDirectional, BaseRCDResistant, StructureHealthBarrierWeak]
-  name: directional phoron window
-  description: Don't smudge up the glass down there.
-  components:
-  - type: Sprite
-    sprite: Structures/Windows/directional.rsi
-    state: plasma_window
-  - type: Icon
-    sprite: Structures/Windows/directional.rsi
-    state: plasma_window
-  - type: Construction
-    graph: WindowDirectional
-    node: phoronWindowDirectional
-  - type: Appearance
-  - type: DamageVisuals
-    thresholds: [5, 10, 20]
-    damageDivisor: 1.5
-    trackAllDamage: true
-    damageOverlay:
-      sprite: Structures/Windows/cracks_directional.rsi
-  - type: Damageable
-    damageModifierSet: GlassPlasmaMod
-  - type: Destructible
-    thresholds:
-    - trigger:
-        !type:DamageTrigger
-        damage: 30
-      behaviors:
-      - !type:PlaySoundBehavior
-        sound:
-          collection: WindowShatter
-      - !type:SpawnEntitiesBehavior
-        spawn:
-          ShardGlassPhoron:
+            max: 1
+          PartRodMetal:
             min: 1
             max: 1
   - type: StaticPrice
-    price: 50
-  - type: RadiationBlocker
-    resistance: 1
+    price: 66
 
 - type: entity
-  parent: PlasmaWindowDirectional
-  id: PlasmaWindowDirectionalCorner
+  parent: PhoronReinforcedWindowDirectional
+  id: PhoronReinforcedWindowDirectionalCorner
   suffix: Corner
   components:
   - type: Sprite
     sprite: Structures/Windows/directional.rsi
-    state: plasma_window_corner
+    state: plasma_reinforced_window_corner
   - type: Icon
     sprite: Structures/Windows/directional.rsi
-    state: plasma_window_corner
+    state: plasma_reinforced_window_corner
   - type: Fixtures
     fixtures:
       fix1:
@@ -108,7 +113,7 @@
         - GlassLayer
   - type: Construction
     graph: WindowDirectionalCorner
-    node: plasmaWindowDirectionalCorner
+    node: phoronReinforcedWindowDirectionalCorner
   - type: DamageVisuals
     thresholds: [5, 10, 20]
     trackAllDamage: true
@@ -116,8 +121,8 @@
       sprite: Structures/Windows/cracks_directional_corner.rsi
 
 - type: entity
-  parent: PhoronWindow
-  id: PhoronWindowDiagonal
+  parent: ReinforcedPhoronWindow
+  id: ReinforcedPhoronWindowDiagonal
   suffix: diagonal
   placement:
     mode: SnapgridCenter
@@ -126,7 +131,7 @@
   components:
   - type: Sprite
     drawdepth: WallTops
-    sprite: Structures/Windows/window-diagonal-plasma.rsi
+    sprite: Structures/Windows/window-diagonal-plasma-reinf.rsi
     state: state0
   - type: Tag
     tags:
@@ -137,7 +142,7 @@
     key: walls
     base: state
   - type: Icon
-    sprite: Structures/Windows/window-diagonal-plasma.rsi
+    sprite: Structures/Windows/window-diagonal-plasma-reinf.rsi
     state: state0
   - type: Fixtures
     fixtures:
@@ -152,6 +157,7 @@
         - FullTileMask
         layer:
         - GlassLayer
+        density: 2000
   - type: Airtight
     noAirWhenFullyAirBlocked: false
     airBlockedDirection:
@@ -162,4 +168,4 @@
       sprite: Structures/Windows/cracks-diagonal.rsi
   - type: Construction
     graph: WindowDiagonal
-    node: phoronWindowDiagonal
+    node: reinforcedPhoronWindowDiagonal

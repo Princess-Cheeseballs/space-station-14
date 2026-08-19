@@ -220,7 +220,7 @@ public sealed partial class AtmosphereSystem
             return;
         }
 
-        if (exposedTemperature > Atmospherics.PlasmaMinimumBurnTemperature && isFlammable)
+        if (exposedTemperature > Atmospherics.PhoronMinimumBurnTemperature && isFlammable)
         {
             if (sparkSourceUid.HasValue)
             {

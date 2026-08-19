@@ -71,7 +71,7 @@
     totalIntensity: 30
     canCreateVacuum: false
   - type: Damageable
-    damageModifierSet: GlassPlasmaMod
+    damageModifierSet: GlassPhoronMod
   - type: Destructible
     thresholds:
     - trigger:

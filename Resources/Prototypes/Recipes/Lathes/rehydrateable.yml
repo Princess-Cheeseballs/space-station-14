@@ -72,7 +72,7 @@
   completetime: 15
   materials:
     Biomass: 8
-    Phoron: 300 # less biomass but more plasma
+    Phoron: 300 # less biomass but more phoron
 
 - type: latheRecipe
   parent: BaseCubeRecipe
@@ -80,4 +80,4 @@
   result: AbominationCube
   materials: # abominations are slow and essentially worse than even carp
     Biomass: 28
-    Phoron: 500 # more biomass but less plasma
+    Phoron: 500 # more biomass but less phoron

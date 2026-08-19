@@ -17,15 +17,15 @@
               amount: 1
               doAfter: 3
 
-        - to: plasmaWindowDirectionalCorner
+        - to: phoronWindowDirectionalCorner
           steps:
-            - material: PlasmaGlass
+            - material: PhoronGlass
               amount: 1
               doAfter: 2
 
-        - to: plasmaReinforcedWindowDirectionalCorner
+        - to: phoronReinforcedWindowDirectionalCorner
           steps:
-            - material: ReinforcedPlasmaGlass
+            - material: ReinforcedPhoronGlass
               amount: 1
               doAfter: 3
 
@@ -75,8 +75,8 @@
             - tool: Anchoring
               doAfter: 2
 
-    - node: plasmaWindowDirectionalCorner
-      entity: PlasmaWindowDirectionalCorner
+    - node: phoronWindowDirectionalCorner
+      entity: PhoronWindowDirectionalCorner
       edges:
         - to: start
           completed:
@@ -94,8 +94,8 @@
             - tool: Anchoring
               doAfter: 3
 
-    - node: plasmaReinforcedWindowDirectionalCorner
-      entity: PlasmaReinforcedWindowDirectionalCorner
+    - node: phoronReinforcedWindowDirectionalCorner
+      entity: PhoronReinforcedWindowDirectionalCorner
       edges:
         - to: start
           completed:

@@ -1550,13 +1550,13 @@
   id: WhitelistChameleonPDA # Chameleon key for ChameleonPDA
 
 - type: Tag
-  id: Windoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: Windoor # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
-  id: WindoorPlasma # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: WindoorPhoron # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
-  id: WindoorUranium # Used in ConstructionGraph "Windoor" to navigate between Windoor, PlasmaWindoor, and UraniumWindoor airlocks.
+  id: WindoorUranium # Used in ConstructionGraph "Windoor" to navigate between Windoor, PhoronWindoor, and UraniumWindoor airlocks.
 
 - type: Tag
   id: Window # Tagged entity is a window. Several systems and several targeting whitelists (XenoArtifactShatterWindows) care about this.

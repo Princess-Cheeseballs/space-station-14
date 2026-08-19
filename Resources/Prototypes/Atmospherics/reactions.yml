@@ -6,7 +6,7 @@
     Oxygen: 0.01
     Phoron: 0.01
   effects:
-    - !type:PlasmaFireReaction {}
+    - !type:PhoronFireReaction {}
 
 - type: gasReaction
   id: TritiumFire

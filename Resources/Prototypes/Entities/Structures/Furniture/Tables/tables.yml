@@ -357,7 +357,7 @@
         Blunt: 100
     tableMassLimit: 240
   - type: Damageable
-    damageModifierSet: GlassPlasmaMod
+    damageModifierSet: GlassPhoronMod
   - type: Destructible
     thresholds:
     - trigger: *DamageFurnitureWeak

@@ -180,4 +180,4 @@
       - !type:PlaySoundBehavior
         sound:
           collection: MetalBreak
-      # maybe also start a fire? Release plasma?
+      # maybe also start a fire? Release phoron?

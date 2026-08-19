@@ -31,7 +31,7 @@ public class GasReactionBenchmark
     private EntityUid _testGrid = default!;
     private TileAtmosphere _testTile = default!;
     // Reaction instances
-    private PlasmaFireReaction _plasmaFireReaction = default!;
+    private PhoronFireReaction _phoronFireReaction = default!;
     private TritiumFireReaction _tritiumFireReaction = default!;
     private FrezonProductionReaction _frezonProductionReaction = default!;
     private FrezonCoolantReaction _frezonCoolantReaction = default!;
@@ -39,7 +39,7 @@ public class GasReactionBenchmark
     private N2ODecompositionReaction _n2oDecompositionReaction = default!;
     private WaterVaporReaction _waterVaporReaction = default!;
     // Gas mixtures for each reaction type
-    private GasMixture _plasmaFireMixture = default!;
+    private GasMixture _phoronFireMixture = default!;
     private GasMixture _tritiumFireMixture = default!;
     private GasMixture _frezonProductionMixture = default!;
     private GasMixture _frezonCoolantMixture = default!;
@@ -64,7 +64,7 @@ public class GasReactionBenchmark
             var entMan = server.ResolveDependency<IEntityManager>();
             _atmosphereSystem = entMan.System<AtmosphereSystem>();
 
-            _plasmaFireReaction = new PlasmaFireReaction();
+            _phoronFireReaction = new PhoronFireReaction();
             _tritiumFireReaction = new TritiumFireReaction();
             _frezonProductionReaction = new FrezonProductionReaction();
             _frezonCoolantReaction = new FrezonCoolantReaction();
@@ -81,12 +81,12 @@ public class GasReactionBenchmark
     {
         // Plasma Fire: Plasma + Oxygen at high temperature
         // Temperature must be > PlasmaMinimumBurnTemperature for reaction to occur
-        _plasmaFireMixture = new GasMixture(Atmospherics.CellVolume)
+        _phoronFireMixture = new GasMixture(Atmospherics.CellVolume)
         {
-            Temperature = Atmospherics.PlasmaMinimumBurnTemperature + 100f // ~673K
+            Temperature = Atmospherics.PhoronMinimumBurnTemperature + 100f // ~673K
         };
-        _plasmaFireMixture.AdjustMoles(Gas.Phoron, 20f);
-        _plasmaFireMixture.AdjustMoles(Gas.Oxygen, 100f);
+        _phoronFireMixture.AdjustMoles(Gas.Phoron, 20f);
+        _phoronFireMixture.AdjustMoles(Gas.Oxygen, 100f);
 
         // Tritium Fire: Tritium + Oxygen at high temperature
         // Temperature must be > FireMinimumTemperatureToExist for reaction to occur
@@ -161,8 +161,8 @@ public class GasReactionBenchmark
         {
             for (var i = 0; i < Iterations; i++)
             {
-                var mixture = CloneMixture(_plasmaFireMixture);
-                _plasmaFireReaction.React(mixture, _testTile, _atmosphereSystem, 1f);
+                var mixture = CloneMixture(_phoronFireMixture);
+                _phoronFireReaction.React(mixture, _testTile, _atmosphereSystem, 1f);
             }
         });
     }

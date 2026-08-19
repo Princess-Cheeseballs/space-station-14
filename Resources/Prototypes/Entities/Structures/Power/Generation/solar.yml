@@ -69,7 +69,7 @@
     sprite: Structures/Power/Generation/solar_panel.rsi
     state: solar_panel_plasma
   - type: Damageable
-    damageModifierSet: GlassPlasmaMod
+    damageModifierSet: GlassPhoronMod
   - type: Destructible
     thresholds:
     - trigger: &DamageMachineNormal # Excess damage, don't spawn entities
@@ -85,7 +85,7 @@
       behaviors:
       - *SoundGlassBreak
       - !type:ChangeConstructionNodeBehavior
-        node: solarpanelplasma_broken
+        node: solarpanelphoron_broken
   - type: Construction
     graph: SolarPanel
     node: solarpanelphoron
@@ -208,7 +208,7 @@
             max: 2
   - type: Construction
     graph: SolarPanel
-    node: solarpanelplasma_broken
+    node: solarpanelphoron_broken
 
 - type: entity
   parent: [ SolarPanelBasePhysSprite, StructureHealthMachineFlimsy ]

@@ -110,7 +110,7 @@
   materials:
     Steel: 50
     Plastic: 50
-    Plasma: 25
+    Phoron: 25
 
 - type: latheRecipe
   parent: BaseToolRecipe

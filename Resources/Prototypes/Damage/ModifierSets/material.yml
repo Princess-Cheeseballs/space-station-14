@@ -108,9 +108,9 @@
     Caustic: 20
     Structural: 2
 
-# Halfway between plasma and glass.
+# Halfway between phoron and glass.
 - type: damageModifierSet
-  id: GlassPlasmaMod
+  id: GlassPhoronMod
   coefficients:
     Blunt: 1.5
     Piercing: 1.5
@@ -125,9 +125,9 @@
     Shock: 20
     Caustic: 20
 
-# Halfway between reinforced glass and plasma.
+# Halfway between reinforced glass and phoron.
 - type: damageModifierSet
-  id: GlassReinforcedPlasmaMod
+  id: GlassReinforcedPhoronMod
   coefficients:
     Blunt: 1.3
     Piercing: 1.2
@@ -215,7 +215,7 @@
 
 # A weird space rock which fills gaps for unusual weaknesses.
 - type: damageModifierSet
-  id: PlasmaMod
+  id: PhoronMod
   coefficients:
     Piercing: 2
     Cold: 2

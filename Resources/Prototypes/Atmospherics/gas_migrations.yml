@@ -1,0 +1,4 @@
+﻿# The first migration!!!
+- type: gasAlias
+  id: Plasma
+  gas: Phoron

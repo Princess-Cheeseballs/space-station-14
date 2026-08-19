@@ -1,7 +1,7 @@
 ## Base prototypes for DeltaPressureComponent settings, to make it easy to just
 ## parent to them and just them globally here.
 
-## For reinforced plasma windows
+## For reinforced phoron windows
 - type: entity
   abstract: true
   id: BaseDeltaPressureReinforcedPhoron
@@ -12,7 +12,7 @@
     scalingType: Linear
     scalingPower: 0.0001
 
-## For quarter reinforced plasma windows
+## For quarter reinforced phoron windows
 - type: entity
   abstract: true
   id: BaseDeltaPressureReinforcedPhoronQuarter
@@ -22,7 +22,7 @@
     minPressureDelta: 25000
     scalingType: Threshold
 
-## For plasma windows
+## For phoron windows
 - type: entity
   abstract: true
   id: BaseDeltaPressurePhoron
@@ -33,7 +33,7 @@
     scalingType: Linear
     scalingPower: 0.0005
 
-## For quarter plasma windows
+## For quarter phoron windows
 - type: entity
   abstract: true
   id: BaseDeltaPressurePhoronQuarter

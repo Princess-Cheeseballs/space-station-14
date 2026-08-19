@@ -23,7 +23,7 @@ public sealed partial class MainMenuControl : Control
     [
         "Wizard",
         "TrainStation",
-        "PlasmaStation",
+        "PhoronStation",
         "AmberStation",
         "FastSpace",
         "AspidParallax",

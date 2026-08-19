@@ -298,7 +298,7 @@
     stackRequirements:
       Manipulator: 3
       Cable: 5
-      PlasmaGlass: 10
+      PhoronGlass: 10
 
 - type: entity
   parent: BaseMachineCircuitboard

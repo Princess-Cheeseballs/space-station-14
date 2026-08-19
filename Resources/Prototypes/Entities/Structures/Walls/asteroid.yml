@@ -326,8 +326,8 @@
   id: AsteroidRockDiamond
 
 - type: entity
-  parent: [ BaseVeinPlasma, AsteroidRock ]
-  id: AsteroidRockPlasma
+  parent: [ BaseVeinPhoron, AsteroidRock ]
+  id: AsteroidRockPhoron
 
 - type: entity
   parent: [ BaseVeinQuartz, AsteroidRock ]
@@ -426,8 +426,8 @@
   id: IronRockGold
 
 - type: entity
-  parent: [ BaseVeinPlasma, IronRock ]
-  id: IronRockPlasma
+  parent: [ BaseVeinPhoron, IronRock ]
+  id: IronRockPhoron
 
 - type: entity
   parent: [ BaseVeinQuartz, IronRock ]
@@ -690,7 +690,7 @@
   id: WallRockSandDiamond
 
 - type: entity
-  parent: [ BaseVeinPhoron WallRockSand ]
+  parent: [ BaseVeinPhoron, WallRockSand ]
   id: WallRockSandPhoron
 
 - type: entity

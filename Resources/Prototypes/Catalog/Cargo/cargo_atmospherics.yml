@@ -64,7 +64,7 @@
     sprite: Structures/Storage/canister.rsi
     state: orange
   product: PhoronCanister
-  cost: 4200 # for reference, bagel's 3x1 roundstart plasma chamber contains ~16kmol for free, this is $4.2k for 2769 mol
+  cost: 4200 # for reference, bagel's 3x1 roundstart phoron chamber contains ~16kmol for free, this is $4.2k for 2769 mol
   category: cargoproduct-category-name-atmospherics
   group: market
 

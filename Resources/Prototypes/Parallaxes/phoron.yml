@@ -1,5 +1,5 @@
 - type: parallax
-  id: PlasmaStation
+  id: PhoronStation
   layers:
     - texture:
         !type:ImageParallaxTextureSource

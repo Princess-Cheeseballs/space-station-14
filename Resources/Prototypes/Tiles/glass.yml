@@ -17,13 +17,13 @@
   itemDrop: SheetRGlass1
 
 - type: tile
-  id: FloorGlassPlasma
+  id: FloorGlassPhoron
   parent: BaseStationTile
-  name: tiles-plasma-glass-floor
+  name: tiles-phoron-glass-floor
   sprite: /Textures/Tiles/Glass/glass-plasma.png
   footstepSounds:
     collection: FootstepTile
-  itemDrop: SheetPlasma1
+  itemDrop: SheetPhoron1
 
 - type: tile
   id: FloorGlassUranium
@@ -41,4 +41,4 @@
   sprite: /Textures/Tiles/Glass/glass-plastitanium.png
   footstepSounds:
     collection: FootstepTile
-  itemDrop: SheetPlasma1
+  itemDrop: SheetPhoron1

@@ -73,9 +73,9 @@
     sprite: Structures/Doors/MaterialDoors/plasma-door.rsi
   - type: Construction
     graph: DoorGraph
-    node: plasmaDoor
+    node: phoronDoor
   - type: Damageable
-    damageModifierSet: PlasmaMod
+    damageModifierSet: PhoronMod
   - type: Destructible
     thresholds:
     - trigger: &DamageDoorWeak

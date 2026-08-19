@@ -29,7 +29,7 @@ public sealed class StationPowerTests : GameTest
         "Exo",
         "Marathon",
         "Packed",
-        "Plasma",
+        "Phoron",
         "Relic",
         "Snowball",
         "Sushi",

@@ -55,7 +55,7 @@
   materials:
     Plastic: 1500
     Silver: 300
-    Plasma: 1000
+    Phoron: 1000
     Uranium: 100
 
 - type: latheRecipe

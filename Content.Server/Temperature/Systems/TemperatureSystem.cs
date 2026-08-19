@@ -6,7 +6,7 @@ using Content.Shared.Rejuvenate;
 using Content.Shared.Temperature;
 using Content.Shared.Projectiles;
 using Content.Shared.Temperature.Components;
-using Content.Shared.Temperature.HeatContainer;
+using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Temperature.Systems;
 
 namespace Content.Server.Temperature.Systems;

@@ -1,6 +1,5 @@
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.EntitySystems;
-using Content.Shared.Temperature.Systems;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Temperature.HeatContainers;

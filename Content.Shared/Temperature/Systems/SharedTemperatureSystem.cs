@@ -2,7 +2,7 @@ using System.Linq;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Temperature.Components;
-using Content.Shared.Temperature.HeatContainer;
+using Content.Shared.Temperature.HeatContainers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;

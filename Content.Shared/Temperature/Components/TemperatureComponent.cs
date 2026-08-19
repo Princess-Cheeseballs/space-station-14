@@ -1,5 +1,5 @@
 using Content.Shared.Atmos;
-using Content.Shared.Temperature.HeatContainer;
+using Content.Shared.Temperature.HeatContainers;
 using Content.Shared.Temperature.Systems;
 
 namespace Content.Shared.Temperature.Components;

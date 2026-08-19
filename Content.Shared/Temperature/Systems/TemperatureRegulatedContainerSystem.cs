@@ -6,10 +6,10 @@ namespace Content.Shared.Temperature.Systems;
 /// <summary>
 /// This handles...
 /// </summary>
-public sealed class TemperatureRegulatedContainerSystem : EntitySystem
+public sealed partial class TemperatureRegulatedContainerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedTemperatureSystem _temperature = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
+    [Dependency] private SharedTemperatureSystem _temperature = default!;
 
     public override void Update(float frameTime)
     {

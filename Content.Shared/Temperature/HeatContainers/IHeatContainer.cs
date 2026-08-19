@@ -1,4 +1,4 @@
-namespace Content.Shared.Temperature.HeatContainer;
+namespace Content.Shared.Temperature.HeatContainers;
 
 /// <summary>
 /// Interface that defines a general-purpose container for heat energy.

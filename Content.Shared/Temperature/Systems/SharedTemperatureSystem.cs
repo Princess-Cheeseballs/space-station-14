@@ -2,7 +2,7 @@ using System.Linq;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Temperature.Components;
-using Content.Shared.Temperature.HeatContainers;
+using Content.Shared.Temperature.HeatContainer;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
@@ -12,12 +12,12 @@ namespace Content.Shared.Temperature.Systems;
 /// <summary>
 /// This handles predicting temperature based speedup.
 /// </summary>
-public abstract class SharedTemperatureSystem : EntitySystem
+public abstract partial class SharedTemperatureSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private MovementSpeedModifierSystem _movementSpeedModifier = default!;
 
-    protected EntityQuery<TemperatureComponent> TemperatureQuery;
+    [Dependency] protected EntityQuery<TemperatureComponent> TemperatureQuery = default!;
 
     /// <summary>
     /// Band-aid for unpredicted atmos. Delays the application for a short period so that laggy clients can get the replicated temperature.
@@ -32,10 +32,13 @@ public abstract class SharedTemperatureSystem : EntitySystem
         SubscribeLocalEvent<TemperatureComponent, MassDataChangedEvent>(OnMassDataChanged);
         SubscribeLocalEvent<TemperatureSpeedComponent, TemperatureChangedEvent>(OnTemperatureChanged);
         SubscribeLocalEvent<TemperatureSpeedComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovementSpeedModifiers);
-
-        TemperatureQuery = GetEntityQuery<TemperatureComponent>();
     }
 
+    /// <remarks>
+    /// Calculates the HeatCapacity for this entity based on its SpecificHeat and mass.
+    /// This is a carryover from the old TemperatureSystem.
+    /// If this entity does not have a <see cref="PhysicsComponent"/>, then it assumes it's 1kg.
+    /// </remarks>
     protected virtual void OnMapInit(Entity<TemperatureComponent> entity, ref MapInitEvent args)
     {
         // We calculate the heat capacity for our entity by multiplying its mass by its specific heat.
@@ -43,12 +46,12 @@ public abstract class SharedTemperatureSystem : EntitySystem
         var mass = CompOrNull<PhysicsComponent>(entity)?.FixturesMass ?? 1f;
 
         // TODO: This assumes this is temperature for the whole body, but ideally we want it split into surface and internal temperature!
-        entity.Comp.HeatContainer.HeatCapacity = mass * entity.Comp.SpecificHeat;
+        entity.Comp.HeatCapacity = mass * entity.Comp.SpecificHeat;
     }
 
     private void OnMassDataChanged(Entity<TemperatureComponent> entity, ref MassDataChangedEvent args)
     {
-        entity.Comp.HeatContainer.HeatCapacity = args.NewMass * entity.Comp.SpecificHeat;
+        entity.Comp.HeatCapacity = args.NewMass * entity.Comp.SpecificHeat;
     }
 
     private void OnTemperatureChanged(Entity<TemperatureSpeedComponent> ent, ref TemperatureChangedEvent args)
@@ -97,7 +100,7 @@ public abstract class SharedTemperatureSystem : EntitySystem
                 continue;
 
             temp.NextSlowdownUpdate = null;
-            _movementSpeedModifier.RefreshMovementSpeedModifiers(uid, movement);
+            _movementSpeedModifier.RefreshMovementSpeedModifiers((uid, movement));
             Dirty(uid, temp);
         }
     }
@@ -111,10 +114,10 @@ public abstract class SharedTemperatureSystem : EntitySystem
     /// <param name="heatTransferMod">An optional heat transfer modifier for this exchange</param>
     /// <param name="ignoreHeatResistance">Whether we should avoid raising an event which checks for conduction modifiers on our entity.</param>
     /// <returns>Returns the amount of heat exchanged, in Joules. A positive value means the entity lost heat energy.</returns>
-    public float ConductHeat(Entity<TemperatureComponent?> entity, ref HeatContainer heatContainer, float deltaT, float heatTransferMod = 1f, bool ignoreHeatResistance = false)
+    public float ConductHeat<T>(Entity<TemperatureComponent?> entity, ref T heatContainer, float deltaT, float heatTransferMod = 1f, bool ignoreHeatResistance = false) where T : IHeatContainer
     {
         if (!TemperatureQuery.Resolve(entity, ref entity.Comp, false)
-            || MathHelper.CloseTo(entity.Comp.HeatContainer.Temperature, heatContainer.Temperature))
+            || MathHelper.CloseTo(entity.Comp.Temperature, heatContainer.Temperature))
             return 0f;
 
         var conductance = entity.Comp.ThermalConductivity * heatTransferMod;
@@ -125,10 +128,10 @@ public abstract class SharedTemperatureSystem : EntitySystem
             conductance *= ev.HeatTransferModifier;
         }
 
-        var lastTemp = entity.Comp.CurrentTemperature;
-        var heatEx = entity.Comp.HeatContainer.ConductHeat(ref heatContainer, deltaT, conductance);
+        var lastTemp = entity.Comp.Temperature;
+        var heatEx = HeatContainerHelpers.ConductHeat(ref entity.Comp, ref heatContainer, deltaT, conductance);
 
-        var changeEv = new TemperatureChangedEvent(entity.Comp.CurrentTemperature, lastTemp);
+        var changeEv = new TemperatureChangedEvent(entity.Comp.Temperature, lastTemp);
         RaiseLocalEvent(entity, ref changeEv, broadcast: true);
         return heatEx;
     }
@@ -145,7 +148,7 @@ public abstract class SharedTemperatureSystem : EntitySystem
     public float ConductHeat(Entity<TemperatureComponent?> entity, float temperature, float deltaT, float heatTransferMod = 1f, bool ignoreHeatResistance = false)
     {
         if (!TemperatureQuery.Resolve(entity, ref entity.Comp, false)
-            || MathHelper.CloseTo(entity.Comp.HeatContainer.Temperature, temperature))
+            || MathHelper.CloseTo(entity.Comp.Temperature, temperature))
             return 0f;
 
         var conductance = entity.Comp.ThermalConductivity * heatTransferMod;
@@ -156,10 +159,10 @@ public abstract class SharedTemperatureSystem : EntitySystem
             conductance *= ev.HeatTransferModifier;
         }
 
-        var lastTemp = entity.Comp.CurrentTemperature;
-        var heatEx = entity.Comp.HeatContainer.ConductHeat(temperature, deltaT, conductance);
+        var lastTemp = entity.Comp.Temperature;
+        var heatEx =  HeatContainerHelpers.ConductHeat(ref entity.Comp, temperature, deltaT, conductance);
 
-        var changeEv = new TemperatureChangedEvent(entity.Comp.CurrentTemperature, lastTemp);
+        var changeEv = new TemperatureChangedEvent(entity.Comp.Temperature, lastTemp);
         RaiseLocalEvent(entity, ref changeEv, broadcast: true);
         return heatEx;
     }
@@ -183,13 +186,13 @@ public abstract class SharedTemperatureSystem : EntitySystem
             heatAmount *= ev.HeatTransferModifier;
         }
 
-        var lastTemp = entity.Comp.CurrentTemperature;
-        var heat = entity.Comp.HeatContainer.AddHeat(heatAmount);
+        var lastTemp = entity.Comp.Temperature;
+        HeatContainerHelpers.AddHeat(ref entity.Comp, heatAmount);
 
-        var changeEv = new TemperatureChangedEvent(entity.Comp.CurrentTemperature, lastTemp);
+        var changeEv = new TemperatureChangedEvent(entity.Comp.Temperature, lastTemp);
         RaiseLocalEvent(entity, ref changeEv, broadcast: true);
 
-        return heat;
+        return heatAmount;
     }
 
     /// <summary>
@@ -200,9 +203,9 @@ public abstract class SharedTemperatureSystem : EntitySystem
         if (!TemperatureQuery.Resolve(entity, ref entity.Comp))
             return;
 
-        var lastTemp = entity.Comp.CurrentTemperature;
-        entity.Comp.HeatContainer.Temperature = temp;
-        var changeEv = new TemperatureChangedEvent(entity.Comp.CurrentTemperature, lastTemp);
+        var lastTemp = entity.Comp.Temperature;
+        entity.Comp.Temperature = temp;
+        var changeEv = new TemperatureChangedEvent(entity.Comp.Temperature, lastTemp);
         RaiseLocalEvent(entity, ref changeEv, broadcast: true);
     }
 }

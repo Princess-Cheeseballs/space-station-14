@@ -26,9 +26,9 @@ namespace Content.Server.Construction
 {
     public sealed partial class ConstructionSystem
     {
-        [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+        [Dependency] private IAdminLogManager _adminLogger = default!;
 #if EXCEPTION_TOLERANCE
-        [Dependency] private readonly IRuntimeLog _runtimeLog = default!;
+        [Dependency] private IRuntimeLog _runtimeLog = default!;
 #endif
 
         private readonly Queue<EntityUid> _constructionUpdateQueue = new();
@@ -400,7 +400,7 @@ namespace Content.Server.Construction
                     }
                     else if (TryComp<TemperatureComponent>(uid, out var tempComp))
                     {
-                        temp = tempComp.CurrentTemperature;
+                        temp = tempComp.Temperature;
                     }
                     else
                     {

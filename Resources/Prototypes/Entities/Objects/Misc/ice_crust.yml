@@ -36,6 +36,7 @@
           - MidImpassable
     - type: Damageable
       damageModifierSet: Wood
+    - type: Injurable
     - type: Destructible
       thresholds:
       - trigger:
@@ -45,9 +46,8 @@
         - !type:DoActsBehavior
           acts: [ "Destruction" ]
     - type: Temperature
-      heatContainer:
-        temperature: 250
-        heatCapacity: 13440.002
+      temperature: 250
+      heatCapacity: 13440.002
     - type: TemperatureDamage
       heatDamage:
         types:

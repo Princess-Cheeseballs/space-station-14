@@ -7,10 +7,10 @@ using Robust.Shared.Player;
 
 namespace Content.Shared.Morgue;
 
-public abstract class SharedMorgueSystem : EntitySystem
+public abstract partial class SharedMorgueSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedPowerStateSystem _powerStateSystem = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedPowerStateSystem _powerStateSystem = default!;
 
     public override void Initialize()
     {

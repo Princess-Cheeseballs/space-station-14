@@ -40,16 +40,12 @@
     coldDamageThreshold: 285
   # Good eatin', you monster.
   - type: Butcherable
-    butcheringType: Spike
     spawned:
     - id: FoodMeat
       amount: 4
   # They wawa!
   - type: Vocal
-    sounds:
-      Male: Scurret
-      Female: Scurret
-      Unsexed: Scurret
+    emoteSounds: Scurret
     wilhelmProbability: 0.01 # the scug, it screams like a man
   - type: Speech
     speechVerb: Wawa
@@ -137,8 +133,10 @@
 
   - type: InventorySlots
   - type: Edible # Why? I'm not sure but I also am afraid of the answer.
-  - type: Hunger
-    baseDecayRate: 0.05 # They get a lil' hungy
+  - type: Satiation
+    satiations:
+      Hunger:
+        prototype: ScurretHunger
   - type: BodyEmotes # Grants them clapping and so on.
     soundsId: Scurret
   - type: Deathgasp
@@ -183,10 +181,9 @@
 # feel free to hook them into random content.
 
 - type: entity
-  name: Emotional Support Scurret
-  id: MobBaseEmotionalSupportScurret
-  parent: MobBaseScurret
   abstract: true
+  id: MobBaseEmotionalSupportScurret
+  name: Emotional Support Scurret
   components:
     - type: Loadout
       prototypes: [ EmotionalSupportScurretGear ]

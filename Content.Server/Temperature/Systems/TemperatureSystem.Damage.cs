@@ -19,14 +19,14 @@ namespace Content.Server.Temperature.Systems;
 /// </summary>
 public sealed partial class TemperatureSystem
 {
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
+    [Dependency] private AlertsSystem _alerts = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private IAdminLogManager _adminLogger = default!;
+    [Dependency] private IGameTiming _gameTiming = default!;
 
-    private EntityQuery<TemperatureDamageComponent> _tempDamageQuery;
-    private EntityQuery<ContainerTemperatureComponent> _containerTemperatureQuery;
-    private EntityQuery<ThermalRegulatorComponent> _thermalRegulatorQuery;
+    [Dependency] private EntityQuery<TemperatureDamageComponent> _tempDamageQuery = default!;
+    [Dependency] private EntityQuery<ContainerTemperatureComponent> _containerTemperatureQuery = default!;
+    [Dependency] private EntityQuery<ThermalRegulatorComponent> _thermalRegulatorQuery = default!;
 
     /// <summary>
     ///     All the components that will have their damage updated at the end of the tick.
@@ -61,10 +61,6 @@ public sealed partial class TemperatureSystem
         SubscribeLocalEvent<TemperatureDamageComponent, EntParentChangedMessage>(OnParentChange);
         SubscribeLocalEvent<ContainerTemperatureComponent, ComponentStartup>(OnParentThresholdStartup);
         SubscribeLocalEvent<ContainerTemperatureComponent, ComponentShutdown>(OnParentThresholdShutdown);
-
-        _tempDamageQuery = GetEntityQuery<TemperatureDamageComponent>();
-        _containerTemperatureQuery = GetEntityQuery<ContainerTemperatureComponent>();
-        _thermalRegulatorQuery = GetEntityQuery<ThermalRegulatorComponent>();
     }
 
     private void UpdateDamage()
@@ -102,7 +98,7 @@ public sealed partial class TemperatureSystem
         var heatDamageThreshold = entity.Comp.ParentHeatDamageThreshold ?? entity.Comp.HeatDamageThreshold;
         var coldDamageThreshold = entity.Comp.ParentColdDamageThreshold ?? entity.Comp.ColdDamageThreshold;
 
-        if (temperature.CurrentTemperature >= heatDamageThreshold)
+        if (temperature.Temperature >= heatDamageThreshold)
         {
             if (!entity.Comp.TakingDamage)
             {
@@ -110,11 +106,11 @@ public sealed partial class TemperatureSystem
                 entity.Comp.TakingDamage = true;
             }
 
-            var diff = Math.Abs(temperature.CurrentTemperature - heatDamageThreshold);
+            var diff = Math.Abs(temperature.Temperature - heatDamageThreshold);
             var tempDamage = c / (1 + a * Math.Pow(Math.E, -heatK * diff)) - y;
             _damageable.TryChangeDamage(entity.Owner, entity.Comp.HeatDamage * tempDamage * deltaTime.TotalSeconds, ignoreResistances: true, interruptsDoAfters: false);
         }
-        else if (temperature.CurrentTemperature <= coldDamageThreshold)
+        else if (temperature.Temperature <= coldDamageThreshold)
         {
             if (!entity.Comp.TakingDamage)
             {
@@ -122,7 +118,7 @@ public sealed partial class TemperatureSystem
                 entity.Comp.TakingDamage = true;
             }
 
-            var diff = Math.Abs(temperature.CurrentTemperature - coldDamageThreshold);
+            var diff = Math.Abs(temperature.Temperature - coldDamageThreshold);
             var tempDamage =
                 Math.Sqrt(diff * (Math.Pow(entity.Comp.DamageCap.Double(), 2) / coldDamageThreshold));
             _damageable.TryChangeDamage(entity.Owner, entity.Comp.ColdDamage * tempDamage * deltaTime.TotalSeconds, ignoreResistances: true, interruptsDoAfters: false);

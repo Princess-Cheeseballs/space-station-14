@@ -47,11 +47,13 @@ namespace Content.Shared.Movement.Systems
         private void OnDowned(Entity<MovementSpeedModifierComponent> entity, ref DownedEvent args)
         {
             RefreshFrictionModifiers((entity, entity.Comp));
+            RefreshMovementModifiers((entity, entity.Comp));
         }
 
         private void OnStand(Entity<MovementSpeedModifierComponent> entity, ref StoodEvent args)
         {
             RefreshFrictionModifiers((entity, entity.Comp));
+            RefreshMovementModifiers((entity, entity.Comp));
         }
 
         /// <summary>
@@ -70,16 +72,13 @@ namespace Content.Shared.Movement.Systems
         }
 
         /// <summary>
-        /// This API method refreshes the movement modifiers for either being weightless, or being grounded depending
-        /// on which modifiers the entity is currently using.
+        /// This API method refreshes the movement modifiers for both being weightless and grounded.
         /// </summary>
-        /// <param name="ent">The entity we're refreshing modifiers for</param>
+        /// <param name="ent">The entity we're refreshing modifiers for.</param>
         public void RefreshMovementModifiers(Entity<MovementSpeedModifierComponent?> ent)
         {
-            if (_gravity.IsWeightless(ent.Owner))
-                RefreshWeightlessModifiers(ent);
-            else
-                RefreshMovementSpeedModifiers(ent);
+            RefreshWeightlessModifiers(ent);
+            RefreshMovementSpeedModifiers(ent);
         }
 
         /// <summary>

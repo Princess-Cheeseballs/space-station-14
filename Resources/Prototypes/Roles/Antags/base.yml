@@ -15,7 +15,7 @@
     components:
     - AntagImmune
 
-# Command
+# High Command
 - type: antagSpecifier
   abstract: true
   parent: BaseAntagSpecifier
@@ -24,6 +24,13 @@
   - Captain
   - HeadOfPersonnel
   - HeadOfSecurity
+
+# Command
+- type: antagSpecifier
+  abstract: true
+  parent: BaseAntagSpecifier
+  id: HeadBlacklistedAntag
+  jobBlacklist:
   - ChiefMedicalOfficer
   - ResearchDirector
   - ChiefEngineer

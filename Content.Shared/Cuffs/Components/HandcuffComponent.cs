@@ -5,7 +5,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Cuffs.Components;
 
 [RegisterComponent, NetworkedComponent]
-[Access(typeof(SharedCuffableSystem))]
+[Access(typeof(CuffableSystem))]
 public sealed partial class HandcuffComponent : Component
 {
     /// <summary>

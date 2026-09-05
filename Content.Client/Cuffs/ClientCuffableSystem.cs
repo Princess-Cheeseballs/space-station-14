@@ -1,4 +1,3 @@
-using Content.Shared.ActionBlocker;
 using Content.Shared.Cuffs;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Humanoid;
@@ -7,7 +6,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Client.Cuffs;
 
-public sealed partial class CuffableSystem : SharedCuffableSystem
+public sealed partial class ClientCuffableSystem : CuffableSystem
 {
     [Dependency] private SpriteSystem _sprite = default!;
 
@@ -48,4 +47,3 @@ public sealed partial class CuffableSystem : SharedCuffableSystem
         _sprite.LayerSetRsi((entity, sprite), _sprite.LayerMapGet((entity, sprite), HumanoidVisualLayers.Handcuffs), new ResPath(entity.Comp.CurrentRSI), state);
     }
 }
-

@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.Cuffs.Components;
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
-[Access(typeof(SharedCuffableSystem))]
+[Access(typeof(CuffableSystem))]
 public sealed partial class CuffableComponent : Component
 {
     public const string DefaultState = "humanoid";

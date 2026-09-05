@@ -60,7 +60,7 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components.ActionBlocking
             {
                 var coordinates = map.MapCoords;
 
-                var cuffableSys = entityManager.System<CuffableSystem>();
+                var cuffableSys = entityManager.System<ServerCuffableSystem>();
                 var xformSys = entityManager.System<SharedTransformSystem>();
 
                 // Spawn the entities

@@ -16,7 +16,7 @@ public sealed partial class HijackShuttleConditionSystem : EntitySystem
 {
     [Dependency] private EmergencyShuttleSystem _emergencyShuttle = default!;
     [Dependency] private MobStateSystem _mobState = default!;
-    [Dependency] private SharedCuffableSystem _cuffable = default!;
+    [Dependency] private CuffableSystem _cuffable = default!;
     [Dependency] private SharedMindSystem _mind = default!;
     [Dependency] private SharedRoleSystem _role = default!;
 

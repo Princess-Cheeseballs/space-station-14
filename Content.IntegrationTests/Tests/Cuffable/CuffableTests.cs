@@ -24,7 +24,7 @@ public sealed class CuffableTests : InteractionTest
     public async Task TestSelfCuffingAndUncuffing()
     {
         var blockerSystem = Server.System<ActionBlockerSystem>();
-        var cuffableSystem = Server.System<SharedCuffableSystem>();
+        var cuffableSystem = Server.System<CuffableSystem>();
 
         // Find our(cuffable)selves
         var cuffable = Comp<CuffableComponent>(Player);
@@ -73,7 +73,7 @@ public sealed class CuffableTests : InteractionTest
     public async Task TestTargetCuffingAndUncuffing()
     {
         var blockerSystem = Server.System<ActionBlockerSystem>();
-        var cuffableSystem = Server.System<SharedCuffableSystem>();
+        var cuffableSystem = Server.System<CuffableSystem>();
         await SpawnTarget(Traitor);
 
         // Get cuffable target
@@ -126,7 +126,7 @@ public sealed class CuffableTests : InteractionTest
     public async Task TestCuffingHandLoss()
     {
         var blockerSystem = Server.System<ActionBlockerSystem>();
-        var cuffableSystem = Server.System<SharedCuffableSystem>();
+        var cuffableSystem = Server.System<CuffableSystem>();
         await SpawnTarget(Traitor);
 
         // Get cuffable entity
@@ -175,7 +175,7 @@ public sealed class CuffableTests : InteractionTest
         await AssertUncuffed(cuffableSystem, blockerSystem, ent);
     }
 
-    public async Task AssertCuffed(SharedCuffableSystem sys, ActionBlockerSystem blockerSystem, Entity<CuffableComponent> target, EntityUid cuffs)
+    public async Task AssertCuffed(CuffableSystem sys, ActionBlockerSystem blockerSystem, Entity<CuffableComponent> target, EntityUid cuffs)
     {
         await Assert.MultipleAsync(() =>
         {
@@ -199,7 +199,7 @@ public sealed class CuffableTests : InteractionTest
 
     }
 
-    public async Task AssertUncuffed(SharedCuffableSystem sys, ActionBlockerSystem blockerSystem, Entity<CuffableComponent> target)
+    public async Task AssertUncuffed(CuffableSystem sys, ActionBlockerSystem blockerSystem, Entity<CuffableComponent> target)
     {
         await Assert.MultipleAsync(() =>
         {

@@ -28,7 +28,7 @@ public sealed partial class ObjectivesSystem : SharedObjectivesSystem
     [Dependency] private IPlayerManager _player = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private EmergencyShuttleSystem _emergencyShuttle = default!;
-    [Dependency] private SharedCuffableSystem _cuffable = default!;
+    [Dependency] private CuffableSystem _cuffable = default!;
     [Dependency] private SharedJobSystem _job = default!;
 
     private IEnumerable<string>? _objectives;

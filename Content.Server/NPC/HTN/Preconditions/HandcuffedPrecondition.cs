@@ -1,4 +1,4 @@
-using Content.Server.Cuffs;
+using Content.Shared.Cuffs;
 
 namespace Content.Server.NPC.HTN.Preconditions;
 

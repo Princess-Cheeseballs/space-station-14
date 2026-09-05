@@ -219,9 +219,6 @@
   id: MobDragonDebug
   suffix: AI/Debug
   components:
-  - type: ActionGun
-    action: ActionDragonsBreath
-    gunProto: DragonsBreathGun
   - type: NPCUseActionOnTarget
     actions:
     - actionId: ActionGoliathTentacle

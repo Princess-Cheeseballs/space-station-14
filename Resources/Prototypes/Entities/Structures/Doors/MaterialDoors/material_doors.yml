@@ -54,6 +54,8 @@
     key: doors
   - type: PlacementReplacement
     key: walls
+  - type: StructureAligner
+  - type: StructureAlignerPylon
 
 - type: entity
   abstract: true

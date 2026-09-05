@@ -58,6 +58,7 @@
         - TableMask
         layer:
         - TableLayer
+        - LowImpassable
   - type: IconSmooth
     key: counter
     states:

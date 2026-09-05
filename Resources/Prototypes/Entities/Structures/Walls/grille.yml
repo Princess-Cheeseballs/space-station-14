@@ -80,7 +80,7 @@
           False: { visible: False }
   - type: AnimationPlayer
   - type: Damageable
-    damageModifierSet: SteelMod
+    damageModifierSet: RodMetalMod
   - type: Destructible
     thresholds:
     - trigger:
@@ -173,7 +173,7 @@
     tags:
     - ForceNoFixRotations
   - type: Damageable
-    damageModifierSet: SteelMod
+    damageModifierSet: RodMetalMod
   - type: Destructible
     thresholds:
     - trigger:

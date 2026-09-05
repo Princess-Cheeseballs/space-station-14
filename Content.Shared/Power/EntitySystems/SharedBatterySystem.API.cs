@@ -178,6 +178,11 @@ public abstract partial class SharedBatterySystem
         RaiseLocalEvent(ent, ref changedEv);
     }
 
+    /// <summary>
+    /// Gets the total battery charge from an entity that is available, including the min and max.
+    /// </summary>
+    /// <param name="ent">Entity we want the total charge from.</param>
+    /// <returns>a tuple of the current charge, and maxmimum charge</returns>
     [PublicAPI]
     public (float Charge, float MaxCharge) GetCharge(EntityUid ent)
     {

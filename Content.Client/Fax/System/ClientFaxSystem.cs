@@ -13,13 +13,15 @@ public sealed partial class ClientFaxSystem : FaxSystem
     [Dependency] private AnimationPlayerSystem _player = default!;
     [Dependency] private SharedAppearanceSystem _appearance = default!;
 
+    private static readonly string FaxKey = "faxecute";
+
     [SubscribeLocalEvent]
     private void OnAppearanceChanged(Entity<FaxMachineComponent> entity, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
 
-        if (_player.HasRunningAnimation(entity, "faxecute"))
+        if (_player.HasRunningAnimation(entity, FaxKey))
             return;
 
         if (_appearance.TryGetData(entity, FaxMachineVisuals.VisualState, out FaxMachineVisualState visuals) &&
@@ -41,7 +43,7 @@ public sealed partial class ClientFaxSystem : FaxSystem
                         },
                     },
                 },
-                "faxecute");
+                FaxKey);
         }
     }
 

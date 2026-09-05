@@ -4,10 +4,11 @@ using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared.Fax.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
 public sealed partial class FaxMachineComponent : Component
 {
     /// <summary>
@@ -51,13 +52,13 @@ public sealed partial class FaxMachineComponent : Component
     /// Should admins be notified on message receive
     /// </summary>
     [DataField]
-    public bool NotifyAdmins { get; set; } = false;
+    public bool NotifyAdmins { get; set; }
 
     /// <summary>
     /// Should that fax receive nuke codes send by admins. Probably should be captain fax only
     /// </summary>
     [DataField]
-    public bool ReceiveNukeCodes { get; set; } = false;
+    public bool ReceiveNukeCodes { get; set; }
 
     /// <summary>
     /// Sound to play when fax printing new message
@@ -87,40 +88,39 @@ public sealed partial class FaxMachineComponent : Component
     /// <summary>
     /// Message sending timeout
     /// </summary>
-    [ViewVariables]
-    [DataField]
-    public float SendTimeoutRemaining;
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
+    public TimeSpan SendTimeoutRemaining;
 
     /// <summary>
     /// Message sending timeout
     /// </summary>
     [ViewVariables]
     [DataField]
-    public float SendTimeout = 5f;
+    public TimeSpan SendTimeout = TimeSpan.FromSeconds(5f);
 
     /// <summary>
     /// Remaining time of inserting animation
     /// </summary>
-    [DataField]
-    public float InsertingTimeRemaining;
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
+    public TimeSpan InsertionEnd;
 
     /// <summary>
     /// How long the inserting animation will play
     /// </summary>
     [ViewVariables]
-    public float InsertionTime = 1.88f; // 0.02 off for correct animation
+    public TimeSpan InsertionTime = TimeSpan.FromSeconds(1.88f); // 0.02 off for correct animation
 
     /// <summary>
     /// Remaining time of printing animation
     /// </summary>
-    [DataField]
-    public float PrintingTimeRemaining;
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
+    public TimeSpan PrintTimeEnd;
 
     /// <summary>
     /// How long the printing animation will play
     /// </summary>
     [ViewVariables]
-    public float PrintingTime = 2.3f;
+    public TimeSpan PrintingTime = TimeSpan.FromSeconds(2.3f);
 
     /// <summary>
     ///     The prototype ID to use for faxed or copied entities if we can't get one from
@@ -163,7 +163,7 @@ public sealed partial class FaxPrintout
     public string Content { get; private set; } = default!;
 
     [DataField(required: true)]
-    public EntProtoId PrototypeId { get; private set; } = default!;
+    public EntProtoId PrototypeId { get; private set; }
 
     [DataField]
     public string? StampState { get; private set; }
@@ -175,7 +175,7 @@ public sealed partial class FaxPrintout
     public bool Locked { get; private set; }
 
     [DataField]
-    public string? SenderFaxName { get; private set; } = default!;
+    public string? SenderFaxName { get; private set; }
 
     private FaxPrintout()
     {

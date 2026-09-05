@@ -25,11 +25,13 @@ public sealed partial class ServerFaxSystem : FaxSystem
 
     private static readonly SoundSpecifier AdminAlert = new SoundPathSpecifier("/Audio/Machines/high_tech_confirm.ogg");
 
+    // I'm not gonna refactor this till it can be moved to shared and it can't be moved to shared until Quick dialogue is kill.
     [SubscribeLocalEvent]
-    private void OnInteractUsing(EntityUid uid, FaxMachineComponent component, InteractUsingEvent args)
+    private void OnInteractUsing(Entity<FaxMachineComponent> entity, ref InteractUsingEvent args)
     {
+        var user = args.User;
         if (args.Handled ||
-            !TryComp<ActorComponent>(args.User, out var actor) ||
+            !TryComp<ActorComponent>(user, out var actor) ||
             !_toolSystem.HasQuality(args.Used, ScrewingQuality)) // Screwing because Pulsing already used by device linking
             return;
 
@@ -38,27 +40,27 @@ public sealed partial class ServerFaxSystem : FaxSystem
             Loc.GetString("fax-machine-dialog-field-name"),
             (string newName) =>
             {
-                if (component.FaxName == newName)
+                if (entity.Comp.FaxName == newName)
                     return;
 
                 if (newName.Length > 20)
                 {
-                    PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-long"), uid);
+                    PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-long"), entity);
                     return;
                 }
 
-                if (component.KnownFaxes.ContainsValue(newName) && !Emag.CheckFlag(uid, EmagType.Interaction)) // Allow existing names if emagged for fun
+                if (entity.Comp.KnownFaxes.ContainsValue(newName) && !Emag.CheckFlag(entity, EmagType.Interaction)) // Allow existing names if emagged for fun
                 {
-                    PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-exist"), uid);
+                    PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-exist"), entity);
                     return;
                 }
 
                 AdminLogger.Add(LogType.Action,
                     LogImpact.Low,
-                    $"{ToPrettyString(args.User):user} renamed {ToPrettyString(uid):tool} from \"{component.FaxName}\" to \"{newName}\"");
-                component.FaxName = newName;
-                PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-set"), uid);
-                UpdateUserInterface(uid, component);
+                    $"{ToPrettyString(user):user} renamed {ToPrettyString(entity):tool} from \"{entity.Comp.FaxName}\" to \"{newName}\"");
+                entity.Comp.FaxName = newName;
+                PopupSystem.PopupEntity(Loc.GetString("fax-machine-popup-name-set"), entity);
+                UpdateUserInterface(entity);
             });
 
         args.Handled = true;
@@ -66,6 +68,7 @@ public sealed partial class ServerFaxSystem : FaxSystem
 
     protected override void NotifyAdmins(string faxName)
     {
+        // Because why would a Shared system EVER NEED TO SEND AN ADMIN ANNOUNCEMENT???????????????????????????
         _chat.SendAdminAnnouncement(Loc.GetString("fax-machine-chat-notify", ("fax", faxName)));
         AudioSystem.PlayGlobal(AdminAlert, Filter.Empty().AddPlayers(_adminManager.ActiveAdmins), false, AudioParams.Default.AddVolume(-8f));
     }

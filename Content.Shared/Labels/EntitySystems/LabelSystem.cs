@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Examine;
 using Content.Shared.Labels.Components;
 using Content.Shared.NameModifier.EntitySystems;
 using Content.Shared.Paper;
+using JetBrains.Annotations;
 using Robust.Shared.Containers;
 using Robust.Shared.Utility;
 
@@ -16,6 +16,7 @@ public sealed partial class LabelSystem : EntitySystem
     [Dependency] private ItemSlotsSystem _itemSlots = default!;
     [Dependency] private SharedAppearanceSystem _appearance = default!;
 
+    private const string LabelFormat = "comp-label-format";
     public const string ContainerName = "paper_label";
 
     public override void Initialize()
@@ -92,7 +93,7 @@ public sealed partial class LabelSystem : EntitySystem
     /// Returns the text of the label from an entity, or <see langword="null"/> if it doesn't have a label.
     /// </summary>
     /// <param name="ent">The entity from which to get the label text.</param>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public string? GetLabelText(Entity<LabelComponent?> ent)
     {
         if (!Resolve(ent, ref ent.Comp, logMissing: false))
@@ -105,7 +106,7 @@ public sealed partial class LabelSystem : EntitySystem
     /// Returns true if an entity has a visible label.
     /// </summary>
     /// <param name="ent">The entity to check for a label.</param>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public bool HasLabel(EntityUid ent)
     {
         return HasComp<LabelComponent>(ent);
@@ -128,7 +129,7 @@ public sealed partial class LabelSystem : EntitySystem
     {
         // We need to check lifestage so labels queued for deferred removal don't get applied.
         if (!string.IsNullOrEmpty(entity.Comp.CurrentLabel) && entity.Comp.LifeStage < ComponentLifeStage.Stopping)
-            args.AddModifier("comp-label-format", extraArgs: ("label", entity.Comp.CurrentLabel));
+            args.AddModifier(LabelFormat, extraArgs: ("label", entity.Comp.CurrentLabel));
     }
 
     private void OnComponentInit(Entity<PaperLabelComponent> ent, ref ComponentInit args)
@@ -193,6 +194,28 @@ public sealed partial class LabelSystem : EntitySystem
         _appearance.SetData(ent, PaperLabelVisuals.HasLabel, slot.HasItem, ent.Comp2);
         if (TryComp<PaperLabelTypeComponent>(slot.Item, out var type))
             _appearance.SetData(ent, PaperLabelVisuals.LabelType, type.PaperType, ent.Comp2);
+    }
+
+    /// <inheritdoc cref="Label(string,string)"/>
+    [PublicAPI]
+    public string Label(Entity<LabelComponent> entity)
+    {
+        return Label(entity, entity.Comp.CurrentLabel);
+    }
+
+    /// <inheritdoc cref="Label(string,string)"/>
+    [PublicAPI]
+    public string Label(EntityUid uid, string? label)
+    {
+        return Label(MetaData(uid).EntityName, label);
+    }
+    /// <summary>
+    /// Returns a name with an applied label as if applied by <see cref="LabelSystem"/>
+    /// </summary>
+    [PublicAPI]
+    public string Label(string name, string? label)
+    {
+        return label == null ? name : Loc.GetString(LabelFormat, ("baseName", name), ("label", label));
     }
 
     /// <summary>

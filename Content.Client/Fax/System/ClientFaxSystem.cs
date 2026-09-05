@@ -8,30 +8,24 @@ namespace Content.Client.Fax.System;
 /// <summary>
 /// Visualizer for the fax machine which displays the correct sprite based on the inserted entity.
 /// </summary>
-public sealed partial class FaxVisualsSystem : EntitySystem
+public sealed partial class ClientFaxSystem : FaxSystem
 {
     [Dependency] private AnimationPlayerSystem _player = default!;
     [Dependency] private SharedAppearanceSystem _appearance = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<FaxMachineComponent, AppearanceChangeEvent>(OnAppearanceChanged);
-    }
-
-    private void OnAppearanceChanged(EntityUid uid, FaxMachineComponent component, ref AppearanceChangeEvent args)
+    [SubscribeLocalEvent]
+    private void OnAppearanceChanged(Entity<FaxMachineComponent> entity, ref AppearanceChangeEvent args)
     {
         if (args.Sprite == null)
             return;
 
-        if (_player.HasRunningAnimation(uid, "faxecute"))
+        if (_player.HasRunningAnimation(entity, "faxecute"))
             return;
 
-        if (_appearance.TryGetData(uid, FaxMachineVisuals.VisualState, out FaxMachineVisualState visuals) &&
+        if (_appearance.TryGetData(entity, FaxMachineVisuals.VisualState, out FaxMachineVisualState visuals) &&
             visuals == FaxMachineVisualState.Inserting)
         {
-            _player.Play(uid,
+            _player.Play(entity,
                 new Animation()
                 {
                     Length = TimeSpan.FromSeconds(2.4),
@@ -42,12 +36,17 @@ public sealed partial class FaxVisualsSystem : EntitySystem
                             LayerKey = FaxMachineVisuals.VisualState,
                             KeyFrames =
                             {
-                                new AnimationTrackSpriteFlick.KeyFrame(component.InsertingState, 0f)
+                                new AnimationTrackSpriteFlick.KeyFrame(entity.Comp.InsertingState, 0f)
                             },
                         },
                     },
                 },
                 "faxecute");
         }
+    }
+
+    protected override void NotifyAdmins(string faxName)
+    {
+
     }
 }

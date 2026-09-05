@@ -12,13 +12,13 @@ namespace Content.Server.Fax.AdminUI;
 public sealed partial class AdminFaxEui : BaseEui
 {
     [Dependency] private IEntityManager _entityManager = default!;
-    private readonly FaxSystem _faxSystem;
+    private readonly ServerFaxSystem _faxSystem;
     private readonly FollowerSystem _followerSystem;
 
     public AdminFaxEui()
     {
         IoCManager.InjectDependencies(this);
-        _faxSystem = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<FaxSystem>();
+        _faxSystem = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<ServerFaxSystem>();
         _followerSystem = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<FollowerSystem>();
     }
 

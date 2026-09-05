@@ -278,6 +278,7 @@ public abstract partial class SharedActionsSystem : EntitySystem
     /// <param name="args">Arguments for this action</param>
     /// <param name="predicted">Whether this action is predicted or not</param>
     /// <param name="skipDoActionRequest">Should this skip the initial doaction request?</param>
+    /// <param name="showPopups">Whether or not this action attempt should a PopUp if it fails.</param>
     private bool TryPerformAction(EntityUid user, ActionArgs args, bool skipDoActionRequest = false, bool predicted = true, bool showPopups = true)
     {
         if (!_actionsQuery.TryComp(user, out var component))

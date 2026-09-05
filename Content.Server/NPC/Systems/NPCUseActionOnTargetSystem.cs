@@ -10,27 +10,17 @@ public sealed partial class NpcUseActionOnTargetSystem : EntitySystem
 {
     [Dependency] private SharedActionsSystem _actions = default!;
 
-    /// <inheritdoc/>
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<NPCUseActionOnTargetComponent, MapInitEvent>(OnMapInit);
-        SubscribeLocalEvent<NPCUseActionOnTargetComponent, AddedActionEvent>(OnAddedAction);
-        SubscribeLocalEvent<NPCUseActionOnTargetComponent, RemovedActionEvent>(OnRemovedAction);
-        SubscribeLocalEvent<WorldTargetActionComponent, ValidateNpcTargetEvent>(OnNpcWorldTarget);
-        SubscribeLocalEvent<EntityTargetActionComponent, ValidateNpcTargetEvent>(OnNpcEntityTarget);
-    }
-
+    [SubscribeLocalEvent]
     private void OnMapInit(Entity<NPCUseActionOnTargetComponent> ent, ref MapInitEvent args)
     {
         foreach (var action in ent.Comp.Actions)
         {
             if (!action.Ref)
-                action.ActionEnt = _actions.AddAction(ent, action.ActionId) ?? null;
+                action.ActionEnt = _actions.AddAction(ent, action.ActionId);
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnAddedAction(Entity<NPCUseActionOnTargetComponent> entity, ref AddedActionEvent args)
     {
         var protoId = MetaData(args.Action.Owner).EntityPrototype;
@@ -46,6 +36,7 @@ public sealed partial class NpcUseActionOnTargetSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnRemovedAction(Entity<NPCUseActionOnTargetComponent> entity, ref RemovedActionEvent args)
     {
         foreach (var action in entity.Comp.Actions)
@@ -63,18 +54,12 @@ public sealed partial class NpcUseActionOnTargetSystem : EntitySystem
         if (!Resolve(user, ref user.Comp, false))
             return false;
 
-        if (action.ActionEnt is not {} actionEnt)
-        {
-            Log.Error($"An NPC attempted to perform an action without an action!");
-            return false;
-        }
+        if (action.ActionEnt is { } actionEnt)
+            return _actions.TryPerformAction(user.Owner, actionEnt, target, Transform(target).Coordinates, false);
 
-        var ev = new ValidateNpcTargetEvent(target);
-        RaiseLocalEvent(actionEnt, ref ev);
-        if (ev.Invalid)
-            return false;
+        Log.Error($"An NPC attempted to perform an action without an action!");
+        return false;
 
-        return _actions.TryPerformAction(user.Owner, actionEnt, ev.EntTarget, ev.EntityCoordinates, false);
     }
 
     public override void Update(float frameTime)
@@ -97,24 +82,4 @@ public sealed partial class NpcUseActionOnTargetSystem : EntitySystem
             }
         }
     }
-
-    private void OnNpcWorldTarget(Entity<WorldTargetActionComponent> entity, ref ValidateNpcTargetEvent ev)
-    {
-        ev.EntityCoordinates = Transform(ev.Target).Coordinates;
-    }
-
-    private void OnNpcEntityTarget(Entity<EntityTargetActionComponent> entity, ref ValidateNpcTargetEvent ev)
-    {
-        ev.EntTarget = ev.Target;
-    }
-}
-
-[ByRefEvent]
-public struct ValidateNpcTargetEvent(EntityUid target)
-{
-    public readonly EntityUid Target = target;
-
-    public bool Invalid;
-    public EntityUid? EntTarget;
-    public EntityCoordinates? EntityCoordinates;
 }

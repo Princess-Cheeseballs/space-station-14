@@ -182,7 +182,7 @@ public abstract partial class SharedBatterySystem
     /// Gets the total battery charge from an entity that is available, including the min and max.
     /// </summary>
     /// <param name="ent">Entity we want the total charge from.</param>
-    /// <returns>a tuple of the current charge, and maxmimum charge</returns>
+    /// <returns>a tuple of the current charge, and maximum charge</returns>
     [PublicAPI]
     public (float Charge, float MaxCharge) GetCharge(EntityUid ent)
     {
@@ -195,6 +195,7 @@ public abstract partial class SharedBatterySystem
     /// Gets the battery's current charge.
     /// </summary>
     [PublicAPI]
+    [Obsolete($"Use Tuple version that raises {nameof(GetChargeEvent)} instead.")]
     public float GetCharge(Entity<BatteryComponent?> ent)
     {
         if (!Resolve(ent, ref ent.Comp, false))

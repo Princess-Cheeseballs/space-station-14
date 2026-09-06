@@ -172,7 +172,7 @@
         flatReductions:
           Blunt: 6
           Slash: 6
-          Piercing: 3
+          Piercing: 6
           Heat: 3
     - type: Construction
       graph: WoodenBuckler
